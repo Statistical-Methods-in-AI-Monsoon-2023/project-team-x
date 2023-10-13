@@ -2,6 +2,8 @@
 
 ### By Shreyas Reddy Palley & Akshat Sanghvi
 
+<br>
+
 To Run the manim file independently, first navigate to directory using:
 
 ```
