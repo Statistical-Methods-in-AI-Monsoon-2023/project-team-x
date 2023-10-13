@@ -1,0 +1,95 @@
+      import 'dart:convert';
+      import 'dart:mirrors';
+      
+      import 'package:manim_web/manim.dart';
+import 'dart:developer';
+
+const resolution = 3;
+
+class TestScene extends Scene {
+  double time = 0;
+
+  @override
+  Future construct() async {
+    Dot blueDot = Dot(ORIGIN);
+    Dot redDot = Dot(Vector3(-1, -1, 0), color: RED);
+
+    // Arrow arrow = Arrow(start: ORIGIN, end: LEFT);
+    Arrow arrow = Arrow(start: ORIGIN, end: RIGHT);
+    arrow.nextToMobject(blueDot, direction: LEFT);
+
+    arrow.addUpdater((mob, dt) => mob..nextToMobject(blueDot, direction: LEFT));
+
+    Mobject shifter(Mobject mob, double dt) {
+      time += dt;
+      return mob..shift(RIGHT * sin(time) / 100);
+    }
+
+    blueDot.addUpdater(shifter);
+    // blueDot.addUpdater((mob, dt) => mob..shift(Vector3(dt, 0, 0)));
+
+    void changeDot() {
+      Dot dot2 = Dot(Vector3(2, 2, 0), radius: 0.2, color: GREEN);
+      blueDot.become(dot2);
+    }
+
+    Future updateOther() async {
+      Dot dot3 = Dot(Vector3(-1, -2, 0), color: ORANGE);
+      await play(Transform(redDot, target: dot3));
+    }
+
+    Button makeButton() {
+      Dot circle = Dot(Vector3(1, 1, 0), radius: 0.1, color: WHITE);
+
+      Button next = Button(mob: circle, onClick: changeDot);
+
+      return next;
+    }
+
+    // await play(ShowCreation(blueDot));
+    Button b = makeButton();
+
+    await playMany([
+      ShowCreation(b),
+      ShowCreation(redDot),
+      ShowCreation(blueDot),
+      ShowCreation(arrow)
+    ]);
+    await play(Transform(blueDot, target: blueDot.copy()..shift(DOWN)));
+    await continueRendering();
+  }
+
+  Future continueRendering() async {
+    while (true) {
+      await wait();
+    }
+  }
+}
+
+
+      List<ClassMirror> findSubClasses(Type type) {
+        var classMirror = reflectClass(type);
+
+        return currentMirrorSystem()
+            .libraries
+            .values
+            .expand((lib) => lib.declarations.values)
+            .where((lib) =>
+                lib is ClassMirror &&
+                lib.isSubclassOf(classMirror) &&
+                lib != classMirror)
+            .cast<ClassMirror>()
+            .toList();
+      }
+
+      void main(){
+        var scenes = [
+          for(var mirror in findSubClasses(Scene))
+            MirrorSystem.getName(mirror.simpleName)
+        ];
+
+        print(jsonEncode(scenes));
+
+        print('OK');
+      }
+    

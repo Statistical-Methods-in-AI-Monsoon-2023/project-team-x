@@ -1,1 +1,22 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Zksn1waN)
+# GMM Visualization Project
+
+### By Shreyas Reddy Palley & Akshat Sanghvi
+
+To Run the manim file independently, first navigate to directory using:
+
+```
+cd manimWebExploration/gmmManim
+```
+
+and start build server using:
+
+```
+manimweb build --file src/example.dart --html src/example.html
+```
+
+or alternatively, start development server using:
+
+```
+manimweb dev --file src/example.dart --html src/example.html
+```
+
