@@ -8,6 +8,7 @@ To Run the manim file independently, first navigate to directory using:
 
 ```
 cd manimWebExploration/gmmManim
+pub get
 ```
 
 and start build server using:
