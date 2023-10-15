@@ -14,12 +14,12 @@ pub get
 and start build server using:
 
 ```
-manimweb build --file src/manim.dart --html src/manim.html
+manimweb build --file src/example.dart --html src/example.html
 ```
 
 or alternatively, start development server using:
 
 ```
-manimweb dev --file src/manim.dart --html src/manim.html
+manimweb dev --file src/example.dart --html src/example.html
 ```
 

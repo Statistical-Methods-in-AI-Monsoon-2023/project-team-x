@@ -2,7 +2,7 @@ import 'package:manim_web/manim.dart';
 
 const resolution = 3;
 
-class GaussianScene extends Scene {
+class GaussianScene1 extends Scene {
   late Axes axes;
   late Axes axes2;
   late Button next;
