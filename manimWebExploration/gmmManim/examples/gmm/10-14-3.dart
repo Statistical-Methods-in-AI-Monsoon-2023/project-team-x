@@ -7,13 +7,14 @@ class TestScene extends Scene {
   double time = 0;
   Dot blueDot = Dot(ORIGIN);
   Dot redDot = Dot(Vector3(-1, -1, 0), color: RED);
-  late Dot dot2;
-  var state = 0;
 
   @override
   Future construct() async {
-    void updateOther() {
-      state = 1;
+    Future updateOther() async {
+      Dot dot3 = Dot(Vector3(-1, -2, 0), color: ORANGE);
+      Dot dot2 = Dot(Vector3(2, 2, 0), radius: 0.2, color: GREEN);
+      // await play(Transform(blueDot, target: dot2));
+      await play(ShowCreation(dot2));
     }
 
     void changeDot() {
@@ -31,12 +32,7 @@ class TestScene extends Scene {
 
     Future continueRendering() async {
       while (true) {
-        if (state == 1) {
-          await play(ShowCreation(dot2));
-          state = 0;
-        } else {
-          await wait();
-        }
+        await wait();
       }
     }
 
@@ -56,7 +52,7 @@ class TestScene extends Scene {
 
     // await play(ShowCreation(blueDot));
     Button b = makeButton();
-    dot2 = Dot(Vector3(2, 2, 0), radius: 0.2, color: GREEN);
+    Dot dot2 = Dot(Vector3(2, 2, 0), radius: 0.2, color: GREEN);
 
     await playMany([
       ShowCreation(b),

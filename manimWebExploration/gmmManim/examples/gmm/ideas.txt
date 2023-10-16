@@ -1,0 +1,2 @@
+Put point on top of each gaussian where user can move them around
+Put Another numberline under graph with the dots colored with their soft alignments
