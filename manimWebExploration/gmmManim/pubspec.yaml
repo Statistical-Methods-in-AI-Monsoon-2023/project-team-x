@@ -4,6 +4,7 @@ environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
+  calc: ^0.2.1
   manim_web: ^1.2.3
 
 dev_dependencies:
