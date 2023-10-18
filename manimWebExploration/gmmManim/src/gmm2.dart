@@ -16,7 +16,7 @@ class GMM {
     return -x;
   }
 
-  // Computes the probability density of a univariate normal distribution
+  // Computes pdf of a 1D (univariate) normal distribution
   double univariateNormal(double x, double mean, double variance) {
     final threshold = 1e-7;
     final diffThreshold = 1e-5;
@@ -29,6 +29,21 @@ class GMM {
     final diff = x - mean;
     final exponent = -0.5 * (diff * diff) / variance;
     return (1 / (sqrt(2 * pi * variance))) * exp(exponent);
+  }
+
+  // Computes pdf of a 2+D (univariate) normal distribution
+  double multivariateNormal(double x, double mean, double covariance) {
+    final threshold = 1e-7;
+    final diffThreshold = 1e-5;
+    if (covariance < threshold) {
+      if (abs(x - mean) < diffThreshold)
+        return 1;
+      else
+        return 0;
+    }
+    final diff = x - mean;
+    final exponent = -0.5 * (diff * diff) / covariance;
+    return (1 / (sqrt(2 * pi * covariance))) * exp(exponent);
   }
 
   // Computes E-step of the EM algorithm
