@@ -4,6 +4,17 @@
 
 <br>
 
+### Requirements
+
+Must install Dart (built and tested with dart version: 2.14.4)
+
+Install manim_web and other relevant libraries (webdev) using 
+
+``` 
+pub global activate manim_web 
+pub global activate webdev
+```
+
 To Run the manim file independently, first navigate to directory using:
 
 ```
