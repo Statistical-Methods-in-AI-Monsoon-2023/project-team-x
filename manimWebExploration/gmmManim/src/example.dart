@@ -56,7 +56,7 @@ class GaussianScene extends Scene {
 
   // Making Objects
   Dot makeDot() {
-    dot = Dot(Vector3(3, 3, 0), radius: 1, color: RED);
+    dot = Dot(Vector3(3, 3, 0), radius: 0.1, color: RED);
     return dot;
   }
 
@@ -65,8 +65,10 @@ class GaussianScene extends Scene {
     dot.become(dot2);
   }
 
+  
+
   Button makeButton() {
-    Dot circle = Dot(Vector3(1, 1, 0), radius: 0.5, color: WHITE);
+    Dot circle = Dot(Vector3(1, 1, 0), radius: 0.08, color: WHITE);
 
     Button next = Button(mob: circle, onClick: changeDot);
 

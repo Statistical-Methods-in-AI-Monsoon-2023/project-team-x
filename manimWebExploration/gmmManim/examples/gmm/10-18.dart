@@ -23,9 +23,7 @@ class TestScene extends Scene {
 
     Button makeButton() {
       Dot circle = Dot(Vector3(1, 1, 0), radius: 0.1, color: WHITE);
-
       Button next = Button(mob: circle, onClick: updateOther);
-
       return next;
     }
 
