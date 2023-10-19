@@ -1,12 +1,12 @@
 import 'dart:math';
 
 class GMM {
-  int k; // Number of clusters
+  int numComponents; // Number of clusters
   List<double> weights; // Weights for each cluster
   List<double> means; // Mean values for each cluster
   List<double> variances; // Variances for each cluster
 
-  GMM(this.k, this.weights, this.means, this.variances);
+  GMM(this.numComponents, this.weights, this.means, this.variances);
 
   // Utility Absolute Function
   double abs(double x) {
@@ -14,6 +14,11 @@ class GMM {
       return x;
     }
     return -x;
+  }
+
+  // Initialize weights to be 1/numComponents
+  List<double> initializeWeights(int length) {
+    return List.generate(length, (index) => 1 / length);
   }
 
   // Computes pdf of a 1D (univariate) normal distribution
@@ -26,12 +31,14 @@ class GMM {
       else
         return 0;
     }
+
     final diff = x - mean;
     final exponent = -0.5 * (diff * diff) / variance;
     return (1 / (sqrt(2 * pi * variance))) * exp(exponent);
   }
 
   // Computes pdf of a 2+D (univariate) normal distribution
+  // TODO: NOT DONE
   double multivariateNormal(double x, double mean, double covariance) {
     final threshold = 1e-7;
     final diffThreshold = 1e-5;
@@ -51,10 +58,10 @@ class GMM {
   List<List<double>> eStep(List<double> data) {
     final n = data.length;
     final responsibilities =
-        List.generate(n, (_) => List.generate(k, (_) => 0.0));
+        List.generate(n, (_) => List.generate(numComponents, (_) => 0.0));
 
     for (var i = 0; i < n; i++) {
-      for (var j = 0; j < k; j++) {
+      for (var j = 0; j < numComponents; j++) {
         responsibilities[i][j] =
             weights[j] * univariateNormal(data[i], means[j], variances[j]);
       }
@@ -71,7 +78,7 @@ class GMM {
   void mStep(List<double> data, List<List<double>> responsibilities) {
     final n = data.length;
 
-    for (var j = 0; j < k; j++) {
+    for (var j = 0; j < numComponents; j++) {
       double respSum = 0;
       for (var i = 0; i < n; i++) {
         respSum += responsibilities[i][j];
