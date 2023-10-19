@@ -9,7 +9,9 @@ class GaussianScene extends Scene {
   late Axes axes2;
   late Button next;
   late Dot dot;
+  late GMM gmm;
 
+  int state = 0;
   int initialN = 3;
 
   List<double> data1 = [3, 6, 8];
@@ -22,13 +24,9 @@ class GaussianScene extends Scene {
 
   @override
   Future construct() async {
-
     // GMM Initializations
     List<double> weights = initializeWeights(initialN);
-    GMM gmm = GMM(
-      initialN, weights, means1, covs1
-    );
-
+    gmm = GMM(initialN, weights, means1, covs1);
 
     // Creating Premade Manim Objects
     addAxes(xRange);
@@ -36,7 +34,7 @@ class GaussianScene extends Scene {
     VGroup dots = createDotsFromData(data1);
     VGroup dots2 = createDotsFromData(data2);
     AnimationGroup ag = createInitialGaussianAnimations(gaussians1);
-
+    Button b = makeUpdateGaussianButton();
 
     // Animations
     await play(ShowCreation(axes));
@@ -45,10 +43,7 @@ class GaussianScene extends Scene {
 
     makeDot();
     await play(ShowCreation(dot));
-
-    Button b = makeButton();
     await play(ShowCreation(b));
-
     await continueRendering();
   }
 
@@ -65,9 +60,13 @@ class GaussianScene extends Scene {
     dot.become(dot2);
   }
 
-  
+  void doGaussian() {
+    state = 1;
+  }
 
-  Button makeButton() {
+  Future updateGaussian() async {}
+
+  Button makeUpdateGaussianButton() {
     Dot circle = Dot(Vector3(1, 1, 0), radius: 0.08, color: WHITE);
 
     Button next = Button(mob: circle, onClick: changeDot);
@@ -189,7 +188,13 @@ class GaussianScene extends Scene {
 
   Future continueRendering() async {
     while (true) {
-      await wait();
+      if (state == 1) {
+        // updateGaussian here
+        await updateGaussian();
+        state = 0;
+      } else {
+        await wait();
+      }
     }
   }
 }
