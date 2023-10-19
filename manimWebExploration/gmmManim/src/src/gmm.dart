@@ -16,11 +16,6 @@ class GMM {
     return -x;
   }
 
-  // Initialize weights to be 1/numComponents
-  List<double> initializeWeights(int length) {
-    return List.generate(length, (index) => 1 / length);
-  }
-
   // Computes pdf of a 1D (univariate) normal distribution
   double univariateNormal(double x, double mean, double variance) {
     final threshold = 1e-7;

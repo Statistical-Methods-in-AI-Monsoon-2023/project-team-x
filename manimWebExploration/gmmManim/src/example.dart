@@ -1,5 +1,6 @@
 import 'package:manim_web/manim.dart';
 import "./src/gmm.dart";
+import "./src/utilityFunctions.dart";
 
 const resolution = 3;
 
@@ -9,7 +10,7 @@ class GaussianScene extends Scene {
   late Button next;
   late Dot dot;
 
-  int initalN = 3;
+  int initialN = 3;
 
   List<double> data1 = [3, 6, 8];
   List<double> data2 = [1, 2, 3];
@@ -21,8 +22,10 @@ class GaussianScene extends Scene {
 
   @override
   Future construct() async {
-    gammas = initializeGammas(means1.length);
-    GMM gmm = GMM();
+    GMM gmm = GMM(
+      initialN,
+    );
+    gammas = initializeWeights(initialN);
 
     addAxes(xRange);
 
@@ -105,15 +108,6 @@ class GaussianScene extends Scene {
 
   Future animateData1D(VGroup dots, VGroup dots2) async {
     await play(Transform(dots, target: dots2));
-  }
-
-  List<double> initializeGammas(int length) {
-    List<double> gammas = [];
-    double gamma = 1 / length;
-    for (var i = 0; i < length; i++) {
-      gammas.add(gamma);
-    }
-    return gammas;
   }
 
   Future animateGaussians(VGroup gaussians1, VGroup gaussians2) async {
