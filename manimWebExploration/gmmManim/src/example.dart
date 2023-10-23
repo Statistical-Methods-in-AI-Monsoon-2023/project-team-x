@@ -68,9 +68,7 @@ class GaussianScene extends Scene {
 
   Button makeUpdateGaussianButton() {
     Dot circle = Dot(Vector3(1, 1, 0), radius: 0.08, color: WHITE);
-
     Button next = Button(mob: circle, onClick: changeDot);
-
     return next;
   }
 
