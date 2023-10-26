@@ -1,12 +1,18 @@
 import 'dart:math';
 
-class GMM {
+// Part of GMM Package
+// Initialize weights to be 1/numComponents
+List<double> initializeWeights1(int length) {
+  return List.generate(length, (index) => 1 / length);
+}
+
+class GMM1D {
   int numComponents; // Number of clusters
   List<double> weights; // Weights for each cluster
   List<double> means; // Mean values for each cluster
   List<double> variances; // Variances for each cluster
 
-  GMM(this.numComponents, this.weights, this.means, this.variances);
+  GMM1D(this.numComponents, this.weights, this.means, this.variances);
 
   // Utility Absolute Function
   double abs(double x) {
@@ -100,7 +106,7 @@ void main() {
   List<double> weights = [1 / 3, 1 / 3, 1 / 3];
 
   var nComponents = 2;
-  GMM gmm = GMM(nComponents, weights, means, covs);
+  GMM1D gmm = GMM1D(nComponents, weights, means, covs);
 
   final numIterations = 20;
 

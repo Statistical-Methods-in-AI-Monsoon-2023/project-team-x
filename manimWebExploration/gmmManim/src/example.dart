@@ -1,15 +1,14 @@
 import 'package:manim_web/manim.dart';
-import "./src/gmm.dart";
+import 'src/gmm1D.dart';
 import "./src/utilityFunctions.dart";
 
-const resolution = 3;
 
 class GaussianScene extends Scene {
   late Axes axes;
   late Axes axes2;
   late Button next;
   late Dot dot;
-  late GMM gmm;
+  late GMM1D gmm;
 
   int state = 0;
   int initialN = 3;
@@ -26,7 +25,7 @@ class GaussianScene extends Scene {
   Future construct() async {
     // GMM Initializations
     List<double> weights = initializeWeights(initialN);
-    gmm = GMM(initialN, weights, means1, covs1);
+    gmm = GMM1D(initialN, weights, means1, covs1);
 
     // Creating Premade Manim Objects
     addAxes(xRange);
@@ -36,7 +35,9 @@ class GaussianScene extends Scene {
     AnimationGroup ag = createInitialGaussianAnimations(gaussians1);
     Button b = makeUpdateGaussianButton();
 
-    // Animations
+    // ANIMATIONS
+
+    // Axes & Data
     await play(ShowCreation(axes));
     await play(ShowCreation(dots));
     await play(ag);
@@ -47,7 +48,7 @@ class GaussianScene extends Scene {
     await continueRendering();
   }
 
-  // Functions
+  // FUNCTIONS
 
   // Making Objects
   Dot makeDot() {
@@ -179,11 +180,14 @@ class GaussianScene extends Scene {
     await play(Transform(dots, target: dots2));
   }
 
+  // Animates the Gaussian Functions given the initial and target gaussians
   Future animateGaussians(VGroup gaussians1, VGroup gaussians2) async {
     await play(
         Transform(gaussians1, target: gaussians2, lagRatio: 1, runTime: 2));
   }
 
+
+  // Handles all subsequent rendering and triggered animations
   Future continueRendering() async {
     while (true) {
       if (state == 1) {
