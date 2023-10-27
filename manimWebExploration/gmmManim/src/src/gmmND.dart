@@ -1,46 +1,39 @@
+// import 'package:manim_web/manim.dart';
 import 'dart:math';
+// import 'package:ml_linalg/linalg.dart';
+import 'package:vector_math/vector_math.dart';
+
+
 
 // Part of GMM Package
 // Initialize weights to be 1/numComponents
-List<double> initializeWeights1(int length) {
+List<double> initializeWeights(int length) {
   return List.generate(length, (index) => 1 / length);
 }
 
-class GMMND {
+class GMM {
   int numComponents; // Number of clusters
   List<double> weights; // Weights for each cluster
-  List<double> means; // Mean values for each cluster
-  List<double> variances; // Variances for each cluster
+  List<Vector3> means; // Mean values for each cluster
+  List<Matrix3> covariances; // Covariance matrices for each cluster
 
-  GMMND(this.numComponents, this.weights, this.means, this.variances);
+  GMM(this.numComponents, this.weights, this.means, this.covariances);
 
-  // Utility Absolute Function
-  double abs(double x) {
-    if (x > 0) {
-      return x;
-    }
-    return -x;
-  }
-
-  // Computes pdf of a 2+D (univariate) normal distribution
-  // TODO: NOT DONE
-  double multivariateNormal(double x, double mean, double covariance) {
+  double multivariateNormal(Matrix x, Matrix mean, Matrix covariance) {
     final threshold = 1e-7;
-    final diffThreshold = 1e-5;
-    if (covariance < threshold) {
-      if (abs(x - mean) < diffThreshold)
-        return 1;
-      else
-        return 0;
-    }
+    final det = covariance.determinant();
+    final invCov = covariance.inverse();
     final diff = x - mean;
-    final exponent = -0.5 * (diff * diff) / covariance;
-    return (1 / (sqrt(2 * pi * covariance))) * exp(exponent);
+    final exponent = -0.5 * diff.transpose() * invCov * diff;
+
+    if (det < threshold) {
+      return 0;
+    }
+
+    return (1 / (sqrt(pow(2 * pi, 2) * det))) * exp(exponent);
   }
 
-  // Computes E-step of the EM algorithm
-  // finds the responsibilities of each point to each cluster
-  List<List<double>> eStep(List<List<double>> data) {
+  List<List<double>> eStep(List<Vector> data) {
     final n = data.length;
     final responsibilities =
         List.generate(n, (_) => List.generate(numComponents, (_) => 0.0));
@@ -48,7 +41,7 @@ class GMMND {
     for (var i = 0; i < n; i++) {
       for (var j = 0; j < numComponents; j++) {
         responsibilities[i][j] =
-            weights[j] * multivariateNormal(data[i], means[j], variances[j]);
+            weights[j] * multivariateNormal(data[i], means[j], covariances[j]);
       }
 
       final sumResp = responsibilities[i].reduce((a, b) => a + b);
@@ -59,54 +52,70 @@ class GMMND {
     return responsibilities;
   }
 
-  // Computes the M-step of the EM algorithm
-  void mStep(List<List<double>> data, List<List<double>> responsibilities) {
+  void mStep(List<Vector2> data, List<List<double>> responsibilities) {
     final n = data.length;
 
     for (var j = 0; j < numComponents; j++) {
       double respSum = 0;
+      Vector2 respData = Vector2.zero();
+      Matrix2 covarianceData = Matrix2.zero();
+
       for (var i = 0; i < n; i++) {
         respSum += responsibilities[i][j];
+        respData += data[i] * responsibilities[i][j];
+        final diff = data[i] - means[j];
+        covarianceData += (diff.outer(diff) * responsibilities[i][j]);
       }
+
       weights[j] = respSum / n;
-
-      final respData =
-          List.generate(n, (i) => responsibilities[i][j] * data[i]);
-      means[j] = respData.reduce((a, b) => a + b) / respSum;
-
-      final varianceData = List.generate(
-          n, (i) => responsibilities[i][j] * pow(data[i] - means[j], 2));
-      variances[j] = varianceData.reduce((a, b) => a + b) / respSum;
+      means[j] = respData / respSum;
+      covariances[j] = covarianceData / respSum;
     }
   }
 }
 
 void main() {
-  List<List<double>> data1 = [[1, 1], [1, 2], [4, 4], [4, 4], [6, 5]];
+  List<Vector3> data2D = [
+    Vector3(1.0, 1.0, 0.0),
+    Vector3(1.5, 1.5, 0.0),
+    Vector3(3.0, 2.9, 0.0),
+    Vector3(3.5, 3.0, 0.0),
+    Vector3(7.0, 5.5, 0.0),
+    Vector3(7.5, 5.7, 0.0),
+    Vector3(8.0, 6.0, 0.0),
+    Vector3(8.5, 6.2, 0.0),
+    Vector3(9.0, 6.5, 0.0),
+  ];
 
   // Manual Initialization
-  List<double> means = [1, 3, 7];
-  List<double> covs = [1, 2, 3];
-  List<double> weights = [1 / 3, 1 / 3, 1 / 3];
+  List<Vector2> means = [
+    Vector2(1, 1),
+    Vector2(7, 6),
+  ];
+  List<Matrix2> covariances = [
+    Matrix2(1, 0.5, 0.5, 1),
+    Matrix2(1, -0.5, -0.5, 1),
+  ];
+  List<double> weights = [0.5, 0.5];
 
   var nComponents = 2;
-  GMMND gmm = GMMND(nComponents, weights, means, covs);
+  GMM gmm = GMM(nComponents, weights, means, covariances);
 
   final numIterations = 20;
 
   for (var iteration = 0; iteration < numIterations; iteration++) {
     print(iteration);
     print(gmm.means);
-    print(gmm.variances);
+    print(gmm.covariances);
     print(gmm.weights);
     print("\n");
 
-    List<List<double>> resp = gmm.eStep(data1);
-    final hi = gmm.mStep(data1, resp);
+    List<List<double>> resp = gmm.eStep(data2D);
+    final hi = gmm.mStep(data2D, resp);
   }
 
   print("Final output");
   print(gmm.means);
-  print(gmm.variances);
+  print(gmm.covariances);
   print(gmm.weights);
 }

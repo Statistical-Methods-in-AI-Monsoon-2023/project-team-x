@@ -6,6 +6,8 @@ environment:
 dependencies:
   calc: ^0.2.1
   manim_web: ^1.2.3
+  ml_linalg: ^13.11.31
+  vector_math: ^2.1.4
 
 dev_dependencies:
   build_runner: ^2.2.0
