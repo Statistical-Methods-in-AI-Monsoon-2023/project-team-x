@@ -9,8 +9,8 @@ dependencies:
   ml_linalg: ^13.11.31
   vector_math: ^2.1.4
 
-  gmm1D:
-    path: "./src/src/gmm1D"
+  gmm:
+    path: "./gmm"
 
 dev_dependencies:
   build_runner: ^2.2.0

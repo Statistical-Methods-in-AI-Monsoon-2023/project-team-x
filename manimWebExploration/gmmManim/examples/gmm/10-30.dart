@@ -14,20 +14,18 @@ class GaussianScene extends Scene {
   late Dot dot;
   late GMM1D gmm;
   late List<double> weights;
-  late VGroup gaussians1;
-  late VGroup gaussians2;
-  late VGroup gaussians3;
+  late List<FunctionGraph> gaussians1;
+  late List<FunctionGraph> gaussians2;
+  late VGroup dots;
+  late VGroup dots2;
 
   int state = 0;
   int initialN = 3;
 
-  // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
-  List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
+  List<double> data1 = [3, 6, 8];
   List<double> data2 = [1, 2, 3];
   List<double> means1 = [1, 3, 7];
   List<double> covs1 = [1, 2, 3];
-  List<double> means2 = [3, 2, 4];
-  List<double> covs2 = [3, 2, 1];
 
   List<double> xRange = [-5, 20];
   late List<double> gammas;
@@ -40,11 +38,10 @@ class GaussianScene extends Scene {
 
     // Creating Premade Manim Objects
     addAxes(xRange);
-    gaussians1 = createGaussians(means1, covs1, xRange);
-    gaussians3 = createGaussians(means2, covs2, xRange);
+    List<FunctionGraph> gaussians1 = createGaussians(means1, covs1, xRange);
     VGroup dots = createDotsFromData(data1);
     VGroup dots2 = createDotsFromData(data2);
-    Animation ag = createInitialGaussianAnimations(gaussians1);
+    AnimationGroup ag = createInitialGaussianAnimations(gaussians1);
     Button b = makeUpdateGaussianButton();
 
     // ANIMATIONS
@@ -55,14 +52,40 @@ class GaussianScene extends Scene {
     await play(ag);
 
     makeDot();
-    // await play(ShowCreation(dot));
     await play(ShowCreation(b));
-
-    // await play(Transform(gaussians1, target:gaussians3));
-    // gaussians1.become(gaussians3);
 
     // HANDLE INTERACTION
     await continueRendering();
+  }
+
+  // Handles all subsequent rendering and triggered animations
+  Future continueRendering() async {
+    while (true) {
+      if (state == 1) {
+        // updateGaussian here
+        // updateGaussian();
+        // await transformGaussians(gaussians1, gaussians2);
+
+        // List<Animation> ag1 = [];
+        // List<double> means2 = [3, 4, 5];
+        // List<double> covs2 = [4, 1, 3];
+
+        // List<FunctionGraph> gaussians3 = createGaussians(means2, covs2, xRange);
+
+        // for (var i = 0; i < means1.length; i++) {
+        //   ag1.add(Transform(gaussians1[i],
+        //       target: gaussians3[i], lagRatio: 2, runTime: 2));
+        // }
+        // AnimationGroup ag = AnimationGroup(ag1);
+        // await play(ag);
+        VGroup dots3 = createDotsFromData(data2);
+        await animateData1D(dots, dots3);
+
+        state = 0;
+      } else {
+        await wait();
+      }
+    }
   }
 
   // FUNCTIONS
@@ -82,27 +105,29 @@ class GaussianScene extends Scene {
     state = 1;
   }
 
-  Future updateGaussian() async {
+  Future updateGaussian1() async {
     List<List<double>> resp = gmm.eStep(data1);
     final hi = gmm.mStep(data1, resp);
 
-    List<double> means2 = gmm.means;
-    List<double> covs2 = gmm.variances;
+    means1 = gmm.means;
+    covs1 = gmm.variances;
+    weights = gmm.weights;
 
-    // means1 = means2;
-    // covs1 = covs2;
+    List<FunctionGraph> gaussians2 = createGaussians(means1, covs1, xRange);
+    await transformGaussians(gaussians1, gaussians2);
+  }
 
-    print("means & covs");
-    print(means2);
-    print(covs2);
-    // print(weights);
-    // List<double> means3 = [2, 3, 1];
-    // List<double> covs3 = [4, 3, 2];
-    // weights = gmm.weights;
+  void updateGaussian() async {
+    List<List<double>> resp = gmm.eStep(data1);
+    final hi = gmm.mStep(data1, resp);
 
-    gaussians3 = createGaussians(means2, covs2, xRange);
-    await play(Transform(gaussians1, target:gaussians3));
-    // gaussians1.become(gaussians2);
+    means1 = gmm.means;
+    covs1 = gmm.variances;
+    weights = gmm.weights;
+
+    List<FunctionGraph> gaussians2 = createGaussians(means1, covs1, xRange);
+    // await transformGaussians(gaussians1, gaussians2);
+    state = 2;
   }
 
   Button makeUpdateGaussianButton() {
@@ -123,7 +148,7 @@ class GaussianScene extends Scene {
     return dotsVG;
   }
 
-  VGroup createGaussians(
+  List<FunctionGraph> createGaussians(
       List<double> means, List<double> covs, List<double> xRange) {
     List<FunctionGraph> graphs = [];
 
@@ -146,20 +171,11 @@ class GaussianScene extends Scene {
     var stepSize = 0.1;
 
     for (var i = 0; i < length; i++) {
-      if (covs[i] < 0.5) {
-        covs[i] = 0.5;
-      }
-
-      if (covs[i] > 3) {
-        covs[i] = 3;
-      }
-
       if (covs[i] < 2) {
         stepSize = 0.1;
       } else {
         stepSize = 0.3;
       }
-
 
       FunctionGraph graph = axes.getGraph(
           (x) =>
@@ -172,7 +188,7 @@ class GaussianScene extends Scene {
           stepSize: stepSize);
       graphs.add(graph);
     }
-    return VGroup(graphs);
+    return graphs;
   }
 
   Axes addAxes(List<double> xRange) {
@@ -202,14 +218,26 @@ class GaussianScene extends Scene {
   }
 
   // Create Animations
-  Animation createInitialGaussianAnimations(VGroup gaussians) {
-    return ShowCreation(gaussians);
+  AnimationGroup createInitialGaussianAnimations(
+      List<FunctionGraph> gaussians) {
+    List<Animation> ag1 = [];
+    for (var i = 0; i < means1.length; i++) {
+      ag1.add(ShowCreation(gaussians[i]));
+    }
+    AnimationGroup ag = AnimationGroup(ag1);
+    return ag;
   }
 
-  // AnimationGroup transformGaussians(
-  //     List<FunctionGraph> gaussians1, List<FunctionGraph> gaussians2) {
-  //   return
-  // }
+  AnimationGroup transformGaussians(
+      List<FunctionGraph> gaussians1, List<FunctionGraph> gaussians2) {
+    List<Animation> ag1 = [];
+    for (var i = 0; i < means1.length; i++) {
+      ag1.add(Transform(gaussians1[i],
+          target: gaussians2[i], lagRatio: 2, runTime: 2));
+    }
+    AnimationGroup ag = AnimationGroup(ag1);
+    return ag;
+  }
 
   Future animateData1D(VGroup dots, VGroup dots2) async {
     await play(Transform(dots, target: dots2));
@@ -219,27 +247,5 @@ class GaussianScene extends Scene {
   Future animateGaussians(VGroup gaussians1, VGroup gaussians2) async {
     await play(
         Transform(gaussians1, target: gaussians2, lagRatio: 1, runTime: 2));
-  }
-
-  void transformGaussians() async {
-    // await play(Transform(gaussians1, target: gaussians3)); // YIPEEEE
-    gaussians1.become(gaussians3);
-  }
-
-  // Handles all subsequent rendering and triggered animations
-  Future continueRendering() async {
-    while (true) {
-      if (state == 1) {
-        // updateGaussian here
-        // updateGaussian();
-        // changeDot();
-        // await play(ShowCreation(dot)); // WORKS FINALLY
-        // await play(Transform(gaussians1, target: gaussians3)); // YIPEEEE
-        await updateGaussian();
-        state = 0;
-      } else {
-        await wait();
-      }
-    }
   }
 }
