@@ -9,7 +9,7 @@ class GaussianMixtureModel {
   List<Matrix> covariances; // List of covariance matrices
   List<double> weights; // List of weights for each cluster
 
-  GaussianMixtureModel(this.k, this.data) {
+  GaussianMixtureModel(this.k, this.data, this.n, this.means, this.covariances, this.weights) {
     n = data.rowsNum;
     initializeParameters();
   }
@@ -26,32 +26,34 @@ class GaussianMixtureModel {
   }
 
   double gaussianProbability(Vector x, Matrix mean, Matrix covariance) {
-    final d = x - mean.getRow(0);
-    final exponent =
-        -0.5 * ((d.transpose() * covariance.inverse() * d).toList()[0]);
-    final denominator = sqrt(pow(2 * pi, d.length) * covariance.determinant());
-    return (1 / denominator) * exp(exponent);
+    // final d = x - mean.getRow(0);
+    // final exponent =
+    //     -0.5 * ((d.transpose() * covariance.inverse() * d).toList()[0]);
+    // final denominator = sqrt(pow(2 * pi, d.length) * covariance.determinant());
+    // return (1 / denominator) * exp(exponent);
+    return 1;
   }
 
   void expectationStep(List<List<double>> responsibilities) {
-    for (int i = 0; i < n; i++) {
-      double sumProbabilities = 0.0;
-      for (int j = 0; j < k; j++) {
-        final probability = weights[j] *
-            gaussianProbability(
-                data.getRow(i), means.getRow(j), covariances[j]);
-        responsibilities[i][j] = probability;
-        sumProbabilities += probability;
-      }
-      responsibilities[i] =
-          responsibilities[i].map((prob) => prob / sumProbabilities).toList();
-    }
+    // for (int i = 0; i < n; i++) {
+    //   double sumProbabilities = 0.0;
+    //   for (int j = 0; j < k; j++) {
+    //     final probability = weights[j] *
+    //         gaussianProbability(
+    //             data.getRow(i), means.getRow(j), covariances[j]);
+    //     responsibilities[i][j] = probability;
+    //     sumProbabilities += probability;
+    //   }
+    //   responsibilities[i] =
+    //       responsibilities[i].map((prob) => prob / sumProbabilities).toList();
+    // }
   }
 
   void maximizationStep(List<List<double>> responsibilities) {
     for (int j = 0; j < k; j++) {
-      final sumResponsibilities =
-          responsibilities.fold(0.0, (acc, r) => acc + r[j]);
+      // final sumResponsibilities =
+      //     responsibilities.fold(0.0, (acc, r) => acc + r[j]);
+      final sumResponsibilities = 1;
       weights[j] = sumResponsibilities / n;
 
       final sumWeights = sumResponsibilities;
@@ -64,12 +66,12 @@ class GaussianMixtureModel {
         final Vector x = data.getRow(i);
         final Vector mean = means.getRow(j);
 
-        meanSum.add(x * responsibilities[i][j]);
-        final d = x - mean;
-        covarianceSum.add(d.outer(d) * responsibilities[i][j]);
-      }
+      //   meanSum.add(x * responsibilities[i][j]);
+      //   final d = x - mean;
+      //   covarianceSum.add(d.outer(d) * responsibilities[i][j]);
+      // }
 
-      means.setRow(j, meanSum / sumWeights);
+      // means.setRow(j, meanSum / sumWeights);
       covariances[j] = covarianceSum / sumWeights;
     }
   }
@@ -79,9 +81,9 @@ class GaussianMixtureModel {
     for (int i = 0; i < n; i++) {
       double pointLikelihood = 0.0;
       for (int j = 0; j < k; j++) {
-        pointLikelihood += weights[j] *
-            gaussianProbability(
-                data.getRow(i), means.getRow(j), covariances[j]);
+        // pointLikelihood += weights[j] *
+        //     gaussianProbability(
+        //         data.getRow(i), means.getRow(j), covariances[j]);
       }
       logLikelihood += log(pointLikelihood);
     }
@@ -106,4 +108,5 @@ class GaussianMixtureModel {
       prevLogLikelihood = currentLogLikelihood;
     }
   }
+}
 }

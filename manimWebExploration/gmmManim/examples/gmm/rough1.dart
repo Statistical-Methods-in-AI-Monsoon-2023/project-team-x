@@ -1,7 +1,7 @@
 import 'package:manim_web/manim.dart';
 // import './src/gmm1D.dart';
 // import "./src/utilityFunctions.dart";
-import "src/utilityFunctions.dart";
+// import "src/utilityFunctions.dart";
 
 class GaussianScene extends Scene {
   late Axes axes;
