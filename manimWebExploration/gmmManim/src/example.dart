@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:manim_web/manim.dart';
 import 'package:gmm/gmm.dart';
 
@@ -19,6 +21,18 @@ class GaussianScene extends Scene {
   late VGroup nextGMM;
   late List<double> means1;
   late List<double> covs1;
+
+  late Button b1;
+  late Button b2;
+  late Button b3;
+  late Button b4;
+  late Button b5;
+
+  late Button b1Copy;
+  late Button b2Copy;
+  late Button b3Copy;
+  late Button b4Copy;
+  late Button b5Copy;
 
   int state = 0;
   int iteration = 0;
@@ -72,11 +86,18 @@ class GaussianScene extends Scene {
     VGroup dots = createDotsFromData(data1);
     VGroup dots2 = createDotsFromData(data2);
     Animation ag = createInitialGMMAnimations(currentGMM);
-    Button b1 = makeUpdateGMMButton();
-    Button b2 = makeResetGMMButton();
-    Button b3 = playGMMButton();
-    Button b4 = makePrevGMMButton();
-    Button b5 = pauseGMMButton();
+    b1 = makeUpdateGMMButton();
+    b2 = makeResetGMMButton();
+    b3 = playGMMButton();
+    b4 = makePrevGMMButton();
+    b5 = pauseGMMButton();
+
+    b1Copy = makeUpdateGMMButton();
+    b2Copy = makeResetGMMButton();
+    b3Copy = playGMMButton();
+    b4Copy = makePrevGMMButton();
+    b5Copy = pauseGMMButton();
+    // bringToBack([b5]);
 
     // ANIMATIONS
 
@@ -173,7 +194,9 @@ class GaussianScene extends Scene {
   }
 
   void stopUpdater() {
-    state = 0;
+    print("Paused");
+    state = 5;
+
   }
 
   void nextGMMUpdater() {
@@ -181,12 +204,14 @@ class GaussianScene extends Scene {
   }
 
   void resetGMMUpdater() {
+
     print("state");
     print(state);
     state = 2;
   }
 
   void playGMMUpdater() {
+    print("Play");
     state = 3;
   }
 
@@ -223,9 +248,9 @@ class GaussianScene extends Scene {
     sqr
       ..scale(Vector3(0.18, 0.18, 1))
       ..rotate(PI / 2);
-    sqr..shift(DOWN / 4);
+    // sqr..shift(DOWN / 4);
     VGroup pauseGMMButtonGroup = VGroup([sqr, r2]);
-    pauseGMMButtonGroup..moveToPoint(Vector3(5.5, 1.0, 0.0));
+    pauseGMMButtonGroup..moveToPoint(Vector3(5.5, 2.0, 0.0));
     pauseGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
 
     Button pauseButton =
@@ -408,9 +433,15 @@ class GaussianScene extends Scene {
 
         state = 0;
       } else if (state == 3) {
+        Button pauseCopy = b5Copy.copy();
+        await play(Transform(b3, target: pauseCopy));
         await playGMM();
       } else if (state == 4) {
         await prevGMMIteration();
+        state = 0;
+      } else if (state == 5) {
+        Button playCopy = b3Copy.copy();
+        await play(Transform(b5, target: playCopy));
         state = 0;
       } else {
         await wait();
