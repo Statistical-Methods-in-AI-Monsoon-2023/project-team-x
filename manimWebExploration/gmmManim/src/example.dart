@@ -14,9 +14,9 @@ class GaussianScene extends Scene {
   late Dot dot;
   late GMM1D gmm;
   late List<double> weights;
-  late VGroup gaussians1;
+  late VGroup currentGMM;
   late VGroup gaussians2;
-  late VGroup gaussians3;
+  late VGroup nextGMM;
 
   int state = 0;
   int initialN = 3;
@@ -33,6 +33,13 @@ class GaussianScene extends Scene {
   late List<double> gammas;
 
   @override
+  FutureOr<void> preload() {
+    Tex.preload(r'Next \\ Iteration');
+    Tex.preload(r'Reset');
+
+  }
+
+  @override
   Future construct() async {
     // GMM Initializations
     List<double> weights = initializeWeights(initialN);
@@ -40,12 +47,14 @@ class GaussianScene extends Scene {
 
     // Creating Premade Manim Objects
     addAxes(xRange);
-    gaussians1 = createGaussians(means1, covs1, xRange);
-    gaussians3 = createGaussians(means2, covs2, xRange);
+    currentGMM = createGMM(means1, covs1, xRange);
+    nextGMM = createGMM(means2, covs2, xRange);
     VGroup dots = createDotsFromData(data1);
     VGroup dots2 = createDotsFromData(data2);
-    Animation ag = createInitialGaussianAnimations(gaussians1);
-    Button b = makeUpdateGaussianButton();
+    Animation ag = createInitialGMMAnimations(currentGMM);
+    Button b1 = makeUpdateGMMButton();
+    Button b2 = makeResetGMMButton();
+
 
     // ANIMATIONS
 
@@ -55,19 +64,17 @@ class GaussianScene extends Scene {
     await play(ag);
 
     makeDot();
-    // await play(ShowCreation(dot));
-    await play(ShowCreation(b));
-
-    // await play(Transform(gaussians1, target:gaussians3));
-    // gaussians1.become(gaussians3);
+    await play(ShowCreation(b1));
+    await play(ShowCreation(b2));
 
     // HANDLE INTERACTION
     await continueRendering();
   }
 
   // FUNCTIONS
+  // MAKING OBJECTS
 
-  // Making Objects
+  // DEBUGGING OBJECTS
   Dot makeDot() {
     dot = Dot(Vector3(3, 3, 0), radius: 0.1, color: RED);
     return dot;
@@ -78,11 +85,8 @@ class GaussianScene extends Scene {
     dot.become(dot2);
   }
 
-  void doGaussian() {
-    state = 1;
-  }
 
-  Future updateGaussian() async {
+  Future doNextGMMIteration() async {
     List<List<double>> resp = gmm.eStep(data1);
     final temp = gmm.mStep(data1, resp);
 
@@ -97,16 +101,83 @@ class GaussianScene extends Scene {
     // List<double> covs3 = [4, 3, 2];
     // weights = gmm.weights;
 
-    gaussians3 = createGaussians(means2, covs2, xRange);
-    await play(Transform(gaussians1, target:gaussians3));
-    // gaussians1.become(gaussians2);
+    nextGMM = createGMM(means2, covs2, xRange);
+    await play(Transform(currentGMM, target:nextGMM));
+    // currentGMM.become(gaussians2);
   }
 
-  Button makeUpdateGaussianButton() {
-    Dot circle = Dot(Vector3(1, 1, 0), radius: 0.08, color: WHITE);
-    Button next = Button(mob: circle, onClick: doGaussian);
+  Future resetGMM() async {
+    List<double> weights = initializeWeights(initialN);
+    gmm = GMM1D(initialN, weights, means1, covs1);
+    nextGMM = createGMM(means1, covs1, xRange);
+    await play(Transform(currentGMM, target: nextGMM));
+  }
+
+  Future playGMM() async {
+    List<List<double>> resp = gmm.eStep(data1);
+    final temp = gmm.mStep(data1, resp);
+
+    List<double> means2 = gmm.means;
+    List<double> covs2 = gmm.variances;
+
+    nextGMM = createGMM(means2, covs2, xRange);
+    await play(Transform(currentGMM, target: nextGMM));
+  }
+
+
+
+  void doNextGMMIterationUpdater() {
+    state = 1;
+  }
+
+  void resetGMMUpdater() {
+    state = 2;
+  }
+
+  void playGMMUpdater() {
+    state = 3;
+  }
+
+  Button playGMMButton() {
+    // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
+    // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
+    // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
+    Rectangle r2 = Rectangle(height: 0.5, width: 1.0);
+    Tex tex = Tex(r'Next \\ Iteration', color: BLACK);
+    tex.scaleUniformly(0.5);
+    VGroup playGMMButtonGroup = VGroup([tex, r2]);
+    playGMMButtonGroup..moveToPoint(Vector3(5.5, 2.0, 0.0));
+
+    Button playButton =
+        Button(mob: playGMMButtonGroup, onClick: doNextGMMIterationUpdater);
+    return playButton;
+  }
+
+  Button makeUpdateGMMButton() {
+    // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
+    // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
+    // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
+    Rectangle r2 = Rectangle(height: 0.5, width: 1.0);
+    Tex tex = Tex(r'Next \\ Iteration', color: BLACK);
+    tex.scaleUniformly(0.5);
+    VGroup nextIterationButton = VGroup([tex, r2]);
+    nextIterationButton..moveToPoint(Vector3(5.5, 2.0, 0.0));
+
+    Button next = Button(mob: nextIterationButton, onClick: doNextGMMIterationUpdater);
     return next;
   }
+
+  Button makeResetGMMButton() {
+    Rectangle r2 = Rectangle(height: 0.5, width: 1.0);
+    Tex tex = Tex(r'Reset', color: BLACK);
+    tex.scaleUniformly(0.5);
+    VGroup resetIterationButton = VGroup([tex, r2]);
+    resetIterationButton..moveToPoint(Vector3(5.5, 3.0, 0.0));
+
+    Button reset = Button(mob: resetIterationButton, onClick: resetGMMUpdater);
+    return reset;
+  }
+
 
   VGroup createDotsFromData(List<double> data) {
     List<Dot> dots = [];
@@ -120,7 +191,7 @@ class GaussianScene extends Scene {
     return dotsVG;
   }
 
-  VGroup createGaussians(List<double> means, List<double> covs, List<double> xRange) {
+  VGroup createGMM(List<double> means, List<double> covs, List<double> xRange) {
     List<FunctionGraph> graphs = [];
 
     var colors = [
@@ -198,12 +269,12 @@ class GaussianScene extends Scene {
   }
 
   // Create Animations
-  Animation createInitialGaussianAnimations(VGroup gaussians) {
+  Animation createInitialGMMAnimations(VGroup gaussians) {
     return ShowCreation(gaussians);
   }
 
   // AnimationGroup transformGaussians(
-  //     List<FunctionGraph> gaussians1, List<FunctionGraph> gaussians2) {
+  //     List<FunctionGraph> currentGMM, List<FunctionGraph> gaussians2) {
   //   return
   // }
 
@@ -212,30 +283,33 @@ class GaussianScene extends Scene {
   }
 
   // Animates the Gaussian Functions given the initial and target gaussians
-  Future animateGaussians(VGroup gaussians1, VGroup gaussians2) async {
+  Future animateGaussians(VGroup currentGMM, VGroup gaussians2) async {
     await play(
-        Transform(gaussians1, target: gaussians2, lagRatio: 1, runTime: 2));
+        Transform(currentGMM, target: gaussians2, lagRatio: 1, runTime: 2));
   }
 
   void transformGaussians() async {
-    // await play(Transform(gaussians1, target: gaussians3)); // YIPEEEE
-    gaussians1.become(gaussians3);
+    // await play(Transform(currentGMM, target: nextGMM)); // YIPEEEE
+    currentGMM.become(nextGMM);
   }
 
   // Handles all subsequent rendering and triggered animations
   Future continueRendering() async {
     while (true) {
       if (state == 1) {
-        // updateGaussian here
-        // updateGaussian();
-        // changeDot();
-        // await play(ShowCreation(dot)); // WORKS FINALLY
-        // await play(Transform(gaussians1, target: gaussians3)); // YIPEEEE
-        await updateGaussian();
+        // Updates the GMM by 1 EM step
+        await doNextGMMIteration();
         state = 0;
+      } else if (state == 2) {
+        await resetGMM();
+        state = 0;
+      } else if (state == 3) {
+        await playGMM();
       } else {
         await wait();
       }
+
+      // if (state != 0) state = 0;
     }
   }
 }
