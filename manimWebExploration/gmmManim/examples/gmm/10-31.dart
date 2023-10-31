@@ -52,8 +52,8 @@ class GaussianScene extends Scene {
 
   @override
   FutureOr<void> preload() {
-    MathTex.preload(r'\gets');
-    MathTex.preload(r'\to');
+    Tex.preload(r'\gets');
+    Tex.preload(r'\to');
     Tex.preload(r'Reset');
     // Tex.preload(r' blacktriangleright ');
   }
@@ -76,7 +76,6 @@ class GaussianScene extends Scene {
     Button b2 = makeResetGMMButton();
     Button b3 = playGMMButton();
     Button b4 = makePrevGMMButton();
-    Button b5 = pauseGMMButton();
 
     // ANIMATIONS
 
@@ -198,10 +197,6 @@ class GaussianScene extends Scene {
     await play(Transform(currentGMM, target: nextGMM));
   }
 
-  void stopUpdater() {
-    state = 0;
-  }
-
   void nextGMMUpdater() {
     state = 1;
   }
@@ -221,6 +216,9 @@ class GaussianScene extends Scene {
   }
 
   Button playGMMButton() {
+    // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
+    // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
+    // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
     Rectangle r2 = Rectangle(height: 0.5, width: 0.8);
     // Tex tex = Tex(r' blacktriangleright ', color: BLACK);
     // tex.scaleUniformly(0.5);
@@ -230,7 +228,7 @@ class GaussianScene extends Scene {
       ..rotate(PI / 2);
     tri..shift(DOWN / 4);
     VGroup playGMMButtonGroup = VGroup([tri, r2]);
-    playGMMButtonGroup..moveToPoint(Vector3(5.5, 2.0, 0.0));
+    playGMMButtonGroup..moveToPoint(Vector3(5.5, 1.0, 0.0));
     playGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
 
     Button playButton =
@@ -238,36 +236,15 @@ class GaussianScene extends Scene {
     return playButton;
   }
 
-  Button pauseGMMButton() {
-    // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
-    // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
-    // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
-    Rectangle r2 = Rectangle(height: 0.5, width: 0.8);
-    // Tex tex = Tex(r' blacktriangleright ', color: BLACK);
-    // tex.scaleUniformly(0.5);
-    Square sqr = Square(color: RED);
-    sqr
-      ..scale(Vector3(0.18, 0.18, 1))
-      ..rotate(PI / 2);
-    sqr..shift(DOWN / 4);
-    VGroup pauseGMMButtonGroup = VGroup([sqr, r2]);
-    pauseGMMButtonGroup..moveToPoint(Vector3(5.5, 2.0, 0.0));
-    pauseGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
-
-    Button playButton =
-        Button(mob: pauseGMMButtonGroup, onClick: stopUpdater);
-    return playButton;
-  }
-
   Button makePrevGMMButton() {
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
     // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
-    Rectangle r2 = Rectangle(height: 0.25, width: 0.4);
-    MathTex tex = MathTex(r'\gets', color: BLACK);
+    Rectangle r2 = Rectangle(height: 0.5, width: 1.0);
+    MathTex tex = MathTex(r'\gets');
     tex.scaleUniformly(0.5);
     VGroup prevIterationButton = VGroup([tex, r2]);
-    prevIterationButton..moveToPoint(Vector3(5.0, 2.0, 0.0));
+    prevIterationButton..moveToPoint(Vector3(5.5, 0.0, 0.0));
 
     Button prev = Button(mob: prevIterationButton, onClick: prevGMMUpdater);
     return prev;
@@ -277,22 +254,22 @@ class GaussianScene extends Scene {
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
     // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
-    Rectangle r2 = Rectangle(height: 0.25, width: 0.4);
-    MathTex tex = MathTex(r'\to', color: BLACK);
+    Rectangle r2 = Rectangle(height: 0.5, width: 1.0);
+    MathTex tex = MathTex(r'\to');
     tex.scaleUniformly(0.5);
     VGroup nextIterationButton = VGroup([tex, r2]);
-    nextIterationButton..moveToPoint(Vector3(6.0, 2.0, 0.0));
+    nextIterationButton..moveToPoint(Vector3(5.5, 2.0, 0.0));
 
     Button next = Button(mob: nextIterationButton, onClick: nextGMMUpdater);
     return next;
   }
 
   Button makeResetGMMButton() {
-    Rectangle r2 = Rectangle(height: 0.3, width: 1.4);
-    Tex tex = Tex(r'Reset', color: RED);
+    Rectangle r2 = Rectangle(height: 0.5, width: 1.0);
+    Tex tex = Tex(r'Reset', color: BLACK);
     tex.scaleUniformly(0.5);
     VGroup resetIterationButton = VGroup([tex, r2]);
-    resetIterationButton..moveToPoint(Vector3(5.48, 3.0, 0.0));
+    resetIterationButton..moveToPoint(Vector3(5.5, 3.0, 0.0));
 
     Button reset = Button(mob: resetIterationButton, onClick: resetGMMUpdater);
     return reset;
