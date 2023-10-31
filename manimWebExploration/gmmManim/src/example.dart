@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:manim_web/manim.dart';
 import 'package:gmm/gmm.dart';
 
@@ -28,11 +26,7 @@ class GaussianScene extends Scene {
   late Button b4;
   late Button b5;
 
-  late Button b1Copy;
-  late Button b2Copy;
-  late Button b3Copy;
-  late Button b4Copy;
-  late Button b5Copy;
+  late VMobject playShape;
 
   int state = 0;
   int iteration = 0;
@@ -91,12 +85,6 @@ class GaussianScene extends Scene {
     b3 = playGMMButton();
     b4 = makePrevGMMButton();
     b5 = pauseGMMButton();
-
-    b1Copy = makeUpdateGMMButton();
-    b2Copy = makeResetGMMButton();
-    b3Copy = playGMMButton();
-    b4Copy = makePrevGMMButton();
-    b5Copy = pauseGMMButton();
     // bringToBack([b5]);
 
     // ANIMATIONS
@@ -112,7 +100,7 @@ class GaussianScene extends Scene {
       ShowCreation(b2),
       ShowCreation(b3),
       ShowCreation(b4),
-      ShowCreation(b5)
+      // ShowCreation(b5)
     ]);
 
     // HANDLE INTERACTION
@@ -212,7 +200,7 @@ class GaussianScene extends Scene {
 
   void playGMMUpdater() {
     print("Play");
-    state = 3;
+    state = 6;
   }
 
   void prevGMMUpdater() {
@@ -223,12 +211,12 @@ class GaussianScene extends Scene {
     Rectangle r2 = Rectangle(height: 0.5, width: 0.8);
     // Tex tex = Tex(r' blacktriangleright ', color: BLACK);
     // tex.scaleUniformly(0.5);
-    Triangle tri = Triangle(color: GREEN);
-    tri
+    playShape = Triangle(color: GREEN);
+    playShape
       ..scale(Vector3(0.18, 0.18, 1))
       ..rotate(PI / 2);
-    tri..shift(DOWN / 4);
-    VGroup playGMMButtonGroup = VGroup([tri, r2]);
+    playShape..shift(DOWN / 4);
+    VGroup playGMMButtonGroup = VGroup([playShape, r2]);
     playGMMButtonGroup..moveToPoint(Vector3(5.5, 2.0, 0.0));
     playGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
 
@@ -423,26 +411,27 @@ class GaussianScene extends Scene {
   // Handles all subsequent rendering and triggered animations
   Future continueRendering() async {
     while (true) {
-      if (state == 1) {
+      if (state == 1) { // Next
         // Updates the GMM by 1 EM step
         await nextGMMIteration();
         state = 0;
-      } else if (state == 2) {
+      } else if (state == 2) { // Reset
         print("HIHIHI");
         await resetGMM();
 
         state = 0;
-      } else if (state == 3) {
-        Button pauseCopy = b5Copy.copy();
-        await play(Transform(b3, target: pauseCopy));
+      } else if (state == 3) { // Play
+
         await playGMM();
-      } else if (state == 4) {
+      } else if (state == 4) { // Prev
         await prevGMMIteration();
         state = 0;
-      } else if (state == 5) {
-        Button playCopy = b3Copy.copy();
-        await play(Transform(b5, target: playCopy));
+      } else if (state == 5) { // Pause
+
         state = 0;
+      } else if (state == 6) { // Play Tri Animation
+
+        state = 3;
       } else {
         await wait();
       }
