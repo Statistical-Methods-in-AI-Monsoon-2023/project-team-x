@@ -84,13 +84,10 @@ class GaussianScene extends Scene {
 
   Future updateGaussian() async {
     List<List<double>> resp = gmm.eStep(data1);
-    final hi = gmm.mStep(data1, resp);
+    final temp = gmm.mStep(data1, resp);
 
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
-
-    // means1 = means2;
-    // covs1 = covs2;
 
     print("means & covs");
     print(means2);
@@ -123,8 +120,7 @@ class GaussianScene extends Scene {
     return dotsVG;
   }
 
-  VGroup createGaussians(
-      List<double> means, List<double> covs, List<double> xRange) {
+  VGroup createGaussians(List<double> means, List<double> covs, List<double> xRange) {
     List<FunctionGraph> graphs = [];
 
     var colors = [
@@ -146,8 +142,8 @@ class GaussianScene extends Scene {
     var stepSize = 0.1;
 
     for (var i = 0; i < length; i++) {
-      if (covs[i] < 0.5) {
-        covs[i] = 0.5;
+      if (covs[i] < 0.8) {
+        covs[i] = 0.8;
       }
 
       if (covs[i] > 3) {
