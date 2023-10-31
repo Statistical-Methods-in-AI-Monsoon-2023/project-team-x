@@ -36,6 +36,7 @@ class GaussianScene extends Scene {
   FutureOr<void> preload() {
     Tex.preload(r'Next \\ Iteration');
     Tex.preload(r'Reset');
+    Tex.preload(r' \blacktriangleright ');
 
   }
 
@@ -54,6 +55,7 @@ class GaussianScene extends Scene {
     Animation ag = createInitialGMMAnimations(currentGMM);
     Button b1 = makeUpdateGMMButton();
     Button b2 = makeResetGMMButton();
+    Button b3 = playGMMButton();
 
 
     // ANIMATIONS
@@ -64,8 +66,7 @@ class GaussianScene extends Scene {
     await play(ag);
 
     makeDot();
-    await play(ShowCreation(b1));
-    await play(ShowCreation(b2));
+    await playMany([ShowCreation(b1), ShowCreation(b2), ShowCreation(b3)]);
 
     // HANDLE INTERACTION
     await continueRendering();
@@ -143,10 +144,10 @@ class GaussianScene extends Scene {
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
     // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
     Rectangle r2 = Rectangle(height: 0.5, width: 1.0);
-    Tex tex = Tex(r'Next \\ Iteration', color: BLACK);
+    Tex tex = Tex(r' \blacktriangleright ', color: BLACK);
     tex.scaleUniformly(0.5);
     VGroup playGMMButtonGroup = VGroup([tex, r2]);
-    playGMMButtonGroup..moveToPoint(Vector3(5.5, 2.0, 0.0));
+    playGMMButtonGroup..moveToPoint(Vector3(5.5, 1.5, 0.0));
 
     Button playButton =
         Button(mob: playGMMButtonGroup, onClick: doNextGMMIterationUpdater);
