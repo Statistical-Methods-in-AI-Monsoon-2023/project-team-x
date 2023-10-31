@@ -328,7 +328,7 @@ class GaussianScene extends Scene {
   bool isConverged(List<double> covs) {
     print(covs);
     for (var i = 0; i < covs.length; i++) {
-      if ((covs[i] != lowerCovsThreshold) || (covs[i] != upperCovsThreshold)) {
+      if (covs[i] > lowerCovsThreshold && covs[i] < upperCovsThreshold) {
         return false;
       }
     }
