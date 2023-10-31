@@ -27,6 +27,8 @@ class GaussianScene extends Scene {
   late Button b5;
 
   late VMobject playShape;
+  late Triangle tri;
+  late Square sqr;
 
   int state = 0;
   int iteration = 0;
@@ -59,6 +61,8 @@ class GaussianScene extends Scene {
   List<double> xRange = [-5, 20];
   late List<double> gammas;
 
+  
+
   @override
   FutureOr<void> preload() {
     MathTex.preload(r'\gets');
@@ -81,6 +85,8 @@ class GaussianScene extends Scene {
     VGroup dots = createDotsFromData(data1);
     VGroup dots2 = createDotsFromData(data2);
     Animation ag = createInitialGMMAnimations(currentGMM);
+
+    makeButtonObjects();
     b1 = makeUpdateGMMButton();
     b2 = makeResetGMMButton();
     b3 = playGMMButton();
@@ -95,7 +101,6 @@ class GaussianScene extends Scene {
     await play(ShowCreation(dots));
     await play(ag);
 
-    makeDot();
     await playMany([
       ShowCreation(b1),
       ShowCreation(b2),
@@ -111,15 +116,17 @@ class GaussianScene extends Scene {
   // FUNCTIONS
   // MAKING OBJECTS
 
-  // DEBUGGING OBJECTS
-  Dot makeDot() {
-    dot = Dot(Vector3(3, 3, 0), radius: 0.1, color: RED);
-    return dot;
-  }
-
-  void changeDot() {
-    Dot dot2 = Dot(Vector3(2, 2, 0), radius: 2, color: GREEN);
-    dot.become(dot2);
+  void makeButtonObjects() {
+    Triangle tri = Triangle(color: GREEN);
+    tri
+      ..rotate(PI / 2)
+      ..moveToPoint(Vector3(5.5, 2.0, 0.0))
+      ..scale(Vector3(0.1, 0.1, 1));
+    Square sqr = Square(color: RED);
+    sqr
+      ..rotate(PI / 2)
+      ..moveToPoint(Vector3(5.5, 2.0, 0.0))
+      ..scale(Vector3(0.1, 0.1, 1));
   }
 
   Future prevGMMIteration() async {
@@ -170,13 +177,16 @@ class GaussianScene extends Scene {
     List<List<double>> resp = gmm.eStep(data1);
     final temp = gmm.mStep(data1, resp);
     iteration++;
+    print("iteration");
     print(iteration);
 
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
 
     bool hasConverged = isConverged(covs2);
-    if (hasConverged) state = 0;
+    print("hasConverged");
+    print(hasConverged);
+    if (hasConverged && iteration > 3) state = 0;
 
     nextGMM = createGMM(means2, covs2, xRange);
     await play(Transform(currentGMM, target: nextGMM));
@@ -202,25 +212,15 @@ class GaussianScene extends Scene {
 
   void playGMMUpdater() {
     if (isPlay) {
-      Triangle tri = Triangle(color: GREEN);
-      tri
-        ..rotate(PI / 2)
-        ..moveToPoint(Vector3(5.5, 2.0, 0.0))
-        ..scale(Vector3(0.1, 0.1, 1));
-      tri..shift(DOWN / 4);
       playShape.become(tri);
-    } else {
-      Square sqr = Square(color: RED);
-      sqr
-        ..rotate(PI / 2)
-        ..moveToPoint(Vector3(5.5, 2.0, 0.0))
-        ..scale(Vector3(0.1, 0.1, 1));
-        
+      state = 0;
+    } else {        
       playShape.become(sqr);
+      state = 3;
     }
     isPlay = !isPlay;
     print("Play");
-    state = 3;
+    
   }
 
   void prevGMMUpdater() {
@@ -442,17 +442,10 @@ class GaussianScene extends Scene {
 
         state = 0;
       } else if (state == 3) { // Play
-
         await playGMM();
       } else if (state == 4) { // Prev
         await prevGMMIteration();
         state = 0;
-      } else if (state == 5) { // Pause
-
-        state = 0;
-      } else if (state == 6) { // Play Tri Animation
-
-        state = 3;
       } else {
         await wait();
       }
