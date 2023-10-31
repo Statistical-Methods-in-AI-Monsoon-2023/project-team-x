@@ -17,31 +17,35 @@ class GaussianScene extends Scene {
   late VGroup currentGMM;
   late VGroup gaussians2;
   late VGroup nextGMM;
+  late List<double> means1;
+  late List<double> covs1;
 
   int state = 0;
+  int iteration = 0;
   int initialN = 3;
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   List<double> data2 = [1, 2, 3];
-  List<double> means1 = [1, 3, 7];
-  List<double> covs1 = [1, 2, 3];
-  List<double> means2 = [3, 2, 4];
-  List<double> covs2 = [3, 2, 1];
+  List<double> initialMeans = [1, 3, 7];
+  List<double> initialCovs = [1, 2, 3];
 
   List<double> xRange = [-5, 20];
   late List<double> gammas;
 
   @override
   FutureOr<void> preload() {
+    Tex.preload(r'Previous \\ Iteration');
     Tex.preload(r'Next \\ Iteration');
     Tex.preload(r'Reset');
-    Tex.preload(r' \blacktriangleright ');
+    // Tex.preload(r' blacktriangleright ');
 
   }
 
   @override
   Future construct() async {
+    List<double> means1 = new List<double>.from(initialMeans);
+    List<double> covs1 = new List<double>.from(initialCovs);
     // GMM Initializations
     List<double> weights = initializeWeights(initialN);
     gmm = GMM1D(initialN, weights, means1, covs1);
@@ -49,13 +53,13 @@ class GaussianScene extends Scene {
     // Creating Premade Manim Objects
     addAxes(xRange);
     currentGMM = createGMM(means1, covs1, xRange);
-    nextGMM = createGMM(means2, covs2, xRange);
     VGroup dots = createDotsFromData(data1);
     VGroup dots2 = createDotsFromData(data2);
     Animation ag = createInitialGMMAnimations(currentGMM);
     Button b1 = makeUpdateGMMButton();
     Button b2 = makeResetGMMButton();
     Button b3 = playGMMButton();
+    Button b4 = makePrevGMMButton();
 
 
     // ANIMATIONS
@@ -66,7 +70,7 @@ class GaussianScene extends Scene {
     await play(ag);
 
     makeDot();
-    await playMany([ShowCreation(b1), ShowCreation(b2), ShowCreation(b3)]);
+    await playMany([ShowCreation(b1), ShowCreation(b2), ShowCreation(b3), ShowCreation(b4)]);
 
     // HANDLE INTERACTION
     await continueRendering();
@@ -86,15 +90,50 @@ class GaussianScene extends Scene {
     dot.become(dot2);
   }
 
+  Future prevGMMIteration() async {
+    iteration--;
+    List<double> weights = initializeWeights(initialN);
+    List<double> means1 = new List<double>.from(initialMeans);
+    List<double> covs1 = new List<double>.from(initialCovs);
+    
+    gmm = GMM1D(initialN, weights, means1, covs1);
 
-  Future doNextGMMIteration() async {
+    for (var i = 0; i < iteration; i++) {
+      List<List<double>> resp = gmm.eStep(data1);
+      final temp = gmm.mStep(data1, resp);
+    }
+
+    List<double> means2 = gmm.means;
+    List<double> covs2 = gmm.variances;
+
+    // gmm = gmm2;
+
+    print("means & covs");
+    print(iteration);
+    print(means2);
+    print(covs2);
+    // print(weights);
+    // List<double> means3 = [2, 3, 1];
+    // List<double> covs3 = [4, 3, 2];
+    // weights = gmm.weights;
+
+    nextGMM = createGMM(means2, covs2, xRange);
+    await play(Transform(currentGMM, target: nextGMM));
+    // currentGMM.become(gaussians2);
+  }
+
+
+  Future nextGMMIteration() async {
     List<List<double>> resp = gmm.eStep(data1);
     final temp = gmm.mStep(data1, resp);
+    iteration++;
 
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
 
     print("means & covs");
+    print(iteration);
+
     print(means2);
     print(covs2);
     // print(weights);
@@ -109,14 +148,24 @@ class GaussianScene extends Scene {
 
   Future resetGMM() async {
     List<double> weights = initializeWeights(initialN);
+    List<double> means1 = new List<double>.from(initialMeans);
+    List<double> covs1 = new List<double>.from(initialCovs);
+    
+    print(means1);
+    print(covs1);
     gmm = GMM1D(initialN, weights, means1, covs1);
+    iteration = 0;
     nextGMM = createGMM(means1, covs1, xRange);
+    
     await play(Transform(currentGMM, target: nextGMM));
   }
 
   Future playGMM() async {
     List<List<double>> resp = gmm.eStep(data1);
     final temp = gmm.mStep(data1, resp);
+    iteration++;
+    print(iteration);
+
 
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
@@ -127,11 +176,13 @@ class GaussianScene extends Scene {
 
 
 
-  void doNextGMMIterationUpdater() {
+  void nextGMMUpdater() {
     state = 1;
   }
 
   void resetGMMUpdater() {
+    print("state");
+    print(state);
     state = 2;
   }
 
@@ -139,19 +190,43 @@ class GaussianScene extends Scene {
     state = 3;
   }
 
+  void prevGMMUpdater() {
+    state = 4;
+  }
+
+
   Button playGMMButton() {
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
     // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
-    Rectangle r2 = Rectangle(height: 0.5, width: 1.0);
-    Tex tex = Tex(r' \blacktriangleright ', color: BLACK);
-    tex.scaleUniformly(0.5);
-    VGroup playGMMButtonGroup = VGroup([tex, r2]);
-    playGMMButtonGroup..moveToPoint(Vector3(5.5, 1.5, 0.0));
+    Rectangle r2 = Rectangle(height: 0.5, width: 0.8);
+    // Tex tex = Tex(r' blacktriangleright ', color: BLACK);
+    // tex.scaleUniformly(0.5);
+    Triangle tri = Triangle(color: GREEN);
+    tri..scale(Vector3(0.18, 0.18, 1))..rotate(PI/2);
+    tri..shift(DOWN / 4);
+    VGroup playGMMButtonGroup = VGroup([tri, r2]);
+    playGMMButtonGroup..moveToPoint(Vector3(5.5, 1.0, 0.0));
+    playGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
 
     Button playButton =
-        Button(mob: playGMMButtonGroup, onClick: doNextGMMIterationUpdater);
+        Button(mob: playGMMButtonGroup, onClick: playGMMUpdater);
     return playButton;
+  }
+
+  Button makePrevGMMButton() {
+    // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
+    // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
+    // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
+    Rectangle r2 = Rectangle(height: 0.5, width: 1.0);
+    Tex tex = Tex(r'Previous \\ Iteration', color: BLACK);
+    tex.scaleUniformly(0.5);
+    VGroup prevIterationButton = VGroup([tex, r2]);
+    prevIterationButton..moveToPoint(Vector3(5.5, 0.0, 0.0));
+
+    Button prev =
+        Button(mob: prevIterationButton, onClick: prevGMMUpdater);
+    return prev;
   }
 
   Button makeUpdateGMMButton() {
@@ -164,7 +239,7 @@ class GaussianScene extends Scene {
     VGroup nextIterationButton = VGroup([tex, r2]);
     nextIterationButton..moveToPoint(Vector3(5.5, 2.0, 0.0));
 
-    Button next = Button(mob: nextIterationButton, onClick: doNextGMMIterationUpdater);
+    Button next = Button(mob: nextIterationButton, onClick: nextGMMUpdater);
     return next;
   }
 
@@ -299,13 +374,18 @@ class GaussianScene extends Scene {
     while (true) {
       if (state == 1) {
         // Updates the GMM by 1 EM step
-        await doNextGMMIteration();
+        await nextGMMIteration();
         state = 0;
       } else if (state == 2) {
+        print("HIHIHI");
         await resetGMM();
+
         state = 0;
       } else if (state == 3) {
         await playGMM();
+      } else if (state == 4) {
+        await prevGMMIteration();
+        state = 0;
       } else {
         await wait();
       }
