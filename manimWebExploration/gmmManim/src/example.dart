@@ -172,7 +172,10 @@ class GaussianScene extends Scene {
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
 
-    if (isConverged(covs2)) state = 0;
+    bool hasConverged = isConverged(covs2);
+    print("convergence");
+    print(hasConverged);
+    if (hasConverged) state = 0;
 
     nextGMM = createGMM(means2, covs2, xRange);
     await play(Transform(currentGMM, target: nextGMM));
@@ -323,8 +326,9 @@ class GaussianScene extends Scene {
   }
 
   bool isConverged(List<double> covs) {
+    print(covs);
     for (var i = 0; i < covs.length; i++) {
-      if (covs[i] < lowerCovsThreshold || covs[i] > upperCovsThreshold) {
+      if ((covs[i] != lowerCovsThreshold) || (covs[i] != upperCovsThreshold)) {
         return false;
       }
     }
