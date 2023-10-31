@@ -31,6 +31,7 @@ class GaussianScene extends Scene {
   int state = 0;
   int iteration = 0;
   int initialN = 3;
+  bool isPlay = false;
   double lowerCovsThreshold = 0.8;
   double upperCovsThreshold = 3;
 
@@ -183,6 +184,7 @@ class GaussianScene extends Scene {
 
   void stopUpdater() {
     print("Paused");
+
     state = 5;
 
   }
@@ -199,6 +201,20 @@ class GaussianScene extends Scene {
   }
 
   void playGMMUpdater() {
+    if (isPlay) {
+      Triangle tri = Triangle(color: GREEN);
+      tri
+        ..scale(Vector3(0.18, 0.18, 1))
+        ..rotate(PI / 2);
+      tri..shift(DOWN / 4);
+      playShape.become(tri);
+    } else {
+      Square sqr = Square(color: RED);
+      sqr
+        ..scale(Vector3(0.18, 0.18, 1))
+        ..rotate(PI / 2);
+      playShape.become(sqr);
+    }
     print("Play");
     state = 6;
   }
