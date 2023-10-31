@@ -204,19 +204,23 @@ class GaussianScene extends Scene {
     if (isPlay) {
       Triangle tri = Triangle(color: GREEN);
       tri
-        ..scale(Vector3(0.18, 0.18, 1))
-        ..rotate(PI / 2);
+        ..rotate(PI / 2)
+        ..moveToPoint(Vector3(5.5, 2.0, 0.0))
+        ..scale(Vector3(0.1, 0.1, 1));
       tri..shift(DOWN / 4);
       playShape.become(tri);
     } else {
       Square sqr = Square(color: RED);
       sqr
-        ..scale(Vector3(0.18, 0.18, 1))
-        ..rotate(PI / 2);
+        ..rotate(PI / 2)
+        ..moveToPoint(Vector3(5.5, 2.0, 0.0))
+        ..scale(Vector3(0.1, 0.1, 1));
+        
       playShape.become(sqr);
     }
+    isPlay = !isPlay;
     print("Play");
-    state = 6;
+    state = 3;
   }
 
   void prevGMMUpdater() {
@@ -427,6 +431,7 @@ class GaussianScene extends Scene {
   // Handles all subsequent rendering and triggered animations
   Future continueRendering() async {
     while (true) {
+      print(state);
       if (state == 1) { // Next
         // Updates the GMM by 1 EM step
         await nextGMMIteration();
