@@ -84,7 +84,7 @@ class GaussianScene extends Scene {
     b2 = makeResetGMMButton();
     b3 = playGMMButton();
     b4 = makePrevGMMButton();
-    b5 = pauseGMMButton();
+    // b5 = pauseGMMButton();
     // bringToBack([b5]);
 
     // ANIMATIONS
