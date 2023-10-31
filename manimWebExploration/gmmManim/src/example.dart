@@ -90,7 +90,8 @@ class GaussianScene extends Scene {
       ShowCreation(b1),
       ShowCreation(b2),
       ShowCreation(b3),
-      ShowCreation(b4)
+      ShowCreation(b4),
+      ShowCreation(b5)
     ]);
 
     // HANDLE INTERACTION
@@ -127,20 +128,8 @@ class GaussianScene extends Scene {
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
 
-    // gmm = gmm2;
-
-    print("means & covs");
-    print(iteration);
-    print(means2);
-    print(covs2);
-    // print(weights);
-    // List<double> means3 = [2, 3, 1];
-    // List<double> covs3 = [4, 3, 2];
-    // weights = gmm.weights;
-
     nextGMM = createGMM(means2, covs2, xRange);
     await play(Transform(currentGMM, target: nextGMM));
-    // currentGMM.become(gaussians2);
   }
 
   Future nextGMMIteration() async {
@@ -151,19 +140,8 @@ class GaussianScene extends Scene {
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
 
-    print("means & covs");
-    print(iteration);
-
-    print(means2);
-    print(covs2);
-    // print(weights);
-    // List<double> means3 = [2, 3, 1];
-    // List<double> covs3 = [4, 3, 2];
-    // weights = gmm.weights;
-
     nextGMM = createGMM(means2, covs2, xRange);
     await play(Transform(currentGMM, target: nextGMM));
-    // currentGMM.become(gaussians2);
   }
 
   Future resetGMM() async {
@@ -171,8 +149,6 @@ class GaussianScene extends Scene {
     List<double> means1 = new List<double>.from(initialMeans);
     List<double> covs1 = new List<double>.from(initialCovs);
 
-    print(means1);
-    print(covs1);
     gmm = GMM1D(initialN, weights, means1, covs1);
     iteration = 0;
     nextGMM = createGMM(means1, covs1, xRange);
@@ -190,8 +166,6 @@ class GaussianScene extends Scene {
     List<double> covs2 = gmm.variances;
 
     bool hasConverged = isConverged(covs2);
-    print("convergence");
-    print(hasConverged);
     if (hasConverged) state = 0;
 
     nextGMM = createGMM(means2, covs2, xRange);
@@ -251,12 +225,12 @@ class GaussianScene extends Scene {
       ..rotate(PI / 2);
     sqr..shift(DOWN / 4);
     VGroup pauseGMMButtonGroup = VGroup([sqr, r2]);
-    pauseGMMButtonGroup..moveToPoint(Vector3(5.5, 2.0, 0.0));
+    pauseGMMButtonGroup..moveToPoint(Vector3(5.5, 1.0, 0.0));
     pauseGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
 
-    Button playButton =
+    Button pauseButton =
         Button(mob: pauseGMMButtonGroup, onClick: stopUpdater);
-    return playButton;
+    return pauseButton;
   }
 
   Button makePrevGMMButton() {
