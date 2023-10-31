@@ -23,6 +23,8 @@ class GaussianScene extends Scene {
   int state = 0;
   int iteration = 0;
   int initialN = 3;
+  double lowerCovsThreshold = 0.8;
+  double upperCovsThreshold = 3;
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
@@ -170,6 +172,8 @@ class GaussianScene extends Scene {
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
 
+    if (isConverged(covs2)) state = 0;
+
     nextGMM = createGMM(means2, covs2, xRange);
     await play(Transform(currentGMM, target: nextGMM));
   }
@@ -289,12 +293,12 @@ class GaussianScene extends Scene {
     var stepSize = 0.1;
 
     for (var i = 0; i < length; i++) {
-      if (covs[i] < 0.8) {
-        covs[i] = 0.8;
+      if (covs[i] < lowerCovsThreshold) {
+        covs[i] = lowerCovsThreshold;
       }
 
-      if (covs[i] > 3) {
-        covs[i] = 3;
+      if (covs[i] > upperCovsThreshold) {
+        covs[i] = upperCovsThreshold;
       }
 
       if (covs[i] < 2) {
@@ -316,6 +320,15 @@ class GaussianScene extends Scene {
       graphs.add(graph);
     }
     return VGroup(graphs);
+  }
+
+  bool isConverged(List<double> covs) {
+    for (var i = 0; i < covs.length; i++) {
+      if (covs[i] < lowerCovsThreshold || covs[i] > upperCovsThreshold) {
+        return false;
+      }
+    }
+    return true;
   }
 
   Axes addAxes(List<double> xRange) {

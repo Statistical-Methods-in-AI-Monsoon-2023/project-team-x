@@ -261,8 +261,8 @@ void main() {
     List<double> random = List.generate(dim, (index) => Random().nextDouble());
     double randomSum = random.reduce((value, element) => value + element);
     Matrix tmp = Matrix.diagonal(random) / randomSum;
-    print(tmp);
-    print("jjjjjjjjji");
+    // print(tmp);
+    // print("jjjjjjjjji");
     covs.add(tmp);
   }
 
