@@ -8,6 +8,8 @@ dependencies:
   manim_web: ^1.2.3
   ml_linalg: ^13.11.31
   vector_math: ^2.1.4
+  http: ^0.13.5
+
 
   gmm:
     path: "./gmm"
