@@ -36,6 +36,7 @@ class GaussianScene extends Scene {
   bool isPlay = false;
   double lowerCovsThreshold = 0.8;
   double upperCovsThreshold = 3;
+  double mainButtonsHeight = 2.5;
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   List<double> data1 = [
@@ -117,16 +118,16 @@ class GaussianScene extends Scene {
   // MAKING OBJECTS
 
   void makeButtonObjects() {
-    Triangle tri = Triangle(color: GREEN);
+    tri = Triangle(color: GREEN);
     tri
       ..rotate(PI / 2)
-      ..moveToPoint(Vector3(5.5, 2.0, 0.0))
+      ..moveToPoint(Vector3(5.5, mainButtonsHeight, 0.0))
       ..scale(Vector3(0.1, 0.1, 1));
-    Square sqr = Square(color: RED);
+    sqr = Square(color: RED);
     sqr
       ..rotate(PI / 2)
-      ..moveToPoint(Vector3(5.5, 2.0, 0.0))
-      ..scale(Vector3(0.1, 0.1, 1));
+      ..moveToPoint(Vector3(5.5, mainButtonsHeight, 0.0))
+      ..scale(Vector3(0.08, 0.08, 1));
   }
 
   Future prevGMMIteration() async {
@@ -186,7 +187,10 @@ class GaussianScene extends Scene {
     bool hasConverged = isConverged(covs2);
     print("hasConverged");
     print(hasConverged);
-    if (hasConverged && iteration > 3) state = 0;
+    if (hasConverged && iteration > 3) {
+      state = 0;
+      playShape.become(tri);
+    }
 
     nextGMM = createGMM(means2, covs2, xRange);
     await play(Transform(currentGMM, target: nextGMM));
@@ -237,7 +241,7 @@ class GaussianScene extends Scene {
       ..rotate(PI / 2);
     playShape..shift(DOWN / 4);
     VGroup playGMMButtonGroup = VGroup([playShape, r2]);
-    playGMMButtonGroup..moveToPoint(Vector3(5.5, 2.0, 0.0));
+    playGMMButtonGroup..moveToPoint(Vector3(5.5, mainButtonsHeight, 0.0));
     playGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
 
     Button playButton =
@@ -258,7 +262,7 @@ class GaussianScene extends Scene {
       ..rotate(PI / 2);
     // sqr..shift(DOWN / 4);
     VGroup pauseGMMButtonGroup = VGroup([sqr, r2]);
-    pauseGMMButtonGroup..moveToPoint(Vector3(5.5, 2.0, 0.0));
+    pauseGMMButtonGroup..moveToPoint(Vector3(5.5, mainButtonsHeight, 0.0));
     pauseGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
 
     Button pauseButton =
@@ -274,7 +278,7 @@ class GaussianScene extends Scene {
     MathTex tex = MathTex(r'\gets', color: BLACK);
     tex.scaleUniformly(0.5);
     VGroup prevIterationButton = VGroup([tex, r2]);
-    prevIterationButton..moveToPoint(Vector3(5.0, 2.0, 0.0));
+    prevIterationButton..moveToPoint(Vector3(5.0, mainButtonsHeight, 0.0));
 
     Button prev = Button(mob: prevIterationButton, onClick: prevGMMUpdater);
     return prev;
@@ -288,7 +292,7 @@ class GaussianScene extends Scene {
     MathTex tex = MathTex(r'\to', color: BLACK);
     tex.scaleUniformly(0.5);
     VGroup nextIterationButton = VGroup([tex, r2]);
-    nextIterationButton..moveToPoint(Vector3(6.0, 2.0, 0.0));
+    nextIterationButton..moveToPoint(Vector3(6.0, mainButtonsHeight, 0.0));
 
     Button next = Button(mob: nextIterationButton, onClick: nextGMMUpdater);
     return next;
@@ -299,7 +303,7 @@ class GaussianScene extends Scene {
     Tex tex = Tex(r'Reset', color: RED);
     tex.scaleUniformly(0.5);
     VGroup resetIterationButton = VGroup([tex, r2]);
-    resetIterationButton..moveToPoint(Vector3(5.48, 3.0, 0.0));
+    resetIterationButton..moveToPoint(Vector3(5.5, 3.0, 0.0));
 
     Button reset = Button(mob: resetIterationButton, onClick: resetGMMUpdater);
     return reset;
