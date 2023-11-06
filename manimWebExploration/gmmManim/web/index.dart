@@ -51,13 +51,6 @@ void main() {
 }
 
 
-
-// import "./src/utilityFunctions.dart";
-// import "src/utilityFunctions.dart";
-List<double> initializeWeights(int length) {
-  return List.generate(length, (index) => 1 / length);
-}
-
 class GaussianScene extends Scene {
   late Axes axes;
   late Axes axes2;
@@ -152,7 +145,6 @@ class GaussianScene extends Scene {
     b3 = playGMMButton();
     b4 = makePrevGMMButton();
     // b5 = pauseGMMButton();
-    // bringToBack([b5]);
 
     // ANIMATIONS
 
@@ -515,5 +507,10 @@ class GaussianScene extends Scene {
 
       // if (state != 0) state = 0;
     }
+  }
+
+  // UTILITY
+  List<double> initializeWeights(int length) {
+    return List.generate(length, (index) => 1 / length);
   }
 }
