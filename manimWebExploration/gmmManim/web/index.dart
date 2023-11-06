@@ -76,8 +76,7 @@ void main() {
         contentUpload.setInnerHtml(contents3.toString());
 
         gs.setData(contents3);
-        var scene = gs..bindDisplay(display);
-        scene.run();
+        // var scene = gs..bindDisplay(display);
       });
 
       reader.onError.listen((e) {
@@ -124,7 +123,8 @@ class GaussianScene extends Scene {
   bool isUploaded = false;
   double lowerCovsThreshold = 0.8;
   double upperCovsThreshold = 3;
-  double mainButtonsHeight = 2.5;
+  double mainButtonsHeight = -0.5;
+  double mainButtonsWidthOffset = 0.0;
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   late List<double> data1;
@@ -176,7 +176,7 @@ class GaussianScene extends Scene {
 
     // Creating Premade Manim Objects
     axes = addAxes(xRange);
-    currentGMM = createGMM(means1, covs1, xRange);
+    currentGMM = createGMM(means1, covs1, xRange, axes);
     dots = createDotsFromData(axes, data1);
     Animation ag = createInitialGMMAnimations(currentGMM);
 
@@ -202,6 +202,7 @@ class GaussianScene extends Scene {
       // ShowCreation(b5)
     ]);
 
+
     // HANDLE INTERACTION
     await continueRendering();
 
@@ -215,20 +216,7 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
 
   void setData(uploadedData) {
-    print("Uploaded Data");
     data1 = uploadedData;
-    xRange = setXRange(data1);
-
-    initialN = 3;
-    initialMeans = [1, 3, 7];
-    initialCovs = [1, 2, 3];
-
-    List<double> means1 = new List<double>.from(initialMeans);
-    List<double> covs1 = new List<double>.from(initialCovs);
-    // GMM Initializations
-    List<double> weights = initializeWeights(initialN);
-    gmm = GMM1D(initialN, weights, means1, covs1);
-
     state = 5;
     //Animation
     // 1. Remove current data
@@ -237,22 +225,32 @@ class GaussianScene extends Scene {
   }
 
   Future restartWithUploadedData() async {
+    print("Uploaded Data");
+    
+    xRange = setXRange(data1);
+    initialN = 3;
+    initialMeans = [1, 3, 7];
+    initialCovs = [1, 2, 3];
+    iteration = 0;
+
+    List<double> means1 = new List<double>.from(initialMeans);
+    List<double> covs1 = new List<double>.from(initialCovs);
+    // GMM Initializations
+    List<double> weights = initializeWeights(initialN);
+    gmm = GMM1D(initialN, weights, means1, covs1);
     Axes newAxes = addAxes(xRange);
     VGroup dots2 = createDotsFromData(newAxes, data1);
+    VGroup newGMM = createGMM(means1, covs1, xRange, newAxes);
 
-    // axes.become(newAxes);
-    // dots.become(dots2);
-    print("Going to Transform now");
-    await play(FadeOut(axes));
-    // await play(FadeIn(newAxes));
-    // await play(Transform(axes, target: newAxes));
-    // await play(Transform(dots, target: dots2));
+    await playMany([Transform(axes, target: newAxes), 
+                    Transform(dots, target: dots2), 
+                    Transform(currentGMM, target: newGMM)]);
   }
 
   // Handles all subsequent rendering and triggered animations
   Future continueRendering() async {
     while (true) {
-      print(state);
+      // print(state);
       if (state == 1) {
         // Next
         // Updates the GMM by 1 EM step
@@ -269,13 +267,14 @@ class GaussianScene extends Scene {
         await playGMM();
       } else if (state == 4) {
         // Prev
+        await play(FadeOut(dots));
+
         await prevGMMIteration();
         state = 0;
       } else if (state == 5) {
         // Restart with Uploaded Data
-
-        print("Restarting with Uploaded Data");
         await restartWithUploadedData();
+      
         state = 0;
       } else {
         await wait();
@@ -305,18 +304,7 @@ class GaussianScene extends Scene {
   // FUNCTIONS
   // MAKING OBJECTS
 
-  void makeButtonObjects() {
-    tri = Triangle(color: GREEN);
-    tri
-      ..rotate(PI / 2)
-      ..moveToPoint(Vector3(5.5, mainButtonsHeight, 0.0))
-      ..scale(Vector3(0.1, 0.1, 1));
-    sqr = Square(color: RED);
-    sqr
-      ..rotate(PI / 2)
-      ..moveToPoint(Vector3(5.5, mainButtonsHeight, 0.0))
-      ..scale(Vector3(0.08, 0.08, 1));
-  }
+
 
   Future prevGMMIteration() async {
     iteration--;
@@ -334,7 +322,7 @@ class GaussianScene extends Scene {
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
 
-    nextGMM = createGMM(means2, covs2, xRange);
+    nextGMM = createGMM(means2, covs2, xRange, axes);
     await play(Transform(currentGMM, target: nextGMM));
   }
 
@@ -346,7 +334,7 @@ class GaussianScene extends Scene {
     List<double> means2 = gmm.means;
     List<double> covs2 = gmm.variances;
 
-    nextGMM = createGMM(means2, covs2, xRange);
+    nextGMM = createGMM(means2, covs2, xRange, axes);
     await play(Transform(currentGMM, target: nextGMM));
   }
 
@@ -357,7 +345,7 @@ class GaussianScene extends Scene {
 
     gmm = GMM1D(initialN, weights, means1, covs1);
     iteration = 0;
-    nextGMM = createGMM(means1, covs1, xRange);
+    nextGMM = createGMM(means1, covs1, xRange, axes);
 
     await play(Transform(currentGMM, target: nextGMM));
   }
@@ -380,7 +368,7 @@ class GaussianScene extends Scene {
       playShape.become(tri);
     }
 
-    nextGMM = createGMM(means2, covs2, xRange);
+    nextGMM = createGMM(means2, covs2, xRange, axes);
     await play(Transform(currentGMM, target: nextGMM));
   }
 
@@ -416,6 +404,21 @@ class GaussianScene extends Scene {
     state = 4;
   }
 
+  void makeButtonObjects() {
+    tri = Triangle(color: GREEN);
+    tri
+      ..rotate(PI / 2)
+      ..scale(Vector3(0.1, 0.1, 1))
+      ..toCorner(corner: UL)
+      ..shift(Vector3(0.62 + mainButtonsWidthOffset, -0.04 + mainButtonsHeight, 0.0));
+    sqr = Square(color: RED);
+    sqr
+      ..rotate(PI / 2)
+      ..scale(Vector3(0.08, 0.08, 1))
+      ..toCorner(corner: UL)
+      ..shift(Vector3(0.62 + mainButtonsWidthOffset, -0.04 + mainButtonsHeight, 0.0));
+  }
+
   Button playGMMButton() {
     Rectangle r2 = Rectangle(height: 0.5, width: 0.8);
     // Tex tex = Tex(r' blacktriangleright ', color: BLACK);
@@ -426,8 +429,10 @@ class GaussianScene extends Scene {
       ..rotate(PI / 2);
     playShape..shift(DOWN / 4);
     VGroup playGMMButtonGroup = VGroup([playShape, r2]);
-    playGMMButtonGroup..moveToPoint(Vector3(5.5, mainButtonsHeight, 0.0));
-    playGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
+    playGMMButtonGroup
+      ..scale(Vector3(0.5, 0.5, 1))
+      ..toCorner(corner: UL)
+      ..shift(Vector3(0.5 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
 
     Button playButton =
         Button(mob: playGMMButtonGroup, onClick: playGMMUpdater);
@@ -445,8 +450,10 @@ class GaussianScene extends Scene {
       ..rotate(PI / 2);
     // sqr..shift(DOWN / 4);
     VGroup pauseGMMButtonGroup = VGroup([sqr, r2]);
-    pauseGMMButtonGroup..moveToPoint(Vector3(5.5, mainButtonsHeight, 0.0));
-    pauseGMMButtonGroup..scale(Vector3(0.5, 0.5, 1));
+    pauseGMMButtonGroup
+      ..scale(Vector3(0.5, 0.5, 1))
+      ..toCorner(corner: UL)
+      ..shift(Vector3(0.5 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
 
     Button pauseButton = Button(mob: pauseGMMButtonGroup, onClick: stopUpdater);
     return pauseButton;
@@ -460,7 +467,9 @@ class GaussianScene extends Scene {
     MathTex tex = MathTex(r'\gets', color: BLACK);
     tex.scaleUniformly(0.5);
     VGroup prevIterationButton = VGroup([tex, r2]);
-    prevIterationButton..moveToPoint(Vector3(5.0, mainButtonsHeight, 0.0));
+    prevIterationButton
+      ..toCorner(corner: UL)
+      ..shift(Vector3(0.0 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
 
     Button prev = Button(mob: prevIterationButton, onClick: prevGMMUpdater);
     return prev;
@@ -474,7 +483,9 @@ class GaussianScene extends Scene {
     MathTex tex = MathTex(r'\to', color: BLACK);
     tex.scaleUniformly(0.5);
     VGroup nextIterationButton = VGroup([tex, r2]);
-    nextIterationButton..moveToPoint(Vector3(6.0, mainButtonsHeight, 0.0));
+    nextIterationButton
+      ..toCorner(corner: UL)
+      ..shift(Vector3(1.0 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
 
     Button next = Button(mob: nextIterationButton, onClick: nextGMMUpdater);
     return next;
@@ -485,7 +496,9 @@ class GaussianScene extends Scene {
     Tex tex = Tex(r'Reset', color: RED);
     tex.scaleUniformly(0.5);
     VGroup resetIterationButton = VGroup([tex, r2]);
-    resetIterationButton..moveToPoint(Vector3(5.5, 3.0, 0.0));
+    resetIterationButton
+      ..toCorner(corner: UL)
+      ..shift(Vector3(0.0 + mainButtonsWidthOffset, 0.5 + mainButtonsHeight, 0.0));
 
     Button reset = Button(mob: resetIterationButton, onClick: resetGMMUpdater);
     return reset;
@@ -503,7 +516,7 @@ class GaussianScene extends Scene {
     return dotsVG;
   }
 
-  VGroup createGMM(List<double> means, List<double> covs, List<double> xRange) {
+  VGroup createGMM(List<double> means, List<double> covs, List<double> xRange, Axes axesTmp) {
     List<FunctionGraph> graphs = [];
 
     var colors = [
@@ -529,7 +542,7 @@ class GaussianScene extends Scene {
         covs[i] = lowerCovsThreshold;
       }
 
-      if (covs[i] > upperCovsThreshold) {
+      if (covs[i] > upperCovsThreshold + 2) {
         covs[i] = upperCovsThreshold;
       }
 
@@ -539,7 +552,7 @@ class GaussianScene extends Scene {
         stepSize = 0.3;
       }
 
-      FunctionGraph graph = axes.getGraph(
+      FunctionGraph graph = axesTmp.getGraph(
           (x) =>
               (4 / covs[i]) *
               exp(-(((x - means[i]) * (x - means[i])) /
@@ -568,7 +581,7 @@ class GaussianScene extends Scene {
       xMin: xRange[0],
       xMax: xRange[1],
       yMin: -1,
-      yMax: 10,
+      yMax: 7,
       xAxisConfig: AxisConfig(
         tickFrequency: 1.0,
         unitSize: 0.5,
@@ -582,7 +595,7 @@ class GaussianScene extends Scene {
       ),
     )
       ..setColor(color: WHITE)
-      ..toCorner(corner: UL);
+      ..toCorner(corner: DL);
 
     // TODO Add labels
 
