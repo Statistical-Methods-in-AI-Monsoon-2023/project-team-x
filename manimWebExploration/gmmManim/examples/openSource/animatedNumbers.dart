@@ -6,24 +6,29 @@ class TestScene extends Scene {
 
 	int precisionThreshold = 3;
 
-	@override
-	FutureOr<void> preload() {
-		Tex.preload('e');
-		Tex.preload('+');
-		Tex.preload('-');
-		Tex.preload('.');
-		Tex.preload('0');
-		Tex.preload('1');
-		Tex.preload('2');
-		Tex.preload('3');
-		Tex.preload('4');
-		Tex.preload('5');
-		Tex.preload('6');
-		Tex.preload('7');
-		Tex.preload('8');
-		Tex.preload('9');
-	}
+  @override
+  FutureOr<void> preload() {
+    MathTex.preload(r'\gets');
+    MathTex.preload(r'\to');
+    MathTex.preload(r'Means \mu:');
+    MathTex.preload(r'Variances \sigma^2:');
+    Tex.preload(r'Reset');
 
+    Tex.preload('e');
+    Tex.preload('+');
+    Tex.preload('-');
+    Tex.preload('.');
+    Tex.preload('0');
+    Tex.preload('1');
+    Tex.preload('2');
+    Tex.preload('3');
+    Tex.preload('4');
+    Tex.preload('5');
+    Tex.preload('6');
+    Tex.preload('7');
+    Tex.preload('8');
+    Tex.preload('9');
+  }
 	@override
 	Future construct() async {
 		m = makeMap();
