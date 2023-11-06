@@ -111,6 +111,8 @@ class GaussianScene extends Scene {
   late Button b4;
   late Button b5;
 
+  late VGroup dots;
+
   late VMobject playShape;
   late Triangle tri;
   late Square sqr;
@@ -175,7 +177,7 @@ class GaussianScene extends Scene {
     // Creating Premade Manim Objects
     addAxes(xRange);
     currentGMM = createGMM(means1, covs1, xRange);
-    VGroup dots = createDotsFromData(data1);
+    dots = createDotsFromData(data1);
     Animation ag = createInitialGMMAnimations(currentGMM);
 
     makeButtonObjects();
@@ -227,10 +229,16 @@ class GaussianScene extends Scene {
     List<double> weights = initializeWeights(initialN);
     gmm = GMM1D(initialN, weights, means1, covs1);
 
+    state = 5;
     //Animation
     // 1. Remove current data
     // 2. Update Axes
     // 3. Add New Data
+  }
+
+  Future restartWithUploadedData() async {
+    Axes newAxes = addAxes(xRange);
+
   }
 
   // Handles all subsequent rendering and triggered animations
@@ -257,7 +265,7 @@ class GaussianScene extends Scene {
         state = 0;
       } else if (state == 5) {
         // Restart with Uploaded Data
-
+        await restartWithUploadedData();
         state = 0;
       } else {
         await wait();
