@@ -22,4 +22,4 @@ doc/api/
 
 # Manim web compilation data
 temp/
-web/
+# web/
