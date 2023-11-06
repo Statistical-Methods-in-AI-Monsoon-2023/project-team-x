@@ -2,8 +2,11 @@ import 'package:manim_web/manim.dart';
 
 class TestScene extends Scene {
 
+	late Tex te;
 	late Tex tn;
 	late Tex tp;
+	late Tex td;
+
 	late Tex t0;
 	late Tex t1;
 	late Tex t2;
@@ -17,8 +20,12 @@ class TestScene extends Scene {
 
 	late Map m;
 
+	int precisionThreshold = 3;
+
 	@override
 	FutureOr<void> preload() {
+		Tex.preload('e');
+		Tex.preload('+');
 		Tex.preload('-');
 		Tex.preload('.');
 		Tex.preload('0');
@@ -37,12 +44,15 @@ class TestScene extends Scene {
 	Future construct() async {
 		makeMap();
 
+		await animateNumberChange(0, 1);
 
 	}
 
 	Map makeMap() {
+		te = Tex('e');
+		tp = Tex('+');
 		tn = Tex('-');
-		tp = Tex('.');
+		td = Tex('.');
 		t0 = Tex('0');
 		t1 = Tex('1');
 		t2 = Tex('2');
@@ -55,8 +65,10 @@ class TestScene extends Scene {
 		t9 = Tex('9');
 
 		m = {
+		"e": te,
+		"+": tp,
 		"-": tn,
-		".": tp,
+		".": td,
 		"0": t0,
 		"1": t1,
 		"2": t2,
@@ -74,19 +86,23 @@ class TestScene extends Scene {
 	Future animateNumberChange(double a, double b) async {
 		int steps = 100;
 		double step = (b - a) / steps;
-		List<double> numbers = [];
+		List<VGroup> numbers = [];
 		double currentNumber = a - step;
-		double tmp;
-		for (var i = 0; i < steps; i++) {
+		String tmp;
+		for (var i = 0; i < steps + 1; i++) {
 			currentNumber += step;
-			tmp = currentNumber.roundToDouble()
-			numbers.add(currentNumber);
+			tmp = currentNumber.toStringAsPrecision(precisionThreshold);
+			List<Tex> t = [];
+			for (var j = 0; j < tmp.length; j++) {
+				t.add(m[tmp[j]]);
+			}
+			numbers.add(VGroup(t));
 		}
-		numbers.add(b);
 
-		double a2 = a;
-		for (var i = 0; i < steps; i++) {
-			
+		VGroup initial = numbers[0];
+		await play(ShowCreation(initial));
+		for (var i = 1; i < steps; i++) {
+			initial.become(numbers[i]);
 		}
 
 	}
