@@ -175,9 +175,9 @@ class GaussianScene extends Scene {
     gmm = GMM1D(initialN, weights, means1, covs1);
 
     // Creating Premade Manim Objects
-    addAxes(xRange);
+    axes = addAxes(xRange);
     currentGMM = createGMM(means1, covs1, xRange);
-    dots = createDotsFromData(data1);
+    dots = createDotsFromData(axes, data1);
     Animation ag = createInitialGMMAnimations(currentGMM);
 
     makeButtonObjects();
@@ -238,10 +238,15 @@ class GaussianScene extends Scene {
 
   Future restartWithUploadedData() async {
     Axes newAxes = addAxes(xRange);
-    VGroup dots2 = createDotsFromData(data1);
+    VGroup dots2 = createDotsFromData(newAxes, data1);
 
-    axes.become(newAxes);
-    dots.become(dots2);
+    // axes.become(newAxes);
+    // dots.become(dots2);
+    print("Going to Transform now");
+    await play(FadeOut(axes));
+    // await play(FadeIn(newAxes));
+    // await play(Transform(axes, target: newAxes));
+    // await play(Transform(dots, target: dots2));
   }
 
   // Handles all subsequent rendering and triggered animations
@@ -486,12 +491,12 @@ class GaussianScene extends Scene {
     return reset;
   }
 
-  VGroup createDotsFromData(List<double> data) {
+  VGroup createDotsFromData(Axes axesTmp, List<double> data) {
     List<Dot> dots = [];
 
     var length = data.length;
     for (var i = 0; i < length; i++) {
-      Dot dot = Dot(axes.c2p(Vector3(data[i], 0, 0)), color: BLUE);
+      Dot dot = Dot(axesTmp.c2p(Vector3(data[i], 0, 0)), color: BLUE);
       dots.add(dot);
     }
     VGroup dotsVG = VGroup(dots);
