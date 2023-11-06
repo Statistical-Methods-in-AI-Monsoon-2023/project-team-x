@@ -137,13 +137,13 @@ class GaussianScene extends Scene {
     MathTex.preload(r'\gets');
     MathTex.preload(r'\to');
     Tex.preload(r'Reset');
-    // Tex.preload(r' blacktriangleright ');
   }
 
   @override
   Future construct() async {
     if (!isUploaded) {
       data1 = [
+        -4.0,
         1.1,
         0.6,
         1.3,
@@ -159,8 +159,9 @@ class GaussianScene extends Scene {
         12.4,
         12
       ];
-      setXRange(data1);
+      xRange = setXRange(data1);
       print(xRange);
+      // xRange = [-5, 20];
     }
     initialN = 3;
     initialMeans = [1, 3, 7];
@@ -201,18 +202,87 @@ class GaussianScene extends Scene {
 
     // HANDLE INTERACTION
     await continueRendering();
+
+    
   }
 
-  void setXRange(dataTmp) {
-    double dataMin = dataTmp.reduce(min);
-    double dataMax = dataTmp.reduce(max);
-    double dataPadding = (dataMax - dataMin) / 4;
-    xRange = [dataMin - dataPadding, dataMax + dataPadding];
-  }
+  // CONSTRUCTION FUNCTION ENDS HERE
+  // CONSTRUCTION FUNCTION ENDS HERE
+  // CONSTRUCTION FUNCTION ENDS HERE
+  // CONSTRUCTION FUNCTION ENDS HERE
+  // CONSTRUCTION FUNCTION ENDS HERE
 
   void setData(uploadedData) {
+    print("Uploaded Data");
     data1 = uploadedData;
+    xRange = setXRange(data1);
+
+    initialN = 3;
+    initialMeans = [1, 3, 7];
+    initialCovs = [1, 2, 3];
+
+    List<double> means1 = new List<double>.from(initialMeans);
+    List<double> covs1 = new List<double>.from(initialCovs);
+    // GMM Initializations
+    List<double> weights = initializeWeights(initialN);
+    gmm = GMM1D(initialN, weights, means1, covs1);
+
+    //Animation
+    // 1. Remove current data
+    // 2. Update Axes
+    // 3. Add New Data
   }
+
+  // Handles all subsequent rendering and triggered animations
+  Future continueRendering() async {
+    while (true) {
+      print(state);
+      if (state == 1) {
+        // Next
+        // Updates the GMM by 1 EM step
+        await nextGMMIteration();
+        state = 0;
+      } else if (state == 2) {
+        // Reset
+        print("HIHIHI");
+        await resetGMM();
+
+        state = 0;
+      } else if (state == 3) {
+        // Play
+        await playGMM();
+      } else if (state == 4) {
+        // Prev
+        await prevGMMIteration();
+        state = 0;
+      } else if (state == 5) {
+        // Restart with Uploaded Data
+
+        state = 0;
+      } else {
+        await wait();
+      }
+
+      // if (state != 0) state = 0;
+    }
+  }
+
+  double min1(double a, double b) {
+    return a < b ? a : b;
+  }
+
+  double max1(double a, double b) {
+    return a < b ? b : a;
+  }
+
+  List<double> setXRange(data1) {
+    double dataMin = data1.reduce(min1);
+    double dataMax = data1.reduce(max1);
+    double dataPadding = (dataMax - dataMin) / 4;
+    List<double> xRange1 = [dataMin - dataPadding, dataMax + dataPadding];
+    return xRange1;
+  }
+
 
   // FUNCTIONS
   // MAKING OBJECTS
@@ -526,35 +596,6 @@ class GaussianScene extends Scene {
     currentGMM.become(nextGMM);
   }
 
-  // Handles all subsequent rendering and triggered animations
-  Future continueRendering() async {
-    while (true) {
-      print(state);
-      if (state == 1) {
-        // Next
-        // Updates the GMM by 1 EM step
-        await nextGMMIteration();
-        state = 0;
-      } else if (state == 2) {
-        // Reset
-        print("HIHIHI");
-        await resetGMM();
-
-        state = 0;
-      } else if (state == 3) {
-        // Play
-        await playGMM();
-      } else if (state == 4) {
-        // Prev
-        await prevGMMIteration();
-        state = 0;
-      } else {
-        await wait();
-      }
-
-      // if (state != 0) state = 0;
-    }
-  }
 
   // UTILITY
   List<double> initializeWeights(int length) {
