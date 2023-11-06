@@ -335,7 +335,7 @@ class GaussianScene extends Scene {
   bool isUploaded = false;
   double lowerCovsThreshold = 0.8;
   double upperCovsThreshold = 3;
-  double mainButtonsHeight = -0.5;
+  double mainButtonsHeight = -0.8;
   double mainButtonsWidthOffset = 0.0;
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
@@ -876,24 +876,28 @@ class GaussianScene extends Scene {
 
   Future createNumberDisplay(List<double> means, List<double> covs) async {
     int length = means.length;
-    MathTex meanText = MathTex(r'Means \mu:');
-    MathTex varianceText = MathTex(r'Variances \sigma^2:');
+    MathTex meanText = MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:');
+    MathTex varianceText = MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:');
+
+    double displayOffset = -0.3;
 
     meanText
       ..scale(Vector3(0.7, 0.7, 1))
-      ..toEdge(edge: LEFT)
-      ..shift(Vector3(3.0, mainButtonsHeight, 0.0));
+      ..toCorner(corner: UL)
+      ..shift(Vector3(2.0, displayOffset, 0.0));
 
     varianceText
       ..scale(Vector3(0.7, 0.7, 1))
-      ..toEdge(edge: LEFT)
-      ..shift(Vector3(3.0, mainButtonsHeight - 1.0, 0.0));
+      ..toCorner(corner: UL)
+      ..shift(Vector3(2.0, displayOffset - 0.5, 0.0));
 
     await playMany([ShowCreation(meanText), ShowCreation(varianceText)]);
+    
   }
 
   Future animateNumberChange(double a, double b, Vector3 pos, Map map,
-      {int steps: 17, double runTime: 0.03, int digits: 3}) async {
+      {int steps: 17, double runTime: 0.03, int digits: 3}) 
+      async {
     int steps = 17;
     double step = (b - a) / steps;
     List<VGroup> numbers = [];
