@@ -268,6 +268,8 @@ class GaussianScene extends Scene {
         state = 0;
       } else if (state == 5) {
         // Restart with Uploaded Data
+
+        print("Restarting with Uploaded Data");
         await restartWithUploadedData();
         state = 0;
       } else {
@@ -557,7 +559,7 @@ class GaussianScene extends Scene {
   }
 
   Axes addAxes(List<double> xRange) {
-    axes = Axes(
+    Axes axesTmp = Axes(
       xMin: xRange[0],
       xMax: xRange[1],
       yMin: -1,
@@ -579,7 +581,7 @@ class GaussianScene extends Scene {
 
     // TODO Add labels
 
-    return axes;
+    return axesTmp;
   }
 
   // Create Animations
