@@ -238,7 +238,10 @@ class GaussianScene extends Scene {
 
   Future restartWithUploadedData() async {
     Axes newAxes = addAxes(xRange);
+    VGroup dots2 = createDotsFromData(data1);
 
+    axes.become(newAxes);
+    dots.become(dots2);
   }
 
   // Handles all subsequent rendering and triggered animations
