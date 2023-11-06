@@ -346,8 +346,6 @@ class GaussianScene extends Scene {
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
     // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
     Rectangle r2 = Rectangle(height: 0.5, width: 0.8);
-    // Tex tex = Tex(r' blacktriangleright ', color: BLACK);
-    // tex.scaleUniformly(0.5);
     Square sqr = Square(color: RED);
     sqr
       ..scale(Vector3(0.18, 0.18, 1))
