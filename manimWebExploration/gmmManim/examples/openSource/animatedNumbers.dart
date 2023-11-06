@@ -52,21 +52,21 @@ class TestScene extends Scene {
 		return m;
 	}
 
-	Future animateNumberChange(double a, double b, Vector3 pos, Map map, {int steps: 17, double runTime: 0.03, int digits: 3}) async {
-		int steps = 17;
+	Future animateNumberChange(double a, double b, Vector3 pos, Map map, 
+  {int steps: 17, double runTime: 0.03, int digits: 3, double scale: 0.5, 
+    double eFlagNumberShift: 0.07,double exponentOffset: 0.07, double letterSpacing: 0.17}) async {
 		double step = (b - a) / steps;
 		List<VGroup> numbers = [];
 		double currentNumber = a - step;
 		String tmp;
+
 		for (var i = 0; i < steps + 1; i++) {
 			currentNumber += step;
 			tmp = currentNumber.toStringAsPrecision(digits);
 			List<Tex> t = [];
 			bool eFlag = false;
 			int sinceE = 0;
-			double eFlagNumberShift = 0.07;
-			double exponentOffset = 0.07;
-			double letterSpacing = 0.17;
+
 			for (var j = 0; j < tmp.length; j++) {
 				bool isNumber = false;
 				Tex letter = map[tmp[j]].copy();
@@ -100,7 +100,7 @@ class TestScene extends Scene {
 
 		for (var i = 1; i < steps + 1; i++) {
 			initial.become(numbers[i]);
-			await wait(0.03);
+			await wait(runTime);
 		}
 
 	}

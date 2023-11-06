@@ -16,7 +16,15 @@
     </style>
   </head>
   <body>
+    <h1>File upload test</h1>
+    <form>
+      <input type="file" id="fileInput" name="filename">
+    </form>
+    <div *ngIf="contents != null">
+        <p>Your Data:</p>
+        <p id="uploadedContent"></p>
+    </div>
     <div id="canvas-container"></div>
-    <script src="index.dart.js"></script>
+    <script defer src="index.dart.js"></script>
   </body>
 </html>

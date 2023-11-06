@@ -658,11 +658,8 @@ class GaussianScene extends Scene {
     return m;
   }
 
-  
-
   Future animateNumberChange(double a, double b, Vector3 pos, Map map,
-      {int steps: 17, double runTime: 0.03, int digits: 3}) 
-      async {
+      {int steps: 17, double runTime: 0.03, int digits: 3}) async {
     int steps = 17;
     double step = (b - a) / steps;
     List<VGroup> numbers = [];
