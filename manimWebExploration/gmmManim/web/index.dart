@@ -159,10 +159,8 @@ class GaussianScene extends Scene {
         12.4,
         12
       ];
-      double dataMin = data1.reduce(min);
-      double dataMax = data1.reduce(max);
-      double dataPadding = (dataMax - dataMin) / 4;
-      xRange = [dataMin - dataPadding, dataMax + dataPadding];
+      setXRange(data1);
+      print(xRange);
     }
     initialN = 3;
     initialMeans = [1, 3, 7];
@@ -203,6 +201,13 @@ class GaussianScene extends Scene {
 
     // HANDLE INTERACTION
     await continueRendering();
+  }
+
+  void setXRange(dataTmp) {
+    double dataMin = dataTmp.reduce(min);
+    double dataMax = dataTmp.reduce(max);
+    double dataPadding = (dataMax - dataMin) / 4;
+    xRange = [dataMin - dataPadding, dataMax + dataPadding];
   }
 
   void setData(uploadedData) {
