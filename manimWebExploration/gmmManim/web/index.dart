@@ -139,6 +139,8 @@ class GaussianScene extends Scene {
   FutureOr<void> preload() {
     MathTex.preload(r'\gets');
     MathTex.preload(r'\to');
+    MathTex.preload(r'Means \mu:');
+    MathTex.preload(r'Variances \sigma^2:');
     Tex.preload(r'Reset');
 
     Tex.preload('e');
@@ -210,6 +212,8 @@ class GaussianScene extends Scene {
     await play(ShowCreation(axes));
     await play(ShowCreation(dots));
     await play(ag);
+
+    await createNumberDisplay(means1, covs1);
 
     await playMany([
       ShowCreation(b1),
@@ -658,7 +662,23 @@ class GaussianScene extends Scene {
     return m;
   }
 
-  
+  Future createNumberDisplay(List<double> means, List<double> covs) async {
+    int length = means.length;
+    MathTex meanText = MathTex(r'Means \mu:');
+    MathTex varianceText = MathTex(r'Variances \sigma^2:');
+
+    meanText
+      ..scale(Vector3(0.7, 0.7, 1))
+      ..toEdge(edge: LEFT)
+      ..shift(Vector3(3.0, mainButtonsHeight, 0.0));
+
+    varianceText
+      ..scale(Vector3(0.7, 0.7, 1))
+      ..toEdge(edge: LEFT)
+      ..shift(Vector3(3.0, mainButtonsHeight - 1.0, 0.0));
+
+    await playMany([ShowCreation(meanText), ShowCreation(varianceText)]);
+  }
 
   Future animateNumberChange(double a, double b, Vector3 pos, Map map,
       {int steps: 17, double runTime: 0.03, int digits: 3}) 
