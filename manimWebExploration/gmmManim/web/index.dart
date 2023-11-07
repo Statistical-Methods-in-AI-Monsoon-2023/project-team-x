@@ -873,21 +873,26 @@ class GaussianScene extends Scene {
   }
 
   Axes addAxes(List<double> xRange) {
+    double stepSize = ((xRange[1] - xRange[0]) / 20).toInt() / 2;
     Axes axesTmp = Axes(
       xMin: xRange[0],
       xMax: xRange[1],
       yMin: -1,
       yMax: 7,
+      axisConfig: AxisConfig(
+        includeNumbers: true,
+        includeTip: true,
+      ),
       xAxisConfig: AxisConfig(
         tickFrequency: 1.0,
         unitSize: 0.5,
         includeTip: false,
+        // includeNumbers: true,
+        // numbersToShow: range(start: 1, end: (xRange[1] - xRange[0]).toInt()),
+        // labelDirection: DOWN
       ),
       yAxisConfig: AxisConfig(
         unitSize: 0.7,
-      ),
-      axisConfig: AxisConfig(
-        includeTip: false,
       ),
     )
       ..setColor(color: WHITE)
