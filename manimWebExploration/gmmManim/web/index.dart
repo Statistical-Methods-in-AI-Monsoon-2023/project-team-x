@@ -460,8 +460,8 @@ class GaussianScene extends Scene {
     // Axes & Data
 
     // await animateNumberChange(0, 1, ORIGIN, m);
-    await play(ShowCreation(axes));
-    await play(ShowCreation(dots));
+    await play(FadeIn(axes));
+    await play(FadeIn(dots));
     await play(ag);
 
     await createNumberDisplay(means1, covs1, m);
@@ -924,12 +924,13 @@ class GaussianScene extends Scene {
       {double heightOffset: 0.0}) {
     int length = list.length;
     List<VGroup> vgs = [];
+    double letterOffset = 1.5;
 
     for (var i = 0; i < length; i++) {
-      VGroup number = VGroup(getNumber(list[i].toString(), map));
+      VGroup number = VGroup(getNumber(list[i].toStringAsPrecision(2), map));
       number
         ..toCorner(corner: UL)
-        ..shift(Vector3(4.0 + 1.0 * i, displayOffset - heightOffset, 0.0));
+        ..shift(Vector3(4.0 + letterOffset* i, displayOffset - heightOffset, 0.0));
       vgs.add(number);
     }
 
@@ -1073,7 +1074,7 @@ class GaussianScene extends Scene {
     this.add([v100]);
     // await play(ShowCreation(v100));
     await play(FadeOut(circle));
-    await play(FadeOut(v100));
+    await play(FadeOut(v100, lagRatio: 2.0));
   }
 
   // UTILITY
