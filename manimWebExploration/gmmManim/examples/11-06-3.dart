@@ -359,15 +359,18 @@ class GaussianScene extends Scene {
   late Triangle tri;
   late Square sqr;
 
+  late VGroup mcVG;
+
   int state = 0;
   int iteration = 0;
-  late int initialN;
+  late int numComponents;
   bool isPlay = false;
   bool isUploaded = false;
   double lowerCovsThreshold = 0.8;
   double upperCovsThreshold = 3;
   double mainButtonsHeight = -0.8;
   double mainButtonsWidthOffset = 0.0;
+  double displayOffset = -0.3;
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   late List<double> data1;
@@ -407,6 +410,7 @@ class GaussianScene extends Scene {
   @override
   Future construct() async {
     m = makeMap();
+    await loadingAnimation(m);
 
     if (!isUploaded) {
       data1 = [
@@ -430,14 +434,14 @@ class GaussianScene extends Scene {
       print(xRange);
       // xRange = [-5, 20];
     }
-    initialN = 3;
+    numComponents = 3;
     initialMeans = [1, 3, 7];
     initialCovs = [1, 2, 3];
     List<double> means1 = new List<double>.from(initialMeans);
     List<double> covs1 = new List<double>.from(initialCovs);
     // GMM Initializations
-    List<double> weights = initializeWeights(initialN);
-    gmm = GMM1D(initialN, weights, means1, covs1);
+    List<double> weights = initializeWeights(numComponents);
+    gmm = GMM1D(numComponents, weights, means1, covs1);
 
     // Creating Premade Manim Objects
     axes = addAxes(xRange);
@@ -454,11 +458,14 @@ class GaussianScene extends Scene {
     // ANIMATIONS
 
     // Axes & Data
+
+    // await animateNumberChange(0, 1, ORIGIN, m);
     await play(ShowCreation(axes));
     await play(ShowCreation(dots));
     await play(ag);
 
-    await createNumberDisplay(means1, covs1);
+    await createNumberDisplay(means1, covs1, m);
+    await fixedComponentNumberDisplay(m);
 
     await playMany([
       ShowCreation(b1),
@@ -480,6 +487,7 @@ class GaussianScene extends Scene {
 
   void setData(uploadedData) {
     data1 = uploadedData;
+    isUploaded = true;
     state = 5;
   }
 
@@ -487,7 +495,7 @@ class GaussianScene extends Scene {
     print("Uploaded Data");
 
     xRange = setXRange(data1);
-    initialN = 3;
+    numComponents = 3;
     initialMeans = [1, 3, 7];
     initialCovs = [1, 2, 3];
     iteration = 0;
@@ -495,8 +503,8 @@ class GaussianScene extends Scene {
     List<double> means1 = new List<double>.from(initialMeans);
     List<double> covs1 = new List<double>.from(initialCovs);
     // GMM Initializations
-    List<double> weights = initializeWeights(initialN);
-    gmm = GMM1D(initialN, weights, means1, covs1);
+    List<double> weights = initializeWeights(numComponents);
+    gmm = GMM1D(numComponents, weights, means1, covs1);
     Axes newAxes = addAxes(xRange);
     VGroup dots2 = createDotsFromData(newAxes, data1);
     VGroup newGMM = createGMM(means1, covs1, xRange, newAxes);
@@ -531,8 +539,6 @@ class GaussianScene extends Scene {
         await playGMM();
       } else if (state == 4) {
         // Prev
-        await play(FadeOut(dots));
-
         await prevGMMIteration();
         state = 0;
       } else if (state == 5) {
@@ -569,11 +575,11 @@ class GaussianScene extends Scene {
 
   Future prevGMMIteration() async {
     iteration--;
-    List<double> weights = initializeWeights(initialN);
+    List<double> weights = initializeWeights(numComponents);
     List<double> means1 = new List<double>.from(initialMeans);
     List<double> covs1 = new List<double>.from(initialCovs);
 
-    gmm = GMM1D(initialN, weights, means1, covs1);
+    gmm = GMM1D(numComponents, weights, means1, covs1);
 
     for (var i = 0; i < iteration; i++) {
       List<List<double>> resp = gmm.eStep(data1);
@@ -584,7 +590,9 @@ class GaussianScene extends Scene {
     List<double> covs2 = gmm.variances;
 
     nextGMM = createGMM(means2, covs2, xRange, axes);
-    await play(Transform(currentGMM, target: nextGMM));
+    Animation mcVGAnimation = transformMCDisplay(means2, covs2, m);
+
+    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
 
   Future nextGMMIteration() async {
@@ -596,24 +604,27 @@ class GaussianScene extends Scene {
     List<double> covs2 = gmm.variances;
 
     nextGMM = createGMM(means2, covs2, xRange, axes);
-    await play(Transform(currentGMM, target: nextGMM));
+    Animation mcVGAnimation = transformMCDisplay(means2, covs2, m);
+
+    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
 
   Future resetGMM() async {
-    List<double> weights = initializeWeights(initialN);
+    List<double> weights = initializeWeights(numComponents);
     List<double> means1 = new List<double>.from(initialMeans);
     List<double> covs1 = new List<double>.from(initialCovs);
 
-    gmm = GMM1D(initialN, weights, means1, covs1);
+    gmm = GMM1D(numComponents, weights, means1, covs1);
     iteration = 0;
     nextGMM = createGMM(means1, covs1, xRange, axes);
+    Animation mcVGAnimation = transformMCDisplay(means1, covs1, m);
 
-    await play(Transform(currentGMM, target: nextGMM));
+    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
 
   Future playGMM() async {
     List<List<double>> resp = gmm.eStep(data1);
-    final temp = gmm.mStep(data1, resp);
+    gmm.mStep(data1, resp);
     iteration++;
     print("iteration");
     print(iteration);
@@ -632,7 +643,9 @@ class GaussianScene extends Scene {
     }
 
     nextGMM = createGMM(means2, covs2, xRange, axes);
-    await play(Transform(currentGMM, target: nextGMM));
+    Animation mcVGAnimation = transformMCDisplay(means2, covs2, m);
+
+    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
 
   void stopUpdater() {
@@ -907,13 +920,44 @@ class GaussianScene extends Scene {
     return m;
   }
 
-  Future createNumberDisplay(List<double> means, List<double> covs) async {
-    int length = means.length;
+  VGroup initializeListDisplay(List<double> list, Map map,
+      {double heightOffset: 0.0}) {
+    int length = list.length;
+    List<VGroup> vgs = [];
+
+    for (var i = 0; i < length; i++) {
+      VGroup number = VGroup(getNumber(list[i].toString(), map));
+      number
+        ..toCorner(corner: UL)
+        ..shift(Vector3(4.0 + 1.0 * i, displayOffset - heightOffset, 0.0));
+      vgs.add(number);
+    }
+
+    return VGroup(vgs);
+  }
+
+  Future initializeMCDisplay(
+      List<double> means, List<double> covs, Map map) async {
+    VGroup mVG = initializeListDisplay(means, map);
+    VGroup cVG = initializeListDisplay(covs, map, heightOffset: 0.5);
+    mcVG = VGroup([mVG, cVG]);
+
+    await play(ShowCreation(mcVG));
+  }
+
+  Animation transformMCDisplay(List<double> means, List<double> covs, Map map) {
+    VGroup mVG = initializeListDisplay(means, map);
+    VGroup cVG = initializeListDisplay(covs, map, heightOffset: 0.5);
+    VGroup mcVG2 = VGroup([mVG, cVG]);
+
+    return Transform(mcVG, target: mcVG2);
+  }
+
+  Future createNumberDisplay(
+      List<double> means, List<double> covs, Map map) async {
     MathTex meanText = MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:');
     MathTex varianceText =
         MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:');
-
-    double displayOffset = -0.3;
 
     meanText
       ..scale(Vector3(0.7, 0.7, 1))
@@ -926,19 +970,69 @@ class GaussianScene extends Scene {
       ..shift(Vector3(2.0, displayOffset - 0.5, 0.0));
 
     await playMany([ShowCreation(meanText), ShowCreation(varianceText)]);
+    await initializeMCDisplay(means, covs, map);
   }
 
-  Future fixedComponentNumberDisplay() async {
-    MathTex componentNumber = MathTex(r'N_{components}:');
+  Future fixedComponentNumberDisplay(Map m) async {
+    MathTex fixedComponentNumber = MathTex(r'N_{components}:');
+    VGroup componentNumber;
+
+    fixedComponentNumber
+      ..toCorner(corner: UL)
+      ..shift(Vector3(0.0, 0.3, 0.0));
+
+    componentNumber = (numComponents < 10)
+        ? VGroup([m[numComponents.toString()]])
+        : VGroup(getNumber(numComponents.toString(), m, pos: ORIGIN));
     componentNumber
       ..toCorner(corner: UL)
-      ..shift(Vector3(0.5, 0.0, 0.0));
-    await play(ShowCreation(componentNumber));
+      ..shift(Vector3(2.2, 0.3, 0.0));
+
+    await playMany(
+        [ShowCreation(fixedComponentNumber), ShowCreation(componentNumber)]);
+  }
+
+  List<Tex> getNumber(String tmp, Map map, {Vector3 pos: ORIGIN}) {
+    List<Tex> t = [];
+    bool eFlag = false;
+    int sinceE = 0;
+    double eFlagNumberShift = 0.07;
+    double exponentOffset = 0.07;
+    double letterSpacing = 0.17;
+    for (var j = 0; j < tmp.length; j++) {
+      bool isNumber = false;
+      Tex letter = map[tmp[j]].copy();
+      double shift = 0;
+      if (tmp[j] == '.') {
+        shift = 0.1;
+      } else if (tmp[j] == 'e') {
+        shift = 0.05;
+        eFlag = true;
+      } else {
+        isNumber = true;
+      }
+      if (eFlag && isNumber) {
+        sinceE++;
+        letter
+          ..scale(Vector3(0.5, 0.5, 1))
+          ..moveToPoint(Vector3(
+              pos[0] + letterSpacing * j - exponentOffset * sinceE,
+              pos[1] + eFlagNumberShift,
+              pos[2]));
+      } else {
+        letter
+          ..moveToPoint(
+              Vector3(pos[0] + letterSpacing * j, pos[1] - shift, pos[2]));
+      }
+
+      t.add(letter);
+    }
+
+    return t;
   }
 
   Future animateNumberChange(double a, double b, Vector3 pos, Map map,
       {int steps: 17, double runTime: 0.03, int digits: 3}) async {
-    int steps = 17;
     double step = (b - a) / steps;
     List<VGroup> numbers = [];
     double currentNumber = a - step;
@@ -946,40 +1040,7 @@ class GaussianScene extends Scene {
     for (var i = 0; i < steps + 1; i++) {
       currentNumber += step;
       tmp = currentNumber.toStringAsPrecision(digits);
-      List<Tex> t = [];
-      bool eFlag = false;
-      int sinceE = 0;
-      double eFlagNumberShift = 0.07;
-      double exponentOffset = 0.07;
-      double letterSpacing = 0.17;
-      for (var j = 0; j < tmp.length; j++) {
-        bool isNumber = false;
-        Tex letter = map[tmp[j]].copy();
-        double shift = 0;
-        if (tmp[j] == '.') {
-          shift = 0.1;
-        } else if (tmp[j] == 'e') {
-          shift = 0.05;
-          eFlag = true;
-        } else {
-          isNumber = true;
-        }
-        if (eFlag && isNumber) {
-          sinceE++;
-          letter
-            ..scale(Vector3(0.5, 0.5, 1))
-            ..moveToPoint(Vector3(
-                pos[0] + letterSpacing * j - exponentOffset * sinceE,
-                pos[1] + eFlagNumberShift,
-                pos[2]));
-        } else {
-          letter
-            ..moveToPoint(
-                Vector3(pos[0] + letterSpacing * j, pos[1] - shift, pos[2]));
-        }
-
-        t.add(letter);
-      }
+      List<Tex> t = getNumber(tmp, map, pos: pos);
       numbers.add(VGroup(t));
     }
 
@@ -990,6 +1051,14 @@ class GaussianScene extends Scene {
       initial.become(numbers[i]);
       await wait(runTime);
     }
+  }
+
+  Future loadingAnimation(Map map) async {
+    Circle circle = Circle(radius: 3.0, color: WHITE);
+    circle.fillColors = [BLACK];
+    await play(ShowCreation(circle));
+    await animateNumberChange(0, 100, ORIGIN, map,
+        steps: 120, digits: 3, runTime: 0.05);
   }
 
   // UTILITY
