@@ -1068,10 +1068,12 @@ class GaussianScene extends Scene {
         steps: 9, digits: 1, runTime: 0.025);
     await animateNumberChange(9, 99, ORIGIN, map,
         steps: 90, digits: 2, runTime: 0.025);
-    await animateNumberChange(99, 100, ORIGIN, map,
-        steps: 1, digits: 3, runTime: 0.025);
-
+    
+    VGroup v100 = VGroup(getNumber("100", map));
+    this.add([v100]);
+    // await play(ShowCreation(v100));
     await play(FadeOut(circle));
+    await play(FadeOut(v100));
   }
 
   // UTILITY
