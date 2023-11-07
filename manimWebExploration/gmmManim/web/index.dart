@@ -358,6 +358,7 @@ class GaussianScene extends Scene {
   late VMobject playShape;
   late Triangle tri;
   late Square sqr;
+  late Rectangle mcSurroundingRectangle;
 
   late VGroup mcVG;
 
@@ -371,6 +372,8 @@ class GaussianScene extends Scene {
   double mainButtonsHeight = -0.8;
   double mainButtonsWidthOffset = 0.0;
   double displayOffset = -0.3;
+  double letterOffset = 1.5;
+
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   late List<double> data1;
@@ -410,7 +413,7 @@ class GaussianScene extends Scene {
   @override
   Future construct() async {
     m = makeMap();
-    await loadingAnimation(m);
+    // await loadingAnimation(m);
 
     if (!isUploaded) {
       data1 = [
@@ -924,7 +927,6 @@ class GaussianScene extends Scene {
       {double heightOffset: 0.0}) {
     int length = list.length;
     List<VGroup> vgs = [];
-    double letterOffset = 1.5;
 
     for (var i = 0; i < length; i++) {
       VGroup number = VGroup(getNumber(list[i].toStringAsPrecision(2), map));
@@ -937,13 +939,13 @@ class GaussianScene extends Scene {
     return VGroup(vgs);
   }
 
-  Future initializeMCDisplay(
-      List<double> means, List<double> covs, Map map) async {
+  Animation initializeMCDisplay(
+      List<double> means, List<double> covs, Map map) {
     VGroup mVG = initializeListDisplay(means, map);
     VGroup cVG = initializeListDisplay(covs, map, heightOffset: 0.5);
     mcVG = VGroup([mVG, cVG]);
 
-    await play(ShowCreation(mcVG));
+    return ShowCreation(mcVG);
   }
 
   Animation transformMCDisplay(List<double> means, List<double> covs, Map map) {
@@ -970,8 +972,15 @@ class GaussianScene extends Scene {
       ..toCorner(corner: UL)
       ..shift(Vector3(2.0, displayOffset - 0.5, 0.0));
 
-    await playMany([ShowCreation(meanText), ShowCreation(varianceText)]);
-    await initializeMCDisplay(means, covs, map);
+    mcSurroundingRectangle = Rectangle(color: WHITE, width: 1.75 + letterOffset * numComponents, height: 1.2)
+      ..toCorner(corner: UL)
+      ..shift(Vector3(1.7, displayOffset + 0.2, 0.0));
+    
+    mcSurroundingRectangle.fillColors = [TRANSPARENT];
+
+
+    Animation initialMCDisplayAnimation = initializeMCDisplay(means, covs, map);
+    await playMany([ShowCreation(meanText), ShowCreation(varianceText), initialMCDisplayAnimation, ShowCreation(mcSurroundingRectangle)]);
   }
 
   Future fixedComponentNumberDisplay(Map m) async {
@@ -1062,7 +1071,7 @@ class GaussianScene extends Scene {
   }
 
   Future loadingAnimation(Map map) async {
-    Circle circle = Circle(radius: 3.0, color: WHITE);
+    Circle circle = Circle(radius: 1.0, color: WHITE)..shift(Vector3(0.1, 0.0, 0.0));
     circle.fillColors = [BLACK];
     await play(ShowCreation(circle));
     await animateNumberChange(0, 9, ORIGIN, map,

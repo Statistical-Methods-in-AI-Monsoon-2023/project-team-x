@@ -460,8 +460,8 @@ class GaussianScene extends Scene {
     // Axes & Data
 
     // await animateNumberChange(0, 1, ORIGIN, m);
-    await play(ShowCreation(axes));
-    await play(ShowCreation(dots));
+    await play(FadeIn(axes));
+    await play(FadeIn(dots));
     await play(ag);
 
     await createNumberDisplay(means1, covs1, m);
@@ -924,12 +924,14 @@ class GaussianScene extends Scene {
       {double heightOffset: 0.0}) {
     int length = list.length;
     List<VGroup> vgs = [];
+    double letterOffset = 1.5;
 
     for (var i = 0; i < length; i++) {
-      VGroup number = VGroup(getNumber(list[i].toString(), map));
+      VGroup number = VGroup(getNumber(list[i].toStringAsPrecision(2), map));
       number
         ..toCorner(corner: UL)
-        ..shift(Vector3(4.0 + 1.0 * i, displayOffset - heightOffset, 0.0));
+        ..shift(
+            Vector3(4.0 + letterOffset * i, displayOffset - heightOffset, 0.0));
       vgs.add(number);
     }
 
@@ -1032,33 +1034,51 @@ class GaussianScene extends Scene {
   }
 
   Future animateNumberChange(double a, double b, Vector3 pos, Map map,
-      {int steps: 17, double runTime: 0.03, int digits: 3}) async {
+      {int steps: 17,
+      double runTime: 0.03,
+      int digits: 3,
+      bool doEnd: true}) async {
     double step = (b - a) / steps;
     List<VGroup> numbers = [];
     double currentNumber = a - step;
     String tmp;
+    VGroup initial = VGroup();
     for (var i = 0; i < steps + 1; i++) {
       currentNumber += step;
       tmp = currentNumber.toStringAsPrecision(digits);
       List<Tex> t = getNumber(tmp, map, pos: pos);
       numbers.add(VGroup(t));
+
+      if (i == 0) {
+        initial = numbers[0];
+        this.add([initial]);
+      } else {
+        initial.become(numbers[i]);
+        await wait(runTime);
+      }
     }
 
-    VGroup initial = numbers[0];
-    await play(ShowCreation(initial));
-
-    for (var i = 1; i < steps + 1; i++) {
-      initial.become(numbers[i]);
+    if (doEnd) {
+      this.remove([initial]);
       await wait(runTime);
     }
   }
 
   Future loadingAnimation(Map map) async {
-    Circle circle = Circle(radius: 3.0, color: WHITE);
+    Circle circle = Circle(radius: 1.0, color: WHITE)
+      ..shift(Vector3(0.1, 0.0, 0.0));
     circle.fillColors = [BLACK];
     await play(ShowCreation(circle));
-    await animateNumberChange(0, 100, ORIGIN, map,
-        steps: 120, digits: 3, runTime: 0.05);
+    await animateNumberChange(0, 9, ORIGIN, map,
+        steps: 9, digits: 1, runTime: 0.025);
+    await animateNumberChange(9, 99, ORIGIN, map,
+        steps: 90, digits: 2, runTime: 0.025);
+
+    VGroup v100 = VGroup(getNumber("100", map));
+    this.add([v100]);
+    // await play(ShowCreation(v100));
+    await play(FadeOut(circle));
+    await play(FadeOut(v100, lagRatio: 2.0));
   }
 
   // UTILITY
