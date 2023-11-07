@@ -368,6 +368,8 @@ class GaussianScene extends Scene {
   double upperCovsThreshold = 3;
   double mainButtonsHeight = -0.8;
   double mainButtonsWidthOffset = 0.0;
+  double displayOffset = -0.3;
+
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   late List<double> data1;
@@ -455,12 +457,12 @@ class GaussianScene extends Scene {
 
     // Axes & Data
 
-    await animateNumberChange(0, 1, ORIGIN, m);
+    // await animateNumberChange(0, 1, ORIGIN, m);
     await play(ShowCreation(axes));
     await play(ShowCreation(dots));
     await play(ag);
 
-    await createNumberDisplay(means1, covs1);
+    await createNumberDisplay(means1, covs1, m);
     await fixedComponentNumberDisplay(m);
 
     await playMany([
@@ -910,13 +912,32 @@ class GaussianScene extends Scene {
     return m;
   }
 
-  Future createNumberDisplay(List<double> means, List<double> covs) async {
-    int length = means.length;
+  VGroup initializeListDisplay(List<double> list, Map map, {double heightOffset: 0.5}) {
+    int length = list.length;
+    List<VGroup> vgs = [];
+
+    for (var i = 0; i < length; i++) {
+      VGroup number = VGroup(getNumber(list[i].toString(), map));
+      number
+        ..toCorner(corner: UL)
+        ..shift(Vector3(2.0 + 1.0 * i, displayOffset, 0.0));
+      vgs.add(number);
+    }
+
+    return VGroup(vgs);
+  }
+
+  Future initializeMCDisplay(List<double> means, List<double> covs, Map map) async {
+    VGroup mVG = initializeListDisplay(means, map);
+    VGroup cVG = initializeListDisplay(covs, map);
+
+    await playMany([ShowCreation(mVG), ShowCreation(cVG)]);
+  }
+
+  Future createNumberDisplay(List<double> means, List<double> covs, Map map) async {
     MathTex meanText = MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:');
     MathTex varianceText =
         MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:');
-
-    double displayOffset = -0.3;
 
     meanText
       ..scale(Vector3(0.7, 0.7, 1))
@@ -928,7 +949,10 @@ class GaussianScene extends Scene {
       ..toCorner(corner: UL)
       ..shift(Vector3(2.0, displayOffset - 0.5, 0.0));
 
+
+
     await playMany([ShowCreation(meanText), ShowCreation(varianceText)]);
+    await initializeMCDisplay(means, covs, map);
   }
 
   Future fixedComponentNumberDisplay(Map m) async {
@@ -942,7 +966,7 @@ class GaussianScene extends Scene {
     componentNumber = (numComponents < 10) ? VGroup([m[numComponents.toString()]]) : VGroup(getNumber(numComponents.toString(), m, pos: ORIGIN));
     componentNumber
       ..toCorner(corner: UL)
-      ..shift(Vector3(0.0, 0.5, 0.0));
+      ..shift(Vector3(2.2, 0.3, 0.0));
     
     await playMany([ShowCreation(fixedComponentNumber), ShowCreation(componentNumber)]);
   }
