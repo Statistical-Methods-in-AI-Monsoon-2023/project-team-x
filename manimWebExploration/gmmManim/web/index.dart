@@ -411,6 +411,7 @@ class GaussianScene extends Scene {
   @override
   Future construct() async {
     m = makeMap();
+    await loadingAnimation(m);
 
     if (!isUploaded) {
       data1 = [
@@ -487,6 +488,7 @@ class GaussianScene extends Scene {
 
   void setData(uploadedData) {
     data1 = uploadedData;
+    isUploaded = true;
     state = 5;
   }
 
@@ -589,7 +591,9 @@ class GaussianScene extends Scene {
     List<double> covs2 = gmm.variances;
 
     nextGMM = createGMM(means2, covs2, xRange, axes);
-    await play(Transform(currentGMM, target: nextGMM));
+    Animation mcVGAnimation = transformMCDisplay(means2, covs2, m);
+
+    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
 
   Future nextGMMIteration() async {
@@ -601,7 +605,9 @@ class GaussianScene extends Scene {
     List<double> covs2 = gmm.variances;
 
     nextGMM = createGMM(means2, covs2, xRange, axes);
-    await play(Transform(currentGMM, target: nextGMM));
+    Animation mcVGAnimation = transformMCDisplay(means2, covs2, m);
+
+    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
 
   Future resetGMM() async {
@@ -638,7 +644,7 @@ class GaussianScene extends Scene {
     }
 
     nextGMM = createGMM(means2, covs2, xRange, axes);
-    Animation mcVGAnimation = transformMCDisplay(means1, covs1, m);
+    Animation mcVGAnimation = transformMCDisplay(means2, covs2, m);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
@@ -1044,6 +1050,10 @@ class GaussianScene extends Scene {
       initial.become(numbers[i]);
       await wait(runTime);
     }
+  }
+
+  Future loadingAnimation(Map map) async {
+    await animateNumberChange(0, 100, ORIGIN, map, steps: 120, digits: 3, runTime: 0.05);
   }
 
   // UTILITY
