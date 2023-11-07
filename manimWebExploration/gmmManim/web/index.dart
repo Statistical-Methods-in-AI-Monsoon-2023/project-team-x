@@ -361,7 +361,7 @@ class GaussianScene extends Scene {
 
   int state = 0;
   int iteration = 0;
-  late int initialN;
+  late int numComponents;
   bool isPlay = false;
   bool isUploaded = false;
   double lowerCovsThreshold = 0.8;
@@ -430,14 +430,14 @@ class GaussianScene extends Scene {
       print(xRange);
       // xRange = [-5, 20];
     }
-    initialN = 3;
+    numComponents = 3;
     initialMeans = [1, 3, 7];
     initialCovs = [1, 2, 3];
     List<double> means1 = new List<double>.from(initialMeans);
     List<double> covs1 = new List<double>.from(initialCovs);
     // GMM Initializations
-    List<double> weights = initializeWeights(initialN);
-    gmm = GMM1D(initialN, weights, means1, covs1);
+    List<double> weights = initializeWeights(numComponents);
+    gmm = GMM1D(numComponents, weights, means1, covs1);
 
     // Creating Premade Manim Objects
     axes = addAxes(xRange);
@@ -459,7 +459,7 @@ class GaussianScene extends Scene {
     await play(ag);
 
     await createNumberDisplay(means1, covs1);
-    await fixedComponentNumberDisplay();
+    await fixedComponentNumberDisplay(m);
 
     await playMany([
       ShowCreation(b1),
@@ -488,7 +488,7 @@ class GaussianScene extends Scene {
     print("Uploaded Data");
 
     xRange = setXRange(data1);
-    initialN = 3;
+    numComponents = 3;
     initialMeans = [1, 3, 7];
     initialCovs = [1, 2, 3];
     iteration = 0;
@@ -496,8 +496,8 @@ class GaussianScene extends Scene {
     List<double> means1 = new List<double>.from(initialMeans);
     List<double> covs1 = new List<double>.from(initialCovs);
     // GMM Initializations
-    List<double> weights = initializeWeights(initialN);
-    gmm = GMM1D(initialN, weights, means1, covs1);
+    List<double> weights = initializeWeights(numComponents);
+    gmm = GMM1D(numComponents, weights, means1, covs1);
     Axes newAxes = addAxes(xRange);
     VGroup dots2 = createDotsFromData(newAxes, data1);
     VGroup newGMM = createGMM(means1, covs1, xRange, newAxes);
@@ -570,11 +570,11 @@ class GaussianScene extends Scene {
 
   Future prevGMMIteration() async {
     iteration--;
-    List<double> weights = initializeWeights(initialN);
+    List<double> weights = initializeWeights(numComponents);
     List<double> means1 = new List<double>.from(initialMeans);
     List<double> covs1 = new List<double>.from(initialCovs);
 
-    gmm = GMM1D(initialN, weights, means1, covs1);
+    gmm = GMM1D(numComponents, weights, means1, covs1);
 
     for (var i = 0; i < iteration; i++) {
       List<List<double>> resp = gmm.eStep(data1);
@@ -601,11 +601,11 @@ class GaussianScene extends Scene {
   }
 
   Future resetGMM() async {
-    List<double> weights = initializeWeights(initialN);
+    List<double> weights = initializeWeights(numComponents);
     List<double> means1 = new List<double>.from(initialMeans);
     List<double> covs1 = new List<double>.from(initialCovs);
 
-    gmm = GMM1D(initialN, weights, means1, covs1);
+    gmm = GMM1D(numComponents, weights, means1, covs1);
     iteration = 0;
     nextGMM = createGMM(means1, covs1, xRange, axes);
 
@@ -929,17 +929,63 @@ class GaussianScene extends Scene {
     await playMany([ShowCreation(meanText), ShowCreation(varianceText)]);
   }
 
-  Future fixedComponentNumberDisplay() async {
-    MathTex componentNumber = MathTex(r'N_{components}:');
-    componentNumber
+  Future fixedComponentNumberDisplay(Map m) async {
+    MathTex fixedComponentNumber = MathTex(r'N_{components}:');
+    MathTex componentNumber;
+
+    fixedComponentNumber
       ..toCorner(corner: UL)
       ..shift(Vector3(0.0, 0.3, 0.0));
-    await play(ShowCreation(componentNumber));
+
+    if (numComponents < 10) {
+      componentNumber = m[numComponents.toString()];
+    }
+    
+    await playMany([ShowCreation(fixedComponentNumber)]);
+  }
+
+  List<Tex> getNumber(String tmp, Map map, Vector3 pos) {
+    List<Tex> t = [];
+    bool eFlag = false;
+    int sinceE = 0;
+    double eFlagNumberShift = 0.07;
+    double exponentOffset = 0.07;
+    double letterSpacing = 0.17;
+    for (var j = 0; j < tmp.length; j++) {
+      bool isNumber = false;
+      Tex letter = map[tmp[j]].copy();
+      double shift = 0;
+      if (tmp[j] == '.') {
+        shift = 0.1;
+      } else if (tmp[j] == 'e') {
+        shift = 0.05;
+        eFlag = true;
+      } else {
+        isNumber = true;
+      }
+      if (eFlag && isNumber) {
+        sinceE++;
+        letter
+          ..scale(Vector3(0.5, 0.5, 1))
+          ..moveToPoint(Vector3(
+              pos[0] + letterSpacing * j - exponentOffset * sinceE,
+              pos[1] + eFlagNumberShift,
+              pos[2]));
+      } else {
+        letter
+          ..moveToPoint(
+              Vector3(pos[0] + letterSpacing * j, pos[1] - shift, pos[2]));
+      }
+
+      t.add(letter);
+    }
+
+    return t;
   }
 
   Future animateNumberChange(double a, double b, Vector3 pos, Map map,
-      {int steps: 17, double runTime: 0.03, int digits: 3}) async {
-    int steps = 17;
+      {int steps: 17, double runTime: 0.03, int digits: 3}) 
+      async {
     double step = (b - a) / steps;
     List<VGroup> numbers = [];
     double currentNumber = a - step;
@@ -947,40 +993,7 @@ class GaussianScene extends Scene {
     for (var i = 0; i < steps + 1; i++) {
       currentNumber += step;
       tmp = currentNumber.toStringAsPrecision(digits);
-      List<Tex> t = [];
-      bool eFlag = false;
-      int sinceE = 0;
-      double eFlagNumberShift = 0.07;
-      double exponentOffset = 0.07;
-      double letterSpacing = 0.17;
-      for (var j = 0; j < tmp.length; j++) {
-        bool isNumber = false;
-        Tex letter = map[tmp[j]].copy();
-        double shift = 0;
-        if (tmp[j] == '.') {
-          shift = 0.1;
-        } else if (tmp[j] == 'e') {
-          shift = 0.05;
-          eFlag = true;
-        } else {
-          isNumber = true;
-        }
-        if (eFlag && isNumber) {
-          sinceE++;
-          letter
-            ..scale(Vector3(0.5, 0.5, 1))
-            ..moveToPoint(Vector3(
-                pos[0] + letterSpacing * j - exponentOffset * sinceE,
-                pos[1] + eFlagNumberShift,
-                pos[2]));
-        } else {
-          letter
-            ..moveToPoint(
-                Vector3(pos[0] + letterSpacing * j, pos[1] - shift, pos[2]));
-        }
-
-        t.add(letter);
-      }
+      List<Tex> t = getNumber(tmp, map, pos);
       numbers.add(VGroup(t));
     }
 
