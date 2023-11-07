@@ -454,6 +454,8 @@ class GaussianScene extends Scene {
     // ANIMATIONS
 
     // Axes & Data
+
+    await animateNumberChange(0, 1, ORIGIN, m);
     await play(ShowCreation(axes));
     await play(ShowCreation(dots));
     await play(ag);
@@ -931,20 +933,21 @@ class GaussianScene extends Scene {
 
   Future fixedComponentNumberDisplay(Map m) async {
     MathTex fixedComponentNumber = MathTex(r'N_{components}:');
-    MathTex componentNumber;
+    VGroup componentNumber;
 
     fixedComponentNumber
       ..toCorner(corner: UL)
       ..shift(Vector3(0.0, 0.3, 0.0));
 
-    if (numComponents < 10) {
-      componentNumber = m[numComponents.toString()];
-    }
+    componentNumber = (numComponents < 10) ? VGroup([m[numComponents.toString()]]) : VGroup(getNumber(numComponents.toString(), m, pos: ORIGIN));
+    componentNumber
+      ..toCorner(corner: UL)
+      ..shift(Vector3(0.0, 0.5, 0.0));
     
-    await playMany([ShowCreation(fixedComponentNumber)]);
+    await playMany([ShowCreation(fixedComponentNumber), ShowCreation(componentNumber)]);
   }
 
-  List<Tex> getNumber(String tmp, Map map, Vector3 pos) {
+  List<Tex> getNumber(String tmp, Map map, {Vector3 pos: ORIGIN}) {
     List<Tex> t = [];
     bool eFlag = false;
     int sinceE = 0;
@@ -993,7 +996,7 @@ class GaussianScene extends Scene {
     for (var i = 0; i < steps + 1; i++) {
       currentNumber += step;
       tmp = currentNumber.toStringAsPrecision(digits);
-      List<Tex> t = getNumber(tmp, map, pos);
+      List<Tex> t = getNumber(tmp, map, pos: pos);
       numbers.add(VGroup(t));
     }
 
