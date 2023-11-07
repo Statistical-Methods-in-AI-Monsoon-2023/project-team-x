@@ -1032,30 +1032,23 @@ class GaussianScene extends Scene {
   }
 
   Future animateNumberChange(double a, double b, Vector3 pos, Map map,
-    {int steps: 17, double runTime: 0.03, int digits: 3, bool doEnd: true}) 
-    async {
+      {int steps: 17, double runTime: 0.03, int digits: 3}) async {
     double step = (b - a) / steps;
     List<VGroup> numbers = [];
     double currentNumber = a - step;
     String tmp;
-    VGroup initial = VGroup();
     for (var i = 0; i < steps + 1; i++) {
       currentNumber += step;
       tmp = currentNumber.toStringAsPrecision(digits);
       List<Tex> t = getNumber(tmp, map, pos: pos);
       numbers.add(VGroup(t));
-
-      if (i == 0) {
-        initial = numbers[0];
-        this.add([initial]);
-      } else {
-        initial.become(numbers[i]);
-        await wait(runTime);
-      }
     }
 
-    if (doEnd) {
-      this.remove([initial]);
+    VGroup initial = numbers[0];
+    await play(ShowCreation(initial));
+
+    for (var i = 1; i < steps + 1; i++) {
+      initial.become(numbers[i]);
       await wait(runTime);
     }
   }
@@ -1064,14 +1057,8 @@ class GaussianScene extends Scene {
     Circle circle = Circle(radius: 3.0, color: WHITE);
     circle.fillColors = [BLACK];
     await play(ShowCreation(circle));
-    await animateNumberChange(0, 9, ORIGIN, map,
-        steps: 9, digits: 1, runTime: 0.025);
-    await animateNumberChange(9, 99, ORIGIN, map,
-        steps: 90, digits: 2, runTime: 0.025);
-    await animateNumberChange(99, 100, ORIGIN, map,
-        steps: 1, digits: 3, runTime: 0.025);
-
-    await play(FadeOut(circle));
+    await animateNumberChange(0, 100, ORIGIN, map,
+        steps: 120, digits: 3, runTime: 0.05);
   }
 
   // UTILITY

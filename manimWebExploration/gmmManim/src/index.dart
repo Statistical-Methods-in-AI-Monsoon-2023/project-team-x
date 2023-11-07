@@ -7,7 +7,7 @@ class TestScene extends Scene {
 
   @override
   FutureOr<void> preload() {
-    MathTex.preload(r'N_{components}:');
+    Tex.preload(r'%');
   }
 
   @override
