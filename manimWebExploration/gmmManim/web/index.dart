@@ -489,7 +489,22 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
 
   void setData(uploadedData) {
-    data1 = uploadedData;
+
+    double mean = uploadedData.reduce((a, b) => a + b) / uploadedData.length;
+    double variance = 0;
+
+    for (var i =0; i < uploadedData.length; i++) {
+      variance += (uploadedData[i] - mean) * (uploadedData[i] - mean);  
+    }
+
+    variance /= uploadedData.length;
+
+    List<double> normalizedData = [];
+    for (var i = 0; i < uploadedData.length; i++) {
+      normalizedData.add((uploadedData - mean) / variance);
+    }
+
+    data1 = normalizedData;
     isUploaded = true;
     state = 5;
   }
@@ -586,7 +601,7 @@ class GaussianScene extends Scene {
 
     for (var i = 0; i < iteration; i++) {
       List<List<double>> resp = gmm.eStep(data1);
-      final temp = gmm.mStep(data1, resp);
+      gmm.mStep(data1, resp);
     }
 
     List<double> means2 = gmm.means;
