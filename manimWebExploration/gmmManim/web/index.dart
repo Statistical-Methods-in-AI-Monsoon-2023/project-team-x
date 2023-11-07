@@ -538,8 +538,6 @@ class GaussianScene extends Scene {
         await playGMM();
       } else if (state == 4) {
         // Prev
-        await play(FadeOut(dots));
-
         await prevGMMIteration();
         state = 0;
       } else if (state == 5) {
@@ -614,13 +612,14 @@ class GaussianScene extends Scene {
     gmm = GMM1D(numComponents, weights, means1, covs1);
     iteration = 0;
     nextGMM = createGMM(means1, covs1, xRange, axes);
+    Animation mcVGAnimation = transformMCDisplay(means1, covs1, m);
 
-    await play(Transform(currentGMM, target: nextGMM));
+    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
 
   Future playGMM() async {
     List<List<double>> resp = gmm.eStep(data1);
-    final temp = gmm.mStep(data1, resp);
+    gmm.mStep(data1, resp);
     iteration++;
     print("iteration");
     print(iteration);
@@ -639,7 +638,9 @@ class GaussianScene extends Scene {
     }
 
     nextGMM = createGMM(means2, covs2, xRange, axes);
-    await play(Transform(currentGMM, target: nextGMM));
+    Animation mcVGAnimation = transformMCDisplay(means1, covs1, m);
+
+    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
 
   void stopUpdater() {
@@ -929,12 +930,21 @@ class GaussianScene extends Scene {
     return VGroup(vgs);
   }
 
-  Future initializeMCDisplay(List<double> means, List<double> covs, Map map) async {
+  Future initializeMCDisplay(List<double> means, List<double> covs, Map map) 
+    async {
     VGroup mVG = initializeListDisplay(means, map);
     VGroup cVG = initializeListDisplay(covs, map, heightOffset: 0.5);
     mcVG = VGroup([mVG, cVG]);
 
     await play(ShowCreation(mcVG));
+  }
+
+  Animation transformMCDisplay(List<double> means, List<double> covs, Map map) {
+    VGroup mVG = initializeListDisplay(means, map);
+    VGroup cVG = initializeListDisplay(covs, map, heightOffset: 0.5);
+    VGroup mcVG2 = VGroup([mVG, cVG]);
+
+    return Transform(mcVG, target: mcVG2);
   }
 
   Future createNumberDisplay(List<double> means, List<double> covs, Map map) async {
