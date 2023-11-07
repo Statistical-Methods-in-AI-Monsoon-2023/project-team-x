@@ -359,6 +359,8 @@ class GaussianScene extends Scene {
   late Triangle tri;
   late Square sqr;
 
+  late VGroup mcVG;
+
   int state = 0;
   int iteration = 0;
   late int numComponents;
@@ -912,7 +914,7 @@ class GaussianScene extends Scene {
     return m;
   }
 
-  VGroup initializeListDisplay(List<double> list, Map map, {double heightOffset: 0.5}) {
+  VGroup initializeListDisplay(List<double> list, Map map, {double heightOffset: 0.0}) {
     int length = list.length;
     List<VGroup> vgs = [];
 
@@ -920,7 +922,7 @@ class GaussianScene extends Scene {
       VGroup number = VGroup(getNumber(list[i].toString(), map));
       number
         ..toCorner(corner: UL)
-        ..shift(Vector3(2.0 + 1.0 * i, displayOffset, 0.0));
+        ..shift(Vector3(4.0 + 1.0 * i, displayOffset - heightOffset, 0.0));
       vgs.add(number);
     }
 
@@ -929,9 +931,10 @@ class GaussianScene extends Scene {
 
   Future initializeMCDisplay(List<double> means, List<double> covs, Map map) async {
     VGroup mVG = initializeListDisplay(means, map);
-    VGroup cVG = initializeListDisplay(covs, map);
+    VGroup cVG = initializeListDisplay(covs, map, heightOffset: 0.5);
+    mcVG = VGroup([mVG, cVG]);
 
-    await playMany([ShowCreation(mVG), ShowCreation(cVG)]);
+    await play(ShowCreation(mcVG));
   }
 
   Future createNumberDisplay(List<double> means, List<double> covs, Map map) async {
