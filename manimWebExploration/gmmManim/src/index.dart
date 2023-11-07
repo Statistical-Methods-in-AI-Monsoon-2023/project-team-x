@@ -7,26 +7,7 @@ class TestScene extends Scene {
 
   @override
   FutureOr<void> preload() {
-    MathTex.preload(r'\gets');
-    MathTex.preload(r'\to');
-    MathTex.preload(r'\textnormal{Means} \hspace{0.1cm} \mu:');
-    MathTex.preload(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:');
-    Tex.preload(r'Reset');
-
-    Tex.preload('e');
-    Tex.preload('+');
-    Tex.preload('-');
-    Tex.preload('.');
-    Tex.preload('0');
-    Tex.preload('1');
-    Tex.preload('2');
-    Tex.preload('3');
-    Tex.preload('4');
-    Tex.preload('5');
-    Tex.preload('6');
-    Tex.preload('7');
-    Tex.preload('8');
-    Tex.preload('9');
+    MathTex.preload(r'N_{components}:');
   }
 
   @override
@@ -35,9 +16,9 @@ class TestScene extends Scene {
 
     // await animateNumberChange(0, 2739187219738092, Vector3(-2.0, 2.0, 0), m,
     //     digits: 4);
-
-    await play(ShowCreation(MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:')));
-    await play(ShowCreation(MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:')..shift(Vector3(0.0, -2.0, 0.0))));
+    await play(ShowCreation(MathTex(r'N_{components}:')));
+    // await play(ShowCreation(MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:')));
+    // await play(ShowCreation(MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:')..shift(Vector3(0.0, -2.0, 0.0))));
   }
 
   Map makeMap() {
