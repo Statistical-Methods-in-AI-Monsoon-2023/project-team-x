@@ -369,7 +369,7 @@ class GaussianScene extends Scene {
   bool isUploaded = false;
   double lowerCovsThreshold = 0.8;
   double upperCovsThreshold = 3;
-  double mainButtonsHeight = -0.2;
+  double mainButtonsHeight = -0.8;
   double mainButtonsWidthOffset = 0.0;
   double displayOffset = -0.3;
   double letterOffset = 1.5;
@@ -486,8 +486,6 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
-
-
 
   void setData(uploadedData) {
     double mean = uploadedData.reduce((a, b) => a + b) / uploadedData.length;
@@ -728,7 +726,7 @@ class GaussianScene extends Scene {
     playGMMButtonGroup
       ..scale(Vector3(0.5, 0.5, 1))
       ..toCorner(corner: UL)
-      ..shift(Vector3(0.5 + mainButtonsWidthOffset, -0.5 + mainButtonsHeight, 0.0));
+      ..shift(Vector3(0.5 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
 
     Button playButton =
         Button(mob: playGMMButtonGroup, onClick: playGMMUpdater);
@@ -749,7 +747,7 @@ class GaussianScene extends Scene {
     pauseGMMButtonGroup
       ..scale(Vector3(0.5, 0.5, 1))
       ..toCorner(corner: UL)
-      ..shift(Vector3(0.5 + mainButtonsWidthOffset, -0.5 + mainButtonsHeight, 0.0));
+      ..shift(Vector3(0.5 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
 
     Button pauseButton = Button(mob: pauseGMMButtonGroup, onClick: stopUpdater);
     return pauseButton;
@@ -765,7 +763,7 @@ class GaussianScene extends Scene {
     VGroup prevIterationButton = VGroup([tex, r2]);
     prevIterationButton
       ..toCorner(corner: UL)
-      ..shift(Vector3(0.0 + mainButtonsWidthOffset, -0.5 + mainButtonsHeight, 0.0));
+      ..shift(Vector3(0.0 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
 
     Button prev = Button(mob: prevIterationButton, onClick: prevGMMUpdater);
     return prev;
@@ -781,7 +779,7 @@ class GaussianScene extends Scene {
     VGroup nextIterationButton = VGroup([tex, r2]);
     nextIterationButton
       ..toCorner(corner: UL)
-      ..shift(Vector3(1.0 + mainButtonsWidthOffset, -0.5 + mainButtonsHeight, 0.0));
+      ..shift(Vector3(1.0 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
 
     Button next = Button(mob: nextIterationButton, onClick: nextGMMUpdater);
     return next;
@@ -795,7 +793,7 @@ class GaussianScene extends Scene {
     resetIterationButton
       ..toCorner(corner: UL)
       ..shift(
-          Vector3(0.0 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
+          Vector3(0.0 + mainButtonsWidthOffset, 0.5 + mainButtonsHeight, 0.0));
 
     Button reset = Button(mob: resetIterationButton, onClick: resetGMMUpdater);
     return reset;
@@ -997,6 +995,7 @@ class GaussianScene extends Scene {
         color: WHITE, width: 1.75 + letterOffset * numComponents, height: 1.2)
       ..toCorner(corner: UL)
       ..shift(Vector3(1.7, displayOffset + 0.2, 0.0));
+
     mcSurroundingRectangle.fillColors = [TRANSPARENT];
 
     Animation initialMCDisplayAnimation = initializeMCDisplay(means, covs, map);

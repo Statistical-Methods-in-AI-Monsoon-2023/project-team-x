@@ -7,7 +7,7 @@ class TestScene extends Scene {
 
   @override
   FutureOr<void> preload() {
-    Tex.preload(r'%');
+    MathTex.preload(r'N_{Components}');
   }
 
   @override
@@ -16,7 +16,7 @@ class TestScene extends Scene {
 
     // await animateNumberChange(0, 2739187219738092, Vector3(-2.0, 2.0, 0), m,
     //     digits: 4);
-    await play(ShowCreation(MathTex(r'N_{components}:')));
+    await play(ShowCreation(MathTex(r'N_{Components}')));
     // await play(ShowCreation(MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:')));
     // await play(ShowCreation(MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:')..shift(Vector3(0.0, -2.0, 0.0))));
   }

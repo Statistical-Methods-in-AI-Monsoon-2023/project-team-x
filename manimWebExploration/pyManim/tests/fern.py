@@ -25,7 +25,7 @@ class Fern(Scene):
         types = [None, 1, 1, 3, 1, 2, 1, 1, 3, 1]
         
         
-        for n in range(100 - 9):
+        for n in range(10000 - 9):
             r = random.random()
             if r < 0.01:
                 c = 0
@@ -40,8 +40,8 @@ class Fern(Scene):
         for c in types[1:]:
             x, y = self.getPoint(*coords[-1], c)
             coords.append((x, y))
-            dot = Dot(axes.c2p(x, y))
-            dots.append(dot, radius=0.03, color=GREEN_C)
+            dot = Dot(axes.c2p(x, y), radius=0.03, color=WHITE)
+            dots.append(dot)
 
 
         self.wait(0.3)
@@ -54,7 +54,7 @@ class Fern(Scene):
         )
         self.wait(0.5)
         self.play(VGroup(*dots).animate.set_color(GREEN_E))
-        self.wait(1)
+        self.wait(2.0)
         self.play(FadeOut(*self.mobjects))
         self.wait(0.5)
         
