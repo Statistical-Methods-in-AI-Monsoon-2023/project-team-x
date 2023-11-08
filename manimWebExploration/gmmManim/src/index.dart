@@ -7,7 +7,28 @@ class TestScene extends Scene {
 
   @override
   FutureOr<void> preload() {
-    MathTex.preload(r'N_{Components}');
+    MathTex.preload(r'\gets');
+    MathTex.preload(r'\to');
+    MathTex.preload(r'\textnormal{Means} \hspace{0.1cm} \mu:');
+    MathTex.preload(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:');
+    MathTex.preload(r'N_{components}:');
+
+    MathTex.preload(r'Reset');
+
+    MathTex.preload('e');
+    MathTex.preload('+');
+    MathTex.preload('-');
+    MathTex.preload('.');
+    MathTex.preload('0');
+    MathTex.preload('1');
+    MathTex.preload('2');
+    MathTex.preload('3');
+    MathTex.preload('4');
+    MathTex.preload('5');
+    MathTex.preload('6');
+    MathTex.preload('7');
+    MathTex.preload('8');
+    MathTex.preload('9');
   }
 
   @override
@@ -16,7 +37,7 @@ class TestScene extends Scene {
 
     // await animateNumberChange(0, 2739187219738092, Vector3(-2.0, 2.0, 0), m,
     //     digits: 4);
-    await play(ShowCreation(MathTex(r'N_{Components}')));
+    await play(ShowCreation(MathTex(r'iteration: ')));
     // await play(ShowCreation(MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:')));
     // await play(ShowCreation(MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:')..shift(Vector3(0.0, -2.0, 0.0))));
   }

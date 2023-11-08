@@ -401,22 +401,22 @@ class GaussianScene extends Scene {
     MathTex.preload(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:');
     MathTex.preload(r'N_{components}:');
 
-    MathTex.preload(r'Reset');
+    Tex.preload(r'Reset');
 
-    MathTex.preload('e');
-    MathTex.preload('+');
-    MathTex.preload('-');
-    MathTex.preload('.');
-    MathTex.preload('0');
-    MathTex.preload('1');
-    MathTex.preload('2');
-    MathTex.preload('3');
-    MathTex.preload('4');
-    MathTex.preload('5');
-    MathTex.preload('6');
-    MathTex.preload('7');
-    MathTex.preload('8');
-    MathTex.preload('9');
+    Tex.preload('e');
+    Tex.preload('+');
+    Tex.preload('-');
+    Tex.preload('.');
+    Tex.preload('0');
+    Tex.preload('1');
+    Tex.preload('2');
+    Tex.preload('3');
+    Tex.preload('4');
+    Tex.preload('5');
+    Tex.preload('6');
+    Tex.preload('7');
+    Tex.preload('8');
+    Tex.preload('9');
   }
 
   @override
@@ -736,8 +736,8 @@ class GaussianScene extends Scene {
   Button playGMMButton() {
     Rectangle r2 =
         makePlayerButton(height: playerButtonHeight, width: playerButtonWidth);
-    // MathTex mathtex = MathTex(r' blacktriangleright ', color: BLACK);
-    // mathtex.scaleUniformly(0.5);
+    // Tex tex = Tex(r' blacktriangleright ', color: BLACK);
+    // tex.scaleUniformly(0.5);
     playShape = Triangle(color: GREEN);
     playShape
       ..scale(Vector3(0.16, 0.16, 1))
@@ -777,9 +777,9 @@ class GaussianScene extends Scene {
     // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
     Rectangle r2 = makePlayerButton();
 
-    MathTex mathtex = MathTex(r'\gets');
-    mathtex.scaleUniformly(1.0);
-    VGroup prevIterationButton = VGroup([mathtex, r2]);
+    MathTex tex = MathTex(r'\gets');
+    tex.scaleUniformly(1.0);
+    VGroup prevIterationButton = VGroup([tex, r2]);
     prevIterationButton
       ..toCorner(corner: UL)
       ..shift(Vector3(mainButtonsLeftOffset, mainButtonsTopOffset, 0.0));
@@ -794,9 +794,9 @@ class GaussianScene extends Scene {
     // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
     Rectangle r2 = makePlayerButton();
 
-    MathTex mathtex = MathTex(r'\to');
-    mathtex.scaleUniformly(1.0);
-    VGroup nextIterationButton = VGroup([mathtex, r2]);
+    MathTex tex = MathTex(r'\to');
+    tex.scaleUniformly(1.0);
+    VGroup nextIterationButton = VGroup([tex, r2]);
     nextIterationButton
       ..toCorner(corner: UL)
       ..shift(Vector3(playerButtonOffset * 2 + mainButtonsLeftOffset,
@@ -808,10 +808,10 @@ class GaussianScene extends Scene {
 
   Button makeResetGMMButton() {
     Rectangle r2 = makePlayerButton(height: 0.6, width: 2.8);
-    MathTex mathtex = MathTex(r'Reset', color: RED);
-    mathtex.scaleUniformly(1.0);
-    mathtex.strokeWidth = 10.0;
-    VGroup resetIterationButton = VGroup([mathtex, r2]);
+    Tex tex = Tex(r'Reset', color: RED);
+    tex.scaleUniformly(1.0);
+    tex.strokeWidth = 10.0;
+    VGroup resetIterationButton = VGroup([tex, r2]);
     resetIterationButton
       ..toCorner(corner: UL)
       ..shift(Vector3(
@@ -945,20 +945,20 @@ class GaussianScene extends Scene {
 
   Map makeMap() {
     Map m = {
-      "e": MathTex('e'),
-      "+": MathTex('+'),
-      "-": MathTex('-'),
-      ".": MathTex('.'),
-      "0": MathTex('0'),
-      "1": MathTex('1'),
-      "2": MathTex('2'),
-      "3": MathTex('3'),
-      "4": MathTex('4'),
-      "5": MathTex('5'),
-      "6": MathTex('6'),
-      "7": MathTex('7'),
-      "8": MathTex('8'),
-      "9": MathTex('9'),
+      "e": Tex('e'),
+      "+": Tex('+'),
+      "-": Tex('-'),
+      ".": Tex('.'),
+      "0": Tex('0'),
+      "1": Tex('1'),
+      "2": Tex('2'),
+      "3": Tex('3'),
+      "4": Tex('4'),
+      "5": Tex('5'),
+      "6": Tex('6'),
+      "7": Tex('7'),
+      "8": Tex('8'),
+      "9": Tex('9'),
     };
     return m;
   }
@@ -1027,72 +1027,37 @@ class GaussianScene extends Scene {
     return ag;
   }
 
-  double diKScale = 0.8;
   Button decrementK() {
-    Circle circle = Circle(radius: 0.20);
-    circle.fillColors = [TRANSPARENT];
-    MathTex minus = m["-"]..scale(Vector3(diKScale, diKScale, 1));
+    Circle circle = Circle();
+    Tex minus = m["-"];
     VGroup dK = VGroup([circle, minus]);
     Button dKButton = Button(mob: dK, onClick: () => numComponents -= 1);
-    dKButton
-      ..toCorner(corner: UL)
-      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset, mainButtonsTopOffset, 0.0));
     return dKButton;
-  }
-
-  Button incrementK() {
-    Circle circle = Circle(radius: 0.20);
-    circle.fillColors = [TRANSPARENT];
-    MathTex minus = m["+"]..scale(Vector3(diKScale, diKScale, 1));
-    VGroup iK = VGroup([circle, minus]);
-    Button iKButton = Button(mob: iK, onClick: () => numComponents -= 1);
-    iKButton
-    ..toCorner(corner: UL)
-    ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 1.2, mainButtonsTopOffset, 0.0));
-    return iKButton;
   }
 
   AnimationGroup fixedComponentNumberDisplay() {
     MathTex fixedComponentNumber = MathTex(r'N_{components}:');
     VGroup componentNumber;
 
-    numComponentsSurroundingRectangle = Rectangle(
-        color: WHITE, width: 4.0, height: 1.3)
-      ..toCorner(corner: UL)
-      ..shift(
-          Vector3(fixedComponentNumberDiplayLeftOffset - 0.3, mcDisplayTopOffset + 0.2, 0.0));
-    numComponentsSurroundingRectangle.fillColors = [TRANSPARENT];
-
-
     fixedComponentNumber
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset,
-          mainButtonsTopOffset + 0.8, 0.0));
+          mainButtonsTopOffset + 0.5, 0.0));
 
     componentNumber = (numComponents < 10)
         ? VGroup([m[numComponents.toString()]])
         : VGroup(getNumber(numComponents.toString(), pos: ORIGIN));
     componentNumber
-      ..scaleUniformly(1.0)
       ..toCorner(corner: UL)
-      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
-          mainButtonsTopOffset - 0.05, 0.0));
+      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5,
+          mainButtonsTopOffset, 0.0));
 
-    Button dKButton = decrementK();
-    Button iKButton = incrementK();
-
-
-    return AnimationGroup([
-        ShowCreation(numComponentsSurroundingRectangle),
-        ShowCreation(fixedComponentNumber), 
-        ShowCreation(componentNumber),
-        ShowCreation(dKButton),
-        ShowCreation(iKButton)
-      ]);
+    return AnimationGroup(
+        [ShowCreation(fixedComponentNumber), ShowCreation(componentNumber)]);
   }
 
-  List<MathTex> getNumber(String tmp, {Vector3 pos: ORIGIN}) {
-    List<MathTex> t = [];
+  List<Tex> getNumber(String tmp, {Vector3 pos: ORIGIN}) {
+    List<Tex> t = [];
     bool eFlag = false;
     int sinceE = 0;
     double eFlagNumberShift = 0.07;
@@ -1102,7 +1067,7 @@ class GaussianScene extends Scene {
     bool isPeriod = false;
     for (var j = 0; j < tmp.length; j++) {
       bool isNumber = false;
-      MathTex letter = m[tmp[j]].copy();
+      Tex letter = m[tmp[j]].copy();
       double yShift = 0;
 
       if (isPeriod) {
@@ -1154,7 +1119,7 @@ class GaussianScene extends Scene {
     for (var i = 0; i < steps + 1; i++) {
       currentNumber += step;
       tmp = currentNumber.toStringAsPrecision(digits);
-      List<MathTex> t = getNumber(tmp, pos: pos);
+      List<Tex> t = getNumber(tmp, pos: pos);
       numbers.add(VGroup(t));
 
       if (i == 0) {
