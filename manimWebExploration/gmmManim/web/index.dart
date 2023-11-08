@@ -370,9 +370,10 @@ class GaussianScene extends Scene {
   double lowerCovsThreshold = 0.8;
   double upperCovsThreshold = 3;
   double mainButtonsHeight = -0.2;
-  double mainButtonsWidthOffset = 0.0;
+  double mainButtonsLeftOffset = 0.0;
   double displayOffset = -0.3;
   double letterOffset = 1.5;
+  double mcLeftOffset = 2.0;
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   late List<double> data1;
@@ -705,18 +706,19 @@ class GaussianScene extends Scene {
       ..scale(Vector3(0.1, 0.1, 1))
       ..toCorner(corner: UL)
       ..shift(Vector3(
-          0.62 + mainButtonsWidthOffset, -0.04 + mainButtonsHeight, 0.0));
+          0.62 + mainButtonsLeftOffset, -0.04 + mainButtonsHeight, 0.0));
     sqr = Square(color: RED);
     sqr
       ..rotate(PI / 2)
       ..scale(Vector3(0.08, 0.08, 1))
       ..toCorner(corner: UL)
       ..shift(Vector3(
-          0.62 + mainButtonsWidthOffset, -0.04 + mainButtonsHeight, 0.0));
+          0.62 + mainButtonsLeftOffset, -0.04 + mainButtonsHeight, 0.0));
   }
 
   Button playGMMButton() {
-    Rectangle r2 = Rectangle(height: 0.5, width: 0.8);
+    Rectangle r2 = Rectangle(height: 0.5, width: 0.8, color: WHITE);
+    r2.fillColors = [TRANSPARENT];
     // Tex tex = Tex(r' blacktriangleright ', color: BLACK);
     // tex.scaleUniformly(0.5);
     playShape = Triangle(color: GREEN);
@@ -728,7 +730,7 @@ class GaussianScene extends Scene {
     playGMMButtonGroup
       ..scale(Vector3(0.5, 0.5, 1))
       ..toCorner(corner: UL)
-      ..shift(Vector3(0.5 + mainButtonsWidthOffset, -0.5 + mainButtonsHeight, 0.0));
+      ..shift(Vector3(0.5 + mainButtonsLeftOffset, -0.5 + mainButtonsHeight, 0.0));
 
     Button playButton =
         Button(mob: playGMMButtonGroup, onClick: playGMMUpdater);
@@ -736,20 +738,18 @@ class GaussianScene extends Scene {
   }
 
   Button pauseGMMButton() {
-    // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
-    // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
-    // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
-    Rectangle r2 = Rectangle(height: 0.5, width: 0.8);
+    Rectangle r2 = makePlayerButton();
+
     Square sqr = Square(color: RED);
     sqr
-      ..scale(Vector3(0.18, 0.18, 1))
-      ..rotate(PI / 2);
+      ..rotate(PI / 2)
+      ..scale(Vector3(0.09, 0.09, 1));
     // sqr..shift(DOWN / 4);
     VGroup pauseGMMButtonGroup = VGroup([sqr, r2]);
     pauseGMMButtonGroup
       ..scale(Vector3(0.5, 0.5, 1))
       ..toCorner(corner: UL)
-      ..shift(Vector3(0.5 + mainButtonsWidthOffset, -0.5 + mainButtonsHeight, 0.0));
+      ..shift(Vector3(0.5 + mainButtonsLeftOffset, -0.5 + mainButtonsHeight, 0.0));
 
     Button pauseButton = Button(mob: pauseGMMButtonGroup, onClick: stopUpdater);
     return pauseButton;
@@ -759,29 +759,37 @@ class GaussianScene extends Scene {
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
     // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
-    Rectangle r2 = Rectangle(height: 0.25, width: 0.4);
+    Rectangle r2 = Rectangle(height: 0.25, width: 0.4, color: WHITE);
+
     MathTex tex = MathTex(r'\gets', color: BLACK);
     tex.scaleUniformly(0.5);
     VGroup prevIterationButton = VGroup([tex, r2]);
     prevIterationButton
       ..toCorner(corner: UL)
-      ..shift(Vector3(0.0 + mainButtonsWidthOffset, -0.5 + mainButtonsHeight, 0.0));
+      ..shift(Vector3(0.0 + mainButtonsLeftOffset, -0.5 + mainButtonsHeight, 0.0));
 
     Button prev = Button(mob: prevIterationButton, onClick: prevGMMUpdater);
     return prev;
+  }
+
+  Rectangle makePlayerButton({double height: 0.25, double width: 0.4, Color color: WHITE}) {
+    Rectangle r2 = Rectangle(height: height, width: width, color: color);
+    r2.fillColors = [TRANSPARENT];
+    return r2;
   }
 
   Button makeUpdateGMMButton() {
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5);
     // RoundedRectangle r = RoundedRectangle(cornerRadius: 0.3, height: 1.0, width: 2.0);
-    Rectangle r2 = Rectangle(height: 0.25, width: 0.4);
+    Rectangle r2 = makePlayerButton();
+
     MathTex tex = MathTex(r'\to', color: BLACK);
     tex.scaleUniformly(0.5);
     VGroup nextIterationButton = VGroup([tex, r2]);
     nextIterationButton
       ..toCorner(corner: UL)
-      ..shift(Vector3(1.0 + mainButtonsWidthOffset, -0.5 + mainButtonsHeight, 0.0));
+      ..shift(Vector3(1.0 + mainButtonsLeftOffset, -0.5 + mainButtonsHeight, 0.0));
 
     Button next = Button(mob: nextIterationButton, onClick: nextGMMUpdater);
     return next;
@@ -795,7 +803,7 @@ class GaussianScene extends Scene {
     resetIterationButton
       ..toCorner(corner: UL)
       ..shift(
-          Vector3(0.0 + mainButtonsWidthOffset, mainButtonsHeight, 0.0));
+          Vector3(0.0 + mainButtonsLeftOffset, mainButtonsHeight, 0.0));
 
     Button reset = Button(mob: resetIterationButton, onClick: resetGMMUpdater);
     return reset;
@@ -986,17 +994,17 @@ class GaussianScene extends Scene {
     meanText
       ..scale(Vector3(0.7, 0.7, 1))
       ..toCorner(corner: UL)
-      ..shift(Vector3(2.0, displayOffset, 0.0));
+      ..shift(Vector3(mcLeftOffset, displayOffset, 0.0));
 
     varianceText
       ..scale(Vector3(0.7, 0.7, 1))
       ..toCorner(corner: UL)
-      ..shift(Vector3(2.0, displayOffset - 0.5, 0.0));
+      ..shift(Vector3(mcLeftOffset, displayOffset - 0.5, 0.0));
 
     mcSurroundingRectangle = Rectangle(
         color: WHITE, width: 1.75 + letterOffset * numComponents, height: 1.2)
       ..toCorner(corner: UL)
-      ..shift(Vector3(1.7, displayOffset + 0.2, 0.0));
+      ..shift(Vector3(mcLeftOffset - 0.3, displayOffset + 0.2, 0.0));
     mcSurroundingRectangle.fillColors = [TRANSPARENT];
 
     Animation initialMCDisplayAnimation = initializeMCDisplay(means, covs, map);
