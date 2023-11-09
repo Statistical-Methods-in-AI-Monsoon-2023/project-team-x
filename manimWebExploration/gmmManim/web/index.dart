@@ -361,6 +361,9 @@ class GaussianScene extends Scene {
   late Rectangle numComponentsSurroundingRectangle;
   late VGroup componentNumber;
 
+  late MathTex meanText;
+  late MathTex varianceText;
+
   late VGroup mcVG;
 
   bool reduceMotion = false;
@@ -377,11 +380,11 @@ class GaussianScene extends Scene {
 
   double mainButtonsTopOffset = -0.5;
   double mainButtonsLeftOffset = 0.0;
-  double letterOffset = 1.5;
+  double letterOffset = 0.5;
 
   double mcDisplayTopOffset = 0.1;
-  double mcDisplayLeftOffset = 6.5;
-  double mcTextOffset = 0.6;
+  double mcDisplayLeftOffset = 1.0;
+  double mcTextOffset = 0.65;
 
   double playerButtonOffset = 1.0;
   double playerButtonHeight = 0.5;
@@ -947,11 +950,11 @@ class GaussianScene extends Scene {
     List<VGroup> vgs = [];
 
     for (var i = 0; i < length; i++) {
-      VGroup number = VGroup(getNumber(list[i].toStringAsPrecision(2)));
+      VGroup number = VGroup(getNumber(list[i].toStringAsPrecision(2)))..scale(Vector3(0.5, 0.5, 1))..shift(Vector3(0.0, -0.1, 0.0));
       number
-        ..toCorner(corner: UL)
-        ..shift(Vector3(mcDisplayLeftOffset + 2.0 + letterOffset * i,
-            mcDisplayTopOffset - heightOffset, 0.0));
+        ..toCorner(corner: UR)
+        ..shift(Vector3(-(mcDisplayLeftOffset + letterOffset* i),
+            mcDisplayTopOffset - heightOffset - 0.05, 0.0));
       vgs.add(number);
     }
 
@@ -970,38 +973,44 @@ class GaussianScene extends Scene {
     VGroup mVG = initializeListDisplay(means);
     VGroup cVG = initializeListDisplay(covs, heightOffset: mcTextOffset);
     VGroup mcVG2 = VGroup([mVG, cVG]);
+    MathTex meanText1 = moveMCText(meanText);
+    MathTex varianceText1 = moveMCText(varianceText);
+
 
     Rectangle mcSurroundingRectangle2 = createMCSurroundingRectangle();
     Animation mcVGAnimation = Transform(mcVG, target: mcVG2);
     Animation mcSurroundingRectangleAnimation = Transform(mcSurroundingRectangle, target: mcSurroundingRectangle2);
+    AnimationGroup mcVGTextAnimation = AnimationGroup([Transform(meanText, target: meanText1), Transform(varianceText, target: varianceText1)]);
 
     return AnimationGroup([mcVGAnimation, mcSurroundingRectangleAnimation]);
   }
 
   Rectangle createMCSurroundingRectangle() {
     Rectangle mcSurroundingRectangle1 = Rectangle(
-        color: WHITE, width: 1.75 + letterOffset * numComponents, height: 1.3)
-      ..toCorner(corner: UL)
+        color: WHITE, width: 2.0 + letterOffset * numComponents, height: 1.3)
+      ..toCorner(corner: UR)
       ..shift(
-          Vector3(mcDisplayLeftOffset - 0.3, mcDisplayTopOffset + 0.2, 0.0));
+          Vector3(
+          -(mcDisplayLeftOffset - 0.3), mcDisplayTopOffset + 0.2, 0.0));
     mcSurroundingRectangle1.fillColors = [TRANSPARENT];
     return mcSurroundingRectangle1;
   }
 
+  MathTex moveMCText(MathTex text, {double offset: 0.0}) {
+    return text
+      ..scale(Vector3(0.7, 0.7, 1))
+      ..toCorner(corner: UR)
+      ..shift(Vector3(-(mcDisplayLeftOffset + letterOffset * numComponents), mcDisplayTopOffset - offset, 0.0));
+
+  }
+
   AnimationGroup createNumberDisplay(List<double> means, List<double> covs) {
-    MathTex meanText = MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:');
-    MathTex varianceText =
+    meanText = MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:');
+    varianceText =
         MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:');
 
-    meanText
-      ..scale(Vector3(0.7, 0.7, 1))
-      ..toCorner(corner: UL)
-      ..shift(Vector3(mcDisplayLeftOffset, mcDisplayTopOffset, 0.0));
-
-    varianceText
-      ..scale(Vector3(0.7, 0.7, 1))
-      ..toCorner(corner: UL)
-      ..shift(Vector3(mcDisplayLeftOffset, mcDisplayTopOffset - 0.6, 0.0));
+    meanText = moveMCText(meanText);
+    varianceText = moveMCText(varianceText, offset: 0.6);
 
     mcSurroundingRectangle = createMCSurroundingRectangle();
 

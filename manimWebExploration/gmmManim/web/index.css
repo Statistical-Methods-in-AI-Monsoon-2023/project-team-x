@@ -2,23 +2,18 @@ body {
     margin: 0;
     padding: 0;
     border: 0;
-    background-color: #191919;
+    background-color: black;
+    color: white;
+
+    /* font-family: "Latin Modern Math"; */
 }
 
 canvas {
-    object-fit: contain;
-    height: min(99vw, 99vh);
-    width: fit-content;
-    position: absolute;
-    top: 0px;
-    left: 0px;
+    width: max(99vw, 99vh);
+    height: auto;
 }
 
 #canvas-container {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-
     height: 100%;
     width: 100%;
 }
