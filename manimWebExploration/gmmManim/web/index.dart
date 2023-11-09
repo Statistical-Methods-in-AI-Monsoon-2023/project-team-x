@@ -359,6 +359,7 @@ class GaussianScene extends Scene {
   late Square sqr;
   late Rectangle mcSurroundingRectangle;
   late Rectangle numComponentsSurroundingRectangle;
+  late VGroup componentNumber;
 
   late VGroup mcVG;
 
@@ -1002,6 +1003,54 @@ class GaussianScene extends Scene {
     state = 7;
   }
 
+  VGroup getComponentNumberVGroup() {
+    VGroup mob = (numComponents < 10)
+        ? VGroup([m[numComponents.toString()]])
+        : VGroup(getNumber(numComponents.toString(), pos: ORIGIN));
+    mob
+      ..scaleUniformly(1.0)
+      ..toCorner(corner: UL)
+      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
+          mainButtonsTopOffset, 0.0));
+    return mob;
+  }
+
+  Animation decrementK() {
+    numComponents -= 1;
+    VGroup newComponentNumber = getComponentNumberVGroup();
+
+    Animation dK = Transform(componentNumber, target: newComponentNumber);
+    means1.removeLast();
+    covs1.removeLast();
+
+    return dK;
+  }
+
+  Animation incrementK() {
+    numComponents += 1;
+    VGroup newComponentNumber = getComponentNumberVGroup();
+
+    Animation iK = Transform(componentNumber, target: newComponentNumber);
+
+    double randomMean = Random().nextDouble() * xRange[1] - xRange[0] - xRange[0];
+    double randomCov = Random().nextDouble();
+    means1.add(randomMean);
+    covs1.add(randomCov);
+
+    return iK;
+
+  }
+
+  Future changeK(Animation xK) async {
+    weights = initializeWeights(numComponents);
+    gmm = GMM1D(numComponents, weights, means1, covs1);
+
+    nextGMM = createGMM(means1, covs1, xRange, axes);
+    Animation transformGMMs = Transform(currentGMM, target: nextGMM);
+
+    playMany([xK, transformGMMs]);
+  }
+
   Button createDecrementKButton() {
     Circle circle = Circle(radius: 0.20);
     circle.fillColors = [TRANSPARENT];
@@ -1028,7 +1077,7 @@ class GaussianScene extends Scene {
 
   AnimationGroup fixedComponentNumberDisplay() {
     MathTex fixedComponentNumber = MathTex(r'N_{components}:');
-    VGroup componentNumber;
+    componentNumber;
 
     numComponentsSurroundingRectangle = Rectangle(
         color: WHITE, width: 2.3, height: 1.3)
@@ -1044,14 +1093,7 @@ class GaussianScene extends Scene {
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset,
           mainButtonsTopOffset + 0.6, 0.0));
 
-    componentNumber = (numComponents < 10)
-        ? VGroup([m[numComponents.toString()]])
-        : VGroup(getNumber(numComponents.toString(), pos: ORIGIN));
-    componentNumber
-      ..scaleUniformly(1.0)
-      ..toCorner(corner: UL)
-      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
-          mainButtonsTopOffset, 0.0));
+    componentNumber = getComponentNumberVGroup();
 
     Button dKButton = createDecrementKButton();
     Button iKButton = createIncrementKButton();
@@ -1197,10 +1239,12 @@ class GaussianScene extends Scene {
 
         state = 0;
       } else if (state == 6) {
-        // await decrementK();
+        Animation dK = decrementK();
+        await changeK(dK);
         state = 0;
       } else if (state == 7) {
-        // await incrementK();
+        Animation iK = incrementK();
+        await changeK(iK);
         state = 0;
       } else {
         await wait();
