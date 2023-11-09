@@ -383,6 +383,8 @@ class GaussianScene extends Scene {
   double playerButtonWidth = 0.8;
 
   double fixedComponentNumberDiplayLeftOffset = 3.5;
+  double diKScale = 0.8;
+
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
   late List<double> data1;
@@ -546,41 +548,6 @@ class GaussianScene extends Scene {
 
     axes = newAxes;
     dots = dots2;
-  }
-
-  // Handles all subsequent rendering and triggered animations
-  Future continueRendering() async {
-    while (true) {
-      // print(state);
-      if (state == 1) {
-        // Next
-        // Updates the GMM by 1 EM step
-        await nextGMMIteration();
-        state = 0;
-      } else if (state == 2) {
-        // Reset
-        print("HIHIHI");
-        await resetGMM();
-
-        state = 0;
-      } else if (state == 3) {
-        // Play
-        await playGMM();
-      } else if (state == 4) {
-        // Prev
-        await prevGMMIteration();
-        state = 0;
-      } else if (state == 5) {
-        // Restart with Uploaded Data
-        await restartWithUploadedData();
-
-        state = 0;
-      } else {
-        await wait();
-      }
-
-      // if (state != 0) state = 0;
-    }
   }
 
   double min1(double a, double b) {
@@ -1027,8 +994,15 @@ class GaussianScene extends Scene {
     return ag;
   }
 
-  double diKScale = 0.8;
-  Button decrementK() {
+  void decrementKUpdater() {
+    state = 6;
+  }
+
+  void incrementKUpdater() {
+    state = 7;
+  }
+
+  Button createDecrementKButton() {
     Circle circle = Circle(radius: 0.20);
     circle.fillColors = [TRANSPARENT];
     MathTex minus = m["-"]..scale(Vector3(diKScale, diKScale, 1));
@@ -1036,19 +1010,19 @@ class GaussianScene extends Scene {
     Button dKButton = Button(mob: dK, onClick: () => numComponents -= 1);
     dKButton
       ..toCorner(corner: UL)
-      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset, mainButtonsTopOffset, 0.0));
+      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset, mainButtonsTopOffset + 0.05, 0.0));
     return dKButton;
   }
 
-  Button incrementK() {
+  Button createIncrementKButton() {
     Circle circle = Circle(radius: 0.20);
     circle.fillColors = [TRANSPARENT];
     MathTex minus = m["+"]..scale(Vector3(diKScale, diKScale, 1));
     VGroup iK = VGroup([circle, minus]);
-    Button iKButton = Button(mob: iK, onClick: () => numComponents -= 1);
+    Button iKButton = Button(mob: iK, onClick: () => numComponents += 1);
     iKButton
     ..toCorner(corner: UL)
-    ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 1.2, mainButtonsTopOffset, 0.0));
+    ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 1.2, mainButtonsTopOffset + 0.05, 0.0));
     return iKButton;
   }
 
@@ -1057,7 +1031,7 @@ class GaussianScene extends Scene {
     VGroup componentNumber;
 
     numComponentsSurroundingRectangle = Rectangle(
-        color: WHITE, width: 4.0, height: 1.3)
+        color: WHITE, width: 2.3, height: 1.3)
       ..toCorner(corner: UL)
       ..shift(
           Vector3(fixedComponentNumberDiplayLeftOffset - 0.3, mcDisplayTopOffset + 0.2, 0.0));
@@ -1065,9 +1039,10 @@ class GaussianScene extends Scene {
 
 
     fixedComponentNumber
+      ..scaleUniformly(0.8)
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset,
-          mainButtonsTopOffset + 0.8, 0.0));
+          mainButtonsTopOffset + 0.6, 0.0));
 
     componentNumber = (numComponents < 10)
         ? VGroup([m[numComponents.toString()]])
@@ -1076,10 +1051,10 @@ class GaussianScene extends Scene {
       ..scaleUniformly(1.0)
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
-          mainButtonsTopOffset - 0.05, 0.0));
+          mainButtonsTopOffset, 0.0));
 
-    Button dKButton = decrementK();
-    Button iKButton = incrementK();
+    Button dKButton = createDecrementKButton();
+    Button iKButton = createIncrementKButton();
 
 
     return AnimationGroup([
@@ -1192,5 +1167,46 @@ class GaussianScene extends Scene {
   // UTILITY
   List<double> initializeWeights(int length) {
     return List.generate(length, (index) => 1 / length);
+  }
+
+  // Handles all subsequent rendering and triggered animations
+  Future continueRendering() async {
+    while (true) {
+      // print(state);
+      if (state == 1) {
+        // Next
+        // Updates the GMM by 1 EM step
+        await nextGMMIteration();
+        state = 0;
+      } else if (state == 2) {
+        // Reset
+        print("HIHIHI");
+        await resetGMM();
+
+        state = 0;
+      } else if (state == 3) {
+        // Play
+        await playGMM();
+      } else if (state == 4) {
+        // Prev
+        await prevGMMIteration();
+        state = 0;
+      } else if (state == 5) {
+        // Restart with Uploaded Data
+        await restartWithUploadedData();
+
+        state = 0;
+      } else if (state == 6) {
+        // await decrementK();
+        state = 0;
+      } else if (state == 7) {
+        // await incrementK();
+        state = 0;
+      } else {
+        await wait();
+      }
+
+      // if (state != 0) state = 0;
+    }
   }
 }
