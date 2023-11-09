@@ -646,7 +646,7 @@ class GaussianScene extends Scene {
     }
 
     nextGMM = createGMM(means1, covs1, xRange, axes);
-    Animation mcVGAnimation = transformMCDisplay(means1, covs1);
+    AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
@@ -966,15 +966,16 @@ class GaussianScene extends Scene {
     return ShowCreation(mcVG);
   }
 
-  Animation transformMCDisplay(List<double> means, List<double> covs) {
+  AnimationGroup transformMCDisplay(List<double> means, List<double> covs) {
     VGroup mVG = initializeListDisplay(means);
     VGroup cVG = initializeListDisplay(covs, heightOffset: mcTextOffset);
     VGroup mcVG2 = VGroup([mVG, cVG]);
 
     Rectangle mcSurroundingRectangle2 = createMCSurroundingRectangle();
-    Animation mcVGAnimation
+    Animation mcVGAnimation = Transform(mcVG, target: mcVG2);
+    Animation mcSurroundingRectangleAnimation = Transform(mcSurroundingRectangle, target: mcSurroundingRectangle2);
 
-    return Transform(mcVG, target: mcVG2);
+    return AnimationGroup([mcVGAnimation, mcSurroundingRectangleAnimation]);
   }
 
   Rectangle createMCSurroundingRectangle() {
