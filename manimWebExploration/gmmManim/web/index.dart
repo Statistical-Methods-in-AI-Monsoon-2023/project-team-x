@@ -363,9 +363,13 @@ class GaussianScene extends Scene {
 
   late VGroup mcVG;
 
+  bool reduceMotion = false;
+
   int state = 0;
   int iteration = 0;
-  late int numComponents;
+  int numComponents = 3;
+  int maxComponents = 15;
+
   bool isPlay = false;
   bool isUploaded = false;
   double lowerCovsThreshold = 0.8;
@@ -385,6 +389,7 @@ class GaussianScene extends Scene {
 
   double fixedComponentNumberDiplayLeftOffset = 3.5;
   double diKScale = 0.8;
+
 
 
   // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
@@ -452,8 +457,8 @@ class GaussianScene extends Scene {
     numComponents = 3;
     initialMeans = [1, 3, 7];
     initialCovs = [1, 2, 3];
-    List<double> means1 = new List<double>.from(initialMeans);
-    List<double> covs1 = new List<double>.from(initialCovs);
+    means1 = new List<double>.from(initialMeans);
+    covs1 = new List<double>.from(initialCovs);
     // GMM Initializations
     List<double> weights = initializeWeights(numComponents);
     gmm = GMM1D(numComponents, weights, means1, covs1);
@@ -573,21 +578,22 @@ class GaussianScene extends Scene {
   Future prevGMMIteration() async {
     iteration--;
     List<double> weights = initializeWeights(numComponents);
-    List<double> means1 = new List<double>.from(initialMeans);
-    List<double> covs1 = new List<double>.from(initialCovs);
 
-    gmm = GMM1D(numComponents, weights, means1, covs1);
+    List<double> means2 = new List<double>.from(initialMeans);
+    List<double> covs2 = new List<double>.from(initialCovs);
+
+    gmm = GMM1D(numComponents, weights, means2, covs2);
 
     for (var i = 0; i < iteration; i++) {
       List<List<double>> resp = gmm.eStep(data1);
       gmm.mStep(data1, resp);
     }
 
-    List<double> means2 = gmm.means;
-    List<double> covs2 = gmm.variances;
+    means1 = gmm.means;
+    covs1 = gmm.variances;
 
-    nextGMM = createGMM(means2, covs2, xRange, axes);
-    Animation mcVGAnimation = transformMCDisplay(means2, covs2);
+    nextGMM = createGMM(means1, covs1, xRange, axes);
+    Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
@@ -597,19 +603,19 @@ class GaussianScene extends Scene {
     final temp = gmm.mStep(data1, resp);
     iteration++;
 
-    List<double> means2 = gmm.means;
-    List<double> covs2 = gmm.variances;
+    means1 = gmm.means;
+    covs1 = gmm.variances;
 
-    nextGMM = createGMM(means2, covs2, xRange, axes);
-    Animation mcVGAnimation = transformMCDisplay(means2, covs2);
+    nextGMM = createGMM(means1, covs1, xRange, axes);
+    Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
 
   Future resetGMM() async {
     List<double> weights = initializeWeights(numComponents);
-    List<double> means1 = new List<double>.from(initialMeans);
-    List<double> covs1 = new List<double>.from(initialCovs);
+    means1 = new List<double>.from(initialMeans);
+    covs1 = new List<double>.from(initialCovs);
 
     gmm = GMM1D(numComponents, weights, means1, covs1);
     iteration = 0;
@@ -626,12 +632,12 @@ class GaussianScene extends Scene {
     print("iteration");
     print(iteration);
 
-    List<double> means2 = gmm.means;
-    List<double> covs2 = gmm.variances;
+    means1 = gmm.means;
+    covs1 = gmm.variances;
 
-    bool hasConverged = isConverged(covs2);
-    print(means2);
-    print(covs2);
+    bool hasConverged = isConverged(covs1);
+    print(means1);
+    print(covs1);
     print("hasConverged");
     print(hasConverged);
     if (hasConverged && iteration > 3) {
@@ -639,8 +645,8 @@ class GaussianScene extends Scene {
       playShape.become(tri);
     }
 
-    nextGMM = createGMM(means2, covs2, xRange, axes);
-    Animation mcVGAnimation = transformMCDisplay(means2, covs2);
+    nextGMM = createGMM(means1, covs1, xRange, axes);
+    Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
   }
@@ -813,8 +819,13 @@ class GaussianScene extends Scene {
       PINK,
       GRAY,
       TEAL_C,
+      GREEN_B,
+      BLUE_C,
       TEAL_B,
-      TEAL_A
+      DARK_GRAY,
+      PURPLE_C,
+      YELLOW_B,
+      BLUE_A,
     ];
     var length = means.length;
     length = min(length, covs.length);
@@ -960,7 +971,20 @@ class GaussianScene extends Scene {
     VGroup cVG = initializeListDisplay(covs, heightOffset: mcTextOffset);
     VGroup mcVG2 = VGroup([mVG, cVG]);
 
+    Rectangle mcSurroundingRectangle2 = createMCSurroundingRectangle();
+    Animation mcVGAnimation
+
     return Transform(mcVG, target: mcVG2);
+  }
+
+  Rectangle createMCSurroundingRectangle() {
+    Rectangle mcSurroundingRectangle1 = Rectangle(
+        color: WHITE, width: 1.75 + letterOffset * numComponents, height: 1.3)
+      ..toCorner(corner: UL)
+      ..shift(
+          Vector3(mcDisplayLeftOffset - 0.3, mcDisplayTopOffset + 0.2, 0.0));
+    mcSurroundingRectangle1.fillColors = [TRANSPARENT];
+    return mcSurroundingRectangle1;
   }
 
   AnimationGroup createNumberDisplay(List<double> means, List<double> covs) {
@@ -978,12 +1002,7 @@ class GaussianScene extends Scene {
       ..toCorner(corner: UL)
       ..shift(Vector3(mcDisplayLeftOffset, mcDisplayTopOffset - 0.6, 0.0));
 
-    mcSurroundingRectangle = Rectangle(
-        color: WHITE, width: 1.75 + letterOffset * numComponents, height: 1.3)
-      ..toCorner(corner: UL)
-      ..shift(
-          Vector3(mcDisplayLeftOffset - 0.3, mcDisplayTopOffset + 0.2, 0.0));
-    mcSurroundingRectangle.fillColors = [TRANSPARENT];
+    mcSurroundingRectangle = createMCSurroundingRectangle();
 
     Animation initialMCDisplayAnimation = initializeMCDisplay(means, covs);
     AnimationGroup ag = AnimationGroup([
@@ -1011,7 +1030,7 @@ class GaussianScene extends Scene {
       ..scaleUniformly(1.0)
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
-          mainButtonsTopOffset, 0.0));
+          mainButtonsTopOffset + 0.05, 0.0));
     return mob;
   }
 
@@ -1032,8 +1051,11 @@ class GaussianScene extends Scene {
 
     Animation iK = Transform(componentNumber, target: newComponentNumber);
 
-    double randomMean = Random().nextDouble() * xRange[1] - xRange[0] - xRange[0];
+    double randomMean = Random().nextDouble() * (xRange[1] - xRange[0]) + xRange[0];
     double randomCov = Random().nextDouble();
+    print("randoms");
+    print(randomMean);
+    print(randomCov);
     means1.add(randomMean);
     covs1.add(randomCov);
 
@@ -1046,9 +1068,20 @@ class GaussianScene extends Scene {
     gmm = GMM1D(numComponents, weights, means1, covs1);
 
     nextGMM = createGMM(means1, covs1, xRange, axes);
-    Animation transformGMMs = Transform(currentGMM, target: nextGMM);
 
-    playMany([xK, transformGMMs]);
+    Animation transformMCDisplayAnimation = transformMCDisplay(means1, covs1);
+    AnimationGroup changeKAnimationGroup;
+    
+    if (reduceMotion) {
+      currentGMM.become(nextGMM);
+      changeKAnimationGroup = AnimationGroup([xK, transformMCDisplayAnimation]);
+    } else {
+      Animation transformGMMs = Transform(currentGMM, target: nextGMM);
+      changeKAnimationGroup =
+          AnimationGroup([xK, transformGMMs, transformMCDisplayAnimation]);
+    }
+
+    await play(changeKAnimationGroup);
   }
 
   Button createDecrementKButton() {
@@ -1056,10 +1089,10 @@ class GaussianScene extends Scene {
     circle.fillColors = [TRANSPARENT];
     MathTex minus = m["-"]..scale(Vector3(diKScale, diKScale, 1));
     VGroup dK = VGroup([circle, minus]);
-    Button dKButton = Button(mob: dK, onClick: () => numComponents -= 1);
+    Button dKButton = Button(mob: dK, onClick: decrementKUpdater);
     dKButton
       ..toCorner(corner: UL)
-      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset, mainButtonsTopOffset + 0.05, 0.0));
+      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset, mainButtonsTopOffset + 0.1, 0.0));
     return dKButton;
   }
 
@@ -1068,16 +1101,15 @@ class GaussianScene extends Scene {
     circle.fillColors = [TRANSPARENT];
     MathTex minus = m["+"]..scale(Vector3(diKScale, diKScale, 1));
     VGroup iK = VGroup([circle, minus]);
-    Button iKButton = Button(mob: iK, onClick: () => numComponents += 1);
+    Button iKButton = Button(mob: iK, onClick: incrementKUpdater);
     iKButton
     ..toCorner(corner: UL)
-    ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 1.2, mainButtonsTopOffset + 0.05, 0.0));
+    ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 1.2, mainButtonsTopOffset + 0.1, 0.0));
     return iKButton;
   }
 
   AnimationGroup fixedComponentNumberDisplay() {
     MathTex fixedComponentNumber = MathTex(r'N_{components}:');
-    componentNumber;
 
     numComponentsSurroundingRectangle = Rectangle(
         color: WHITE, width: 2.3, height: 1.3)
@@ -1240,10 +1272,16 @@ class GaussianScene extends Scene {
         state = 0;
       } else if (state == 6) {
         Animation dK = decrementK();
+        print(numComponents);
         await changeK(dK);
         state = 0;
       } else if (state == 7) {
+        if (numComponents == maxComponents) {
+          state = 0;
+          continue;
+        }
         Animation iK = incrementK();
+        print(numComponents);
         await changeK(iK);
         state = 0;
       } else {
