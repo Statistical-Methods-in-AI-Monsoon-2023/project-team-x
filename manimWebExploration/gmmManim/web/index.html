@@ -10,13 +10,16 @@
 
   </head>
   <body>
-    <h1>file upload:</h1>
-    <form>
-      <input type="file" id="fileInput" name="filename">
-    </form>
-    <div *ngIf="contents != null">
-        <p>your data:</p>
-        <p id="uploadedContent"></p>
+    <div id="uploadWrapper">
+
+        <p>Input your data:  </p>
+        <form>
+            <input type="file" id="fileInput" name="filename">
+        </form>
+        <div *ngIf="contents != null">
+            <p>your data:</p>
+            <p id="uploadedContent"></p>
+        </div>
     </div>
     <div id="canvas-container"></div>
     <script defer src="index.dart.js"></script>

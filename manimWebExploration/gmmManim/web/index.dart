@@ -468,7 +468,7 @@ class GaussianScene extends Scene {
 
     // Creating Premade Manim Objects
     axes = addAxes(xRange);
-    currentGMM = createGMM(means1, covs1, xRange, axes);
+    currentGMM = createGMM(means1, covs1, axes);
     dots = createDotsFromData(axes, data1);
     Animation ag = createInitialGMMAnimations(currentGMM);
 
@@ -511,7 +511,7 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
 
-  void setData(uploadedData) {
+  void setData(List<double> uploadedData) {
     double mean = uploadedData.reduce((a, b) => a + b) / uploadedData.length;
     double variance = 0;
 
@@ -523,10 +523,14 @@ class GaussianScene extends Scene {
 
     List<double> normalizedData = [];
     for (var i = 0; i < uploadedData.length; i++) {
-      normalizedData.add((uploadedData - mean) / variance);
+      // normalizedData.add(((uploadedData[i] - mean) / variance).toInt() * 1.0);
+      normalizedData.add(0);
     }
 
-    data1 = normalizedData;
+    print(uploadedData);
+    print(normalizedData);
+    data1 = uploadedData;
+    // data1 = normalizedData;
     isUploaded = true;
     state = 5;
   }
@@ -536,27 +540,26 @@ class GaussianScene extends Scene {
 
     xRange = setXRange(data1);
     numComponents = 3;
-    initialMeans = [1, 3, 7];
-    initialCovs = [1, 2, 3];
     iteration = 0;
 
-    List<double> means1 = new List<double>.from(initialMeans);
-    List<double> covs1 = new List<double>.from(initialCovs);
+    means1 = new List<double>.from(initialMeans);
+    covs1 = new List<double>.from(initialCovs);
     // GMM Initializations
-    List<double> weights = initializeWeights(numComponents);
+    weights = initializeWeights(numComponents);
     gmm = GMM1D(numComponents, weights, means1, covs1);
     Axes newAxes = addAxes(xRange);
+    print("Finished axes");
     VGroup dots2 = createDotsFromData(newAxes, data1);
-    VGroup newGMM = createGMM(means1, covs1, xRange, newAxes);
+    print("Finished dots");
+    VGroup newGMM = createGMM(means1, covs1, newAxes);
+    print("Finished gmm");
 
     await playMany([
-      Transform(axes, target: newAxes),
-      Transform(dots, target: dots2),
+      // Transform(axes, target: newAxes),
+      // Transform(dots, target: dots2),
       Transform(currentGMM, target: newGMM)
     ]);
-
-    axes = newAxes;
-    dots = dots2;
+    print("Finished animation");
   }
 
   double min1(double a, double b) {
@@ -568,8 +571,8 @@ class GaussianScene extends Scene {
   }
 
   List<double> setXRange(data1) {
-    double dataMin = data1.reduce(min1);
-    double dataMax = data1.reduce(max1);
+    double dataMin = data1.reduce(min1) - 1;
+    double dataMax = data1.reduce(max1) + 1;
     double dataPadding = (dataMax - dataMin) / 4;
     List<double> xRange1 = [dataMin - dataPadding, dataMax + dataPadding];
     return xRange1;
@@ -595,7 +598,7 @@ class GaussianScene extends Scene {
     means1 = gmm.means;
     covs1 = gmm.variances;
 
-    nextGMM = createGMM(means1, covs1, xRange, axes);
+    nextGMM = createGMM(means1, covs1, axes);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
@@ -609,7 +612,7 @@ class GaussianScene extends Scene {
     means1 = gmm.means;
     covs1 = gmm.variances;
 
-    nextGMM = createGMM(means1, covs1, xRange, axes);
+    nextGMM = createGMM(means1, covs1, axes);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
@@ -622,7 +625,7 @@ class GaussianScene extends Scene {
 
     gmm = GMM1D(numComponents, weights, means1, covs1);
     iteration = 0;
-    nextGMM = createGMM(means1, covs1, xRange, axes);
+    nextGMM = createGMM(means1, covs1, axes);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
@@ -648,7 +651,7 @@ class GaussianScene extends Scene {
       playShape.become(tri);
     }
 
-    nextGMM = createGMM(means1, covs1, xRange, axes);
+    nextGMM = createGMM(means1, covs1, axes);
     AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
@@ -810,7 +813,7 @@ class GaussianScene extends Scene {
     return dotsVG;
   }
 
-  VGroup createGMM(List<double> means, List<double> covs, xRange, Axes axesT) {
+  VGroup createGMM(List<double> means, List<double> covs, Axes axesT) {
     List<FunctionGraph> graphs = [];
 
     var colors = [
@@ -875,7 +878,7 @@ class GaussianScene extends Scene {
   }
 
   Axes addAxes(List<double> xRange) {
-    double stepSize = ((xRange[1] - xRange[0]) / 20).toInt() / 2;
+    double stepSize = max1(((xRange[1] - xRange[0]) ~/ 20) / 2, 0.5);
     Axes axesTmp = Axes(
       xMin: xRange[0],
       xMax: xRange[1],
@@ -974,7 +977,7 @@ class GaussianScene extends Scene {
     VGroup cVG = initializeListDisplay(covs, heightOffset: mcTextOffset);
     VGroup mcVG2 = VGroup([mVG, cVG]);
     MathTex meanText1 = moveMCText(meanText);
-    MathTex varianceText1 = moveMCText(varianceText);
+    MathTex varianceText1 = moveMCText(varianceText, offset: 0.6);
 
 
     Rectangle mcSurroundingRectangle2 = createMCSurroundingRectangle();
@@ -982,7 +985,7 @@ class GaussianScene extends Scene {
     Animation mcSurroundingRectangleAnimation = Transform(mcSurroundingRectangle, target: mcSurroundingRectangle2);
     AnimationGroup mcVGTextAnimation = AnimationGroup([Transform(meanText, target: meanText1), Transform(varianceText, target: varianceText1)]);
 
-    return AnimationGroup([mcVGAnimation, mcSurroundingRectangleAnimation]);
+    return AnimationGroup([mcVGAnimation, mcSurroundingRectangleAnimation, mcVGTextAnimation]);
   }
 
   Rectangle createMCSurroundingRectangle() {
@@ -1077,7 +1080,7 @@ class GaussianScene extends Scene {
     weights = initializeWeights(numComponents);
     gmm = GMM1D(numComponents, weights, means1, covs1);
 
-    nextGMM = createGMM(means1, covs1, xRange, axes);
+    nextGMM = createGMM(means1, covs1, axes);
 
     Animation transformMCDisplayAnimation = transformMCDisplay(means1, covs1);
     AnimationGroup changeKAnimationGroup;
