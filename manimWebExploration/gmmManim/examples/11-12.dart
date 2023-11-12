@@ -705,7 +705,8 @@ class GaussianScene extends Scene {
   Button playGMMButton() {
     Rectangle r2 =
         makePlayerButton(height: playerButtonHeight, width: playerButtonWidth);
-
+    // MathTex mathtex = MathTex(r' blacktriangleright ', color: BLACK);
+    // mathtex.scaleUniformly(0.5);
     playShape = Triangle(color: GREEN);
     playShape
       ..scale(Vector3(0.16, 0.16, 1))
@@ -938,10 +939,10 @@ class GaussianScene extends Scene {
     int length = numComponents;
     List<VGroup> vgs = [];
 
-    // print("ild");
+    print("ild");
 
     for (var i = 0; i < length; i++) {
-      // print(list[i].toStringAsPrecision(2));
+      print(list[i].toStringAsPrecision(2));
       VGroup number = VGroup(getNumber(list[i].toStringAsPrecision(2)))
         ..scale(Vector3(0.5, 0.5, 1))
         ..shift(Vector3(0.0, -0.1, 0.0));
@@ -1021,7 +1022,7 @@ class GaussianScene extends Scene {
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset,
           mainButtonsTopOffset + 0.6, 0.0));
 
-    initialComponentNumber = VGroup([m["4"].copy()])
+    initialComponentNumber = VGroup([m[initialComponents.toString()]])
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
           mainButtonsTopOffset + 0.5, 0.0));
@@ -1089,9 +1090,7 @@ class GaussianScene extends Scene {
     print("numComponents");
     print(numComponents);
     // VGroup newComponentNumber = getComponentNumberVGroup(numComponents);
-    print(numComponents.toString());
-    print(m[numComponents.toString()].copy());
-    VGroup targetComponentNumber1 = VGroup([m[numComponents.toString()].copy()])
+    VGroup targetComponentNumber1 = VGroup(m[numComponents.toString()])
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
           mainButtonsTopOffset + numComponents * 0.1, 0.0));
@@ -1100,14 +1099,13 @@ class GaussianScene extends Scene {
     print("decremented!!!!!");
     print(numComponents);
     print(initialComponents);
-    if (numComponents == initialComponents) {
-      print("initial");
-      dK = Transform(componentNumber, target: initialComponentNumber);
-      componentNumber.become(initialComponentNumber);
-    } else {
-      dK = Transform(componentNumber, target: targetComponentNumber1);
-    }
-    // dK = Transform(componentNumber, target: targetComponentNumber1);
+    // if (numComponents == initialComponents) {
+    //   print("initial");
+    //   dK = Transform(componentNumber, target: initialComponentNumber);
+    // } else {
+    //   dK = Transform(componentNumber, target: newComponentNumber);
+    // }
+    dK = Transform(componentNumber, target: targetComponentNumber1);
     means1.removeLast();
     covs1.removeLast();
 
@@ -1118,13 +1116,7 @@ class GaussianScene extends Scene {
     numComponents += 1;
     print("numComponents");
     print(numComponents);
-    // VGroup newComponentNumber = getComponentNumberVGroup(numComponents);
-    VGroup newComponentNumber = VGroup([m[numComponents.toString()].copy()])
-      ..toCorner(corner: UL)
-      ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
-          mainButtonsTopOffset + numComponents * 0.1, 0.0));
-    
-    print(newComponentNumber);
+    VGroup newComponentNumber = getComponentNumberVGroup(numComponents);
 
     print("decremented!!!!!");
     print(numComponents);

@@ -11,13 +11,12 @@
   </head>
   <body>
     <div id="uploadWrapper">
-
-        <p>Input your data:  </p>
+        <h1><i>file upload:</i></h1>
         <form>
-            <input type="file" id="fileInput" name="filename">
+        <input type="file" id="fileInput" name="filename">
         </form>
         <div *ngIf="contents != null">
-            <p>your data:</p>
+            <p><i>your data:</i></p>
             <p id="uploadedContent"></p>
         </div>
     </div>

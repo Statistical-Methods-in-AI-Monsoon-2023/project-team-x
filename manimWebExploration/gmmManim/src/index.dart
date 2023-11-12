@@ -15,20 +15,20 @@ class TestScene extends Scene {
 
     MathTex.preload(r'Reset');
 
-    MathTex.preload('e');
-    MathTex.preload('+');
-    MathTex.preload('-');
-    MathTex.preload('.');
-    MathTex.preload('0');
-    MathTex.preload('1');
-    MathTex.preload('2');
-    MathTex.preload('3');
-    MathTex.preload('4');
-    MathTex.preload('5');
-    MathTex.preload('6');
-    MathTex.preload('7');
-    MathTex.preload('8');
-    MathTex.preload('9');
+    Tex.preload('e');
+    Tex.preload('+');
+    Tex.preload('-');
+    Tex.preload('.');
+    Tex.preload('0');
+    Tex.preload('1');
+    Tex.preload('2');
+    Tex.preload('3');
+    Tex.preload('4');
+    Tex.preload('5');
+    Tex.preload('6');
+    Tex.preload('7');
+    Tex.preload('8');
+    Tex.preload('9');
   }
 
   @override
