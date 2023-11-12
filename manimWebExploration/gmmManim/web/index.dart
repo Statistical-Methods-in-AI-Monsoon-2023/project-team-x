@@ -361,7 +361,6 @@ class GaussianScene extends Scene {
   late Rectangle mcSurroundingRectangle;
   late Rectangle numComponentsSurroundingRectangle;
   late VGroup componentNumber;
-  late VGroup initialComponentNumber;
 
   late MathTex meanText;
   late MathTex varianceText;
@@ -372,7 +371,8 @@ class GaussianScene extends Scene {
 
   int state = 0;
   int iteration = 0;
-  int initialComponents = 4;
+  int initialComponents = 3;
+  String initialComponentsString = 3.toString();
   late int numComponents;
   int maxComponents = 10;
 
@@ -404,6 +404,7 @@ class GaussianScene extends Scene {
   late List<double> xRange;
   late List<double> gammas;
   late Map m;
+  late VGroup initialComponentNumber;
 
   @override
   FutureOr<void> preload() {
@@ -459,8 +460,8 @@ class GaussianScene extends Scene {
       print(xRange);
       // xRange = [-5, 20];
     }
-    initialMeans = [1, 6, 12, 8];
-    initialCovs = [1, 4, 5, 3];
+    initialMeans = [1, 6, 12];
+    initialCovs = [1, 4, 5];
     means1 = new List<double>.from(initialMeans);
     covs1 = new List<double>.from(initialCovs);
     // GMM Initializations
@@ -825,7 +826,7 @@ class GaussianScene extends Scene {
     var threshold = 0.3;
     var stepSize = 0.1;
 
-    for (var i = 0; i < length; i++) {
+    for (var i = 0; i < numComponents; i++) {
       if (covs[i] < lowerCovsThreshold) {
         covs[i] = lowerCovsThreshold;
       }
@@ -834,11 +835,8 @@ class GaussianScene extends Scene {
         covs[i] = upperCovsThreshold;
       }
 
-      if (covs[i] < 2) {
-        stepSize = 0.1;
-      } else {
-        stepSize = 0.3;
-      }
+
+      stepSize = covs[i] / 5;
 
       FunctionGraph graph = axesT.getGraph(
           (x) =>
@@ -1021,10 +1019,10 @@ class GaussianScene extends Scene {
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset,
           mainButtonsTopOffset + 0.6, 0.0));
 
-    initialComponentNumber = VGroup([m["4"].copy()])
+    initialComponentNumber = VGroup([Tex('3')])
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
-          mainButtonsTopOffset + 0.5, 0.0));
+          mainButtonsTopOffset + 0.05, 0.0));
     componentNumber = getComponentNumberVGroup(numComponents);
 
     Button dKButton = createDecrementKButton();
@@ -1062,10 +1060,12 @@ class GaussianScene extends Scene {
   }
 
   void decrementKUpdater() {
+    numComponents -= 1;
     state = 6;
   }
 
   void incrementKUpdater() {
+    numComponents += 1;
     state = 7;
   }
 
@@ -1085,29 +1085,17 @@ class GaussianScene extends Scene {
   }
 
   Animation decrementK() {
-    numComponents -= 1;
-    print("numComponents");
-    print(numComponents);
-    // VGroup newComponentNumber = getComponentNumberVGroup(numComponents);
-    print(numComponents.toString());
-    print(m[numComponents.toString()].copy());
-    VGroup targetComponentNumber1 = VGroup([m[numComponents.toString()].copy()])
+    VGroup newComponentNumber = VGroup([m[numComponents.toString()].copy()])
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
-          mainButtonsTopOffset + numComponents * 0.1, 0.0));
+          mainButtonsTopOffset + 0.05, 0.0));
 
     Animation dK;
-    print("decremented!!!!!");
-    print(numComponents);
-    print(initialComponents);
     if (numComponents == initialComponents) {
-      print("initial");
       dK = Transform(componentNumber, target: initialComponentNumber);
-      componentNumber.become(initialComponentNumber);
     } else {
-      dK = Transform(componentNumber, target: targetComponentNumber1);
+      dK = Transform(componentNumber, target: newComponentNumber);
     }
-    // dK = Transform(componentNumber, target: targetComponentNumber1);
     means1.removeLast();
     covs1.removeLast();
 
@@ -1115,20 +1103,11 @@ class GaussianScene extends Scene {
   }
 
   Animation incrementK() {
-    numComponents += 1;
-    print("numComponents");
-    print(numComponents);
-    // VGroup newComponentNumber = getComponentNumberVGroup(numComponents);
     VGroup newComponentNumber = VGroup([m[numComponents.toString()].copy()])
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
-          mainButtonsTopOffset + numComponents * 0.1, 0.0));
+          mainButtonsTopOffset + 0.05, 0.0));
     
-    print(newComponentNumber);
-
-    print("decremented!!!!!");
-    print(numComponents);
-    print(initialComponents);
     Animation iK;
     if (numComponents == initialComponents) {
       iK = Transform(componentNumber, target: initialComponentNumber);
@@ -1139,9 +1118,6 @@ class GaussianScene extends Scene {
     double randomMean =
         Random().nextDouble() * (xRange[1] - xRange[0]) + xRange[0];
     double randomCov = Random().nextDouble() * 5;
-    // print("randoms");
-    // print(randomMean);
-    // print(randomCov);
     means1.add(randomMean);
     covs1.add(randomCov);
 
@@ -1159,11 +1135,11 @@ class GaussianScene extends Scene {
 
     if (reduceMotion) {
       currentGMM.become(nextGMM);
-      changeKAnimationGroup = AnimationGroup([xK, transformMCDisplayAnimation]);
+      changeKAnimationGroup = AnimationGroup([transformMCDisplayAnimation, xK]);
     } else {
       Animation transformGMMs = Transform(currentGMM, target: nextGMM);
       changeKAnimationGroup =
-          AnimationGroup([xK, transformGMMs, transformMCDisplayAnimation]);
+          AnimationGroup([transformGMMs, transformMCDisplayAnimation, xK]);
     }
 
     await play(changeKAnimationGroup);
@@ -1172,14 +1148,16 @@ class GaussianScene extends Scene {
   Future resetGMM() async {
     numComponents = initialComponents;
     VGroup newComponentNumber1 = getComponentNumberVGroup(initialComponents);
-    Animation xKAnimation =
-        Transform(componentNumber, target: newComponentNumber1);
+    Animation xKAnimation;
+    
+    if (numComponents == initialComponents) {
+      xKAnimation = Transform(componentNumber, target: initialComponentNumber);
+    } else {
+      xKAnimation = Transform(componentNumber, target: newComponentNumber1);
+    }
     weights = initializeWeights(numComponents);
     List<double> means2 = new List<double>.from(initialMeans);
     List<double> covs2 = new List<double>.from(initialCovs);
-
-    print(means2);
-    print(covs2);
 
     gmm = GMM1D(numComponents, weights, means2, covs2);
     means1 = gmm.means;
