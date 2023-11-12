@@ -551,11 +551,8 @@ class GaussianScene extends Scene {
     weights = initializeWeights(numComponents);
     gmm = GMM1D(numComponents, weights, means1, covs1);
     Axes newAxes = addAxes(xRange);
-    print("Finished axes");
     VGroup dots2 = createDotsFromData(newAxes, data1);
-    print("Finished dots");
     VGroup newGMM = createGMM(means1, covs1, newAxes);
-    print("Finished gmm");
 
     await playMany([
       // Transform(axes, target: newAxes),
