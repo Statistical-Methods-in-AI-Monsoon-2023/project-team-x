@@ -1358,8 +1358,6 @@ class GaussianScene extends Scene {
       } else {
         await wait();
       }
-
-      // if (state != 0) state = 0;
     }
   }
 }

@@ -492,6 +492,8 @@ class GaussianScene extends Scene {
 
     // Axes & Data
 
+    // TODO: SHOULD MAKE START BUTTON
+
     // await loadingAnimation();
     // await showFrame();
     await play(FadeIn(axes));
@@ -879,13 +881,12 @@ class GaussianScene extends Scene {
         includeTip: true,
       ),
       xAxisConfig: AxisConfig(
-        tickFrequency: 1.0,
-        unitSize: 0.5,
-        includeTip: false,
-        // includeNumbers: true,
-        // numbersToShow: range(start: 1, end: (xRange[1] - xRange[0]).toInt()),
-        // labelDirection: DOWN
-      ),
+          tickFrequency: 1.0,
+          unitSize: 0.5,
+          includeTip: false,
+          includeNumbers: true,
+          // numbersToShow: range(start: 1, end: (xRange[1] - xRange[0]).toInt()),
+          labelDirection: DOWN),
       yAxisConfig: AxisConfig(
         unitSize: 0.7,
       ),
@@ -1083,6 +1084,8 @@ class GaussianScene extends Scene {
   VGroup getComponentNumberVGroup(nComponents) {
     print("NumComponents:");
     print(nComponents);
+
+    // // CODE FOR CREATING NUMCOMPONENTS TEXT >= 10
     // VGroup componentNumberObject = (nComponents < 10)
     //     ? VGroup([m[nComponents.toString()]])
     //     : VGroup(getNumber(nComponents.toString(), pos: ORIGIN));
@@ -1212,13 +1215,9 @@ class GaussianScene extends Scene {
     double xShift = 0;
     bool isPeriod = false;
 
-    // print("gn");
-    // print(tmp);
     for (var j = 0; j < tmp.length; j++) {
       bool isNumber = false;
       Tex letter = m[tmp[j]].copy();
-      // print("\tletter");
-      // print(m[tmp[j]]);
       double yShift = 0;
 
       if (isPeriod) {
@@ -1253,8 +1252,6 @@ class GaussianScene extends Scene {
 
       t.add(letter);
     }
-
-    // print(t);
 
     return t;
   }
@@ -1302,7 +1299,6 @@ class GaussianScene extends Scene {
 
     VGroup v100 = VGroup(getNumber("100"));
     this.add([v100]);
-    // await play(ShowCreation(v100));
     await play(FadeOut(circle));
     await play(FadeOut(v100, lagRatio: 2.0));
   }
@@ -1362,8 +1358,6 @@ class GaussianScene extends Scene {
       } else {
         await wait();
       }
-
-      // if (state != 0) state = 0;
     }
   }
 }
