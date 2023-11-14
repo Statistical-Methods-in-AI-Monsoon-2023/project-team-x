@@ -433,9 +433,10 @@ class GaussianScene extends Scene {
   }
 
   Future showFrame() async {
-    Rectangle frame = Rectangle(height: FRAME_HEIGHT - 0.5, width: FRAME_WIDTH - 0.5)
-      ..toCorner(corner: UL)
-      ..shift(Vector3(-0.2, 0.5, 0.0));
+    Rectangle frame =
+        Rectangle(height: FRAME_HEIGHT - 0.5, width: FRAME_WIDTH - 0.5)
+          ..toCorner(corner: UL)
+          ..shift(Vector3(-0.2, 0.5, 0.0));
     frame.fillColors = [TRANSPARENT];
     await play(ShowCreation(frame));
   }
@@ -490,8 +491,6 @@ class GaussianScene extends Scene {
     // ANIMATIONS
 
     // Axes & Data
-
-    // TODO: SHOULD MAKE START BUTTON
 
     // await loadingAnimation();
     // await showFrame();
@@ -715,8 +714,8 @@ class GaussianScene extends Scene {
   }
 
   Button createPlayGMMButton() {
-    Rectangle r2 =
-        createPlayerButton(height: playerButtonHeight, width: playerButtonWidth);
+    Rectangle r2 = createPlayerButton(
+        height: playerButtonHeight, width: playerButtonWidth);
 
     playShape = Triangle(color: GREEN);
     playShape
@@ -843,7 +842,6 @@ class GaussianScene extends Scene {
         covs[i] = upperCovsThreshold;
       }
 
-
       stepSize = covs[i] / 5;
 
       FunctionGraph graph = axesT.getGraph(
@@ -884,9 +882,9 @@ class GaussianScene extends Scene {
         tickFrequency: 1.0,
         unitSize: 0.5,
         includeTip: false,
-        includeNumbers: true,
+        // includeNumbers: true,
         // numbersToShow: range(start: 1, end: (xRange[1] - xRange[0]).toInt()),
-        labelDirection: DOWN
+        // labelDirection: DOWN
       ),
       yAxisConfig: AxisConfig(
         unitSize: 0.7,
@@ -1085,8 +1083,6 @@ class GaussianScene extends Scene {
   VGroup getComponentNumberVGroup(nComponents) {
     print("NumComponents:");
     print(nComponents);
-
-    // // CODE FOR CREATING NUMCOMPONENTS TEXT >= 10
     // VGroup componentNumberObject = (nComponents < 10)
     //     ? VGroup([m[nComponents.toString()]])
     //     : VGroup(getNumber(nComponents.toString(), pos: ORIGIN));
@@ -1122,7 +1118,7 @@ class GaussianScene extends Scene {
       ..toCorner(corner: UL)
       ..shift(Vector3(fixedComponentNumberDiplayLeftOffset + 0.5 + 0.25,
           mainButtonsTopOffset + 0.05, 0.0));
-    
+
     Animation iK;
     if (numComponents == initialComponents) {
       iK = Transform(componentNumber, target: initialComponentNumber);
@@ -1162,7 +1158,8 @@ class GaussianScene extends Scene {
 
   Future resetGMM() async {
     numComponents = initialComponents;
-    Animation xKAnimation = Transform(componentNumber, target: initialComponentNumber);
+    Animation xKAnimation =
+        Transform(componentNumber, target: initialComponentNumber);
 
     weights = initializeWeights(numComponents);
     List<double> means2 = new List<double>.from(initialMeans);
@@ -1215,9 +1212,13 @@ class GaussianScene extends Scene {
     double xShift = 0;
     bool isPeriod = false;
 
+    // print("gn");
+    // print(tmp);
     for (var j = 0; j < tmp.length; j++) {
       bool isNumber = false;
       Tex letter = m[tmp[j]].copy();
+      // print("\tletter");
+      // print(m[tmp[j]]);
       double yShift = 0;
 
       if (isPeriod) {
@@ -1252,6 +1253,8 @@ class GaussianScene extends Scene {
 
       t.add(letter);
     }
+
+    // print(t);
 
     return t;
   }
@@ -1299,6 +1302,7 @@ class GaussianScene extends Scene {
 
     VGroup v100 = VGroup(getNumber("100"));
     this.add([v100]);
+    // await play(ShowCreation(v100));
     await play(FadeOut(circle));
     await play(FadeOut(v100, lagRatio: 2.0));
   }
