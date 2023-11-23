@@ -11,13 +11,15 @@
   </head>
   <body>
     <div id="uploadWrapper">
-        <h1><i>file upload:</i></h1>
-        <form>
-        <input type="file" id="fileInput" name="filename">
-        </form>
-        <div *ngIf="contents != null">
-            <p><i>your data:</i></p>
-            <p id="uploadedContent"></p>
+        <h1>File upload: </h1>
+        <div class="uploadDisplayContainer">
+            <form id="uploadFile">
+            <input type="file" id="fileInput" name="filename">
+            </form>
+            <div *ngIf="contents != null" id="dataDisplay">
+                <p>Data:</p>
+                <p id="uploadedContent"></p>
+            </div>
         </div>
     </div>
     <div id="canvas-container"></div>

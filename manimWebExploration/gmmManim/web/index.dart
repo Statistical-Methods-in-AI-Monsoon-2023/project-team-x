@@ -691,7 +691,8 @@ class GaussianScene extends Scene {
   }
 
   Rectangle createPlayerButton(
-      {double height: 0.5, double width: 0.8, Color color: WHITE}) {
+      {double height: 0.5, double width: 0.8, Color color: WHITE}) 
+      {
     Rectangle r2 = Rectangle(height: height, width: width, color: color);
     r2.fillColors = [TRANSPARENT];
     return r2;
@@ -733,23 +734,6 @@ class GaussianScene extends Scene {
         Button(mob: createPlayGMMButtonGroup, onClick: playGMMUpdater);
     return playButton;
   }
-
-  // Button pauseGMMButton() {
-  //   Rectangle r2 = createPlayerButton();
-
-  //   Square sqr = Square(color: RED);
-  //   sqr
-  //     ..rotate(PI / 2)
-  //     ..scale(Vector3(0.18, 0.18, 1));
-  //   // sqr..shift(DOWN / 4);
-  //   VGroup pauseGMMButtonGroup = VGroup([sqr, r2]);
-  //   pauseGMMButtonGroup
-  //     ..toCorner(corner: UL)
-  //     ..shift(Vector3(playerButtonOffset + mainButtonsLeftOffset, mainButtonsTopOffset, 0.0));
-
-  //   Button pauseButton = Button(mob: pauseGMMButtonGroup, onClick: stopUpdater);
-  //   return pauseButton;
-  // }
 
   Button createPrevGMMButton() {
     // Mobject obj = RoundedRectangle(cornerRadius: 0.5, height: 2.0, width: 4.0);

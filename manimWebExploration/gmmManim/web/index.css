@@ -5,7 +5,9 @@ body {
     background-color: black;
     color: white;
 
-    /* font-family: "Latin Modern Math"; */
+    font-family: "Latin Modern Math";
+    font-size: 12px;
+    font-style: normal;
 }
 
 canvas {
@@ -27,9 +29,29 @@ canvas {
 
 }
 
+.uploadDisplayContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: baseline;
+    height: 50px;
+}
+
 #uploadWrapper {
     display: flex;
     justify-content: left;
     align-items: center;;
     flex-direction: row;
+
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+#uploadFile {
+    margin-left: 50px;
+}
+
+#dataDisplay {
+    height: 30px;
+    width: fit-content;
 }
