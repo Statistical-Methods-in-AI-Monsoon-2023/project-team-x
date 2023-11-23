@@ -395,8 +395,9 @@ class GaussianScene extends Scene {
 
   double fixedComponentNumberDiplayLeftOffset = 3.5;
   double diKScale = 0.8;
+  double xRangeBuffer = 2;
 
-  // List<double> data1 = [1.1, 0.6, 1.3, 1.1, 5.2, 4.7, 5.1, 5.3, 5.2, 12.3, 12.1, 12.9, 12.4, 12];
+  List<double> originalData = [-7.3, -7.2, -7.1, -7.0, -7.2, -3.0, -1.0, 2.0, 2.5, 3.1, 3.3, 7.7, 7.9, 7.9, 9.0];
   late List<double> data1;
   late List<double> initialMeans;
   late List<double> initialCovs;
@@ -446,23 +447,7 @@ class GaussianScene extends Scene {
     m = makeMap();
 
     if (!isUploaded) {
-      data1 = [
-        -4.0,
-        1.1,
-        0.6,
-        1.3,
-        1.1,
-        5.2,
-        4.7,
-        5.1,
-        5.3,
-        5.2,
-        12.3,
-        12.1,
-        12.9,
-        12.4,
-        12
-      ];
+      data1 = originalData;
       xRange = setXRange(data1);
       print(xRange);
       // xRange = [-5, 20];
@@ -526,24 +511,31 @@ class GaussianScene extends Scene {
 
   void setData(List<double> uploadedData) {
     double mean = uploadedData.reduce((a, b) => a + b) / uploadedData.length;
+    double min_value = uploadedData.reduce((a, b) => min1(a, b));
+    double max_value = uploadedData.reduce((a, b) => max1(a, b));
+    
     double variance = 0;
 
-    for (var i = 0; i < uploadedData.length; i++) {
-      variance += (uploadedData[i] - mean) * (uploadedData[i] - mean);
-    }
+    print("Values");
+    print(min_value);
+    print(max_value);
 
-    variance /= uploadedData.length;
 
     List<double> normalizedData = [];
+    double diff = max_value - min_value;
+
     for (var i = 0; i < uploadedData.length; i++) {
-      // normalizedData.add(((uploadedData[i] - mean) / variance).toInt() * 1.0);
-      normalizedData.add(0);
+      double normalizedDataPoint = (uploadedData[i] - mean) / diff * ((xRange[1] - xRange[0]) - xRangeBuffer * 2);
+      normalizedData.add(normalizedDataPoint);
     }
 
+
+
+    print("uploaded + normalized data");
     print(uploadedData);
     print(normalizedData);
-    data1 = uploadedData;
-    // data1 = normalizedData;
+
+    data1 = normalizedData;
     isUploaded = true;
     state = 5;
   }
@@ -566,12 +558,13 @@ class GaussianScene extends Scene {
     VGroup dots2 = createDotsFromData(newAxes, data1);
     // VGroup newGMM = createGMM(means1, covs1, newAxes);
 
-    // axes.become(newAxes);
-    await playMany([
-      Transform(axes, target: newAxes),
-      Transform(dots, target: dots2),
-      // Transform(currentGMM, target: newGMM)
-    ]);
+    axes.become(newAxes);
+    dots.become(dots2);
+    // await playMany([
+    //   // Transform(axes, target: newAxes),
+    //   // Transform(dots, target: dots2),
+    //   // Transform(currentGMM, target: newGMM)
+    // ]);
 
     print("Finished animation");
   }
@@ -588,7 +581,9 @@ class GaussianScene extends Scene {
     double dataMin = data1.reduce(min1) - 1;
     double dataMax = data1.reduce(max1) + 1;
     double dataPadding = (dataMax - dataMin) / 4;
-    List<double> xRange1 = [dataMin - dataPadding, dataMax + dataPadding];
+    // List<double> xRange1 = [dataMin - dataPadding, dataMax + dataPadding];
+
+    List<double> xRange1 = [-12, 12]; // Axes stays constant
     return xRange1;
   }
 

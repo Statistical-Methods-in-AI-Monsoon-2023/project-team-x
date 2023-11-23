@@ -1,3 +1,7 @@
+:root {
+    --font_family: "Hack Nerd Font";
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -5,7 +9,8 @@ body {
     background-color: black;
     color: white;
 
-    font-family: "Latin Modern Math";
+    /* font-family: "Latin Modern Math"; */
+    font-family: var(--font_family);
     font-size: 12px;
     font-style: normal;
 }
@@ -43,8 +48,8 @@ canvas {
     align-items: center;;
     flex-direction: row;
 
-    padding-left: 50px;
-    padding-right: 50px;
+    padding: 50px;
+    padding-bottom: 0px;
 }
 
 #uploadFile {
@@ -52,6 +57,11 @@ canvas {
 }
 
 #dataDisplay {
-    height: 30px;
+    /* height: 30px; */
+    height: fit-content;
     width: fit-content;
+}
+
+input, input[type="file" i], #file-upload-button {
+    font-family: var(--font_family);
 }
