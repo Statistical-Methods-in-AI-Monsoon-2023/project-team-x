@@ -316,7 +316,7 @@ void main() {
           contents3.add(double.parse(contents2[i]));
         }
 
-        contentUpload.setInnerHtml(contents3.toString());
+        contentUpload.setInnerHtml("Data: " + contents3.toString());
 
         gs.setData(contents3);
         // var scene = gs..bindDisplay(display);
