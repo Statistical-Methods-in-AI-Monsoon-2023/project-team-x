@@ -1,8 +1,9 @@
-
 import 'dart:html';
 import 'package:manim_web/display/abstract_html_display.dart';
 import 'package:gmm/gmm.dart';
 import 'package:manim_web/manim.dart';
+import 'dart:math';
+import 'package:ml_linalg/linalg.dart';
 
 void main() {
   SingleStringMathTex.texToSVGMap[r'''align*'''] = {};
@@ -340,13 +341,13 @@ class GaussianScene extends Scene {
   late Axes axes2;
   late Button next;
   late Dot dot;
-  late GMM1D gmm;
+  late GMMND gmm;
   late List<double> weights;
   late VGroup currentGMM;
   late VGroup gaussians2;
   late VGroup nextGMM;
-  late List<double> means1;
-  late List<double> covs1;
+  late List<Matrix> means1;
+  late List<Matrix> covs1;
 
   late Button nextGMMUpdateButton;
   late Button resetGMMButton;
@@ -398,26 +399,52 @@ class GaussianScene extends Scene {
   double diKScale = 0.8;
   double xRangeBuffer = 2;
 
-  List<double> originalData = [
-    -7.3,
-    -7.2,
-    -7.1,
-    -7.0,
-    -7.2,
-    -3.0,
-    -1.0,
-    2.0,
-    2.5,
-    3.1,
-    3.3,
-    7.7,
-    7.9,
-    7.9,
-    9.0
+  int numDimensions = 2;
+
+  // List<List<double>> originalData = [
+  //   [-7.3, -7.2],
+  //   [-7.1, -7.0],
+  //   [-7.2, -7.2],
+  //   [-3.0, -1.0],
+  //   [2.0, 2.5],
+  //   [3.1, 3.3],
+  //   [7.7, 7.9],
+  //   [7.9, 9.0]
+  // ];
+
+  List<Matrix> originalData = [
+    Matrix.fromList([
+      [1.0, 1.1],
+    ]),
+    Matrix.fromList([
+      [-7.3, -7.2],
+    ]),
+    Matrix.fromList([
+      [-7.1, -7.0],
+    ]),
+    Matrix.fromList([
+      [-7.2, -7.2],
+    ]),
+    Matrix.fromList([
+      [-3.0, -1.0],
+    ]),
+    Matrix.fromList([
+      [2.0, 2.5],
+    ]),
+    Matrix.fromList([
+      [3.1, 3.3],
+    ]),
+    Matrix.fromList([
+      [7.7, 7.9],
+    ]),
+    Matrix.fromList([
+      [7.9, 9.0]
+    ]),
   ];
-  late List<double> data1;
-  late List<double> initialMeans;
-  late List<double> initialCovs;
+
+  late List<Matrix> data1;
+  late List<Matrix> initialMeans;
+  late List<Matrix> initialCovs;
 
   late List<double> xRange;
   late List<double> gammas;
@@ -470,13 +497,33 @@ class GaussianScene extends Scene {
       print(xRange);
       // xRange = [-5, 20];
     }
-    initialMeans = [1, 6, 12];
-    initialCovs = [1, 4, 5];
-    means1 = new List<double>.from(initialMeans);
-    covs1 = new List<double>.from(initialCovs);
+    initialMeans = [
+      Matrix.fromList([
+        [1.0, 1.0]
+      ]),
+      Matrix.fromList([
+        [6.0, 2.0]
+      ]),
+      Matrix.fromList([
+        [12.0, 2.0]
+      ])
+    ];
+    initialCovs = [
+      Matrix.fromList([
+        [1.0, 2.0]
+      ]),
+      Matrix.fromList([
+        [4.0, 2.0]
+      ]),
+      Matrix.fromList([
+        [5.0, 2.0]
+      ])
+    ];
+    means1 = initialMeans;
+    covs1 = initialCovs;
     // GMM Initializations
     List<double> weights = initializeWeights(numComponents);
-    gmm = GMM1D(numComponents, weights, means1, covs1);
+    gmm = GMMND(numComponents, numDimensions, weights, means1, covs1);
 
     // Creating Premade Manim Objects
     axes = addAxes(xRange);
@@ -527,7 +574,7 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
 
-  void setData(List<double> uploadedData) {
+  void setData(List<Matrix> uploadedData) {
     double mean = uploadedData.reduce((a, b) => a + b) / uploadedData.length;
     double min_value = uploadedData.reduce((a, b) => min1(a, b));
     double max_value = uploadedData.reduce((a, b) => max1(a, b));
@@ -538,7 +585,7 @@ class GaussianScene extends Scene {
     print(min_value);
     print(max_value);
 
-    List<double> normalizedData = [];
+    List<Matrix> normalizedData = [];
     double diff = max_value - min_value;
 
     for (var i = 0; i < uploadedData.length; i++) {
@@ -566,11 +613,12 @@ class GaussianScene extends Scene {
     iteration = 0;
     numComponents = initialComponents;
 
-    means1 = new List<double>.from(initialMeans);
-    covs1 = new List<double>.from(initialCovs);
+    // TODO: Fix this temp initialization. Make it a proper copy
+    means1 = initialMeans;
+    covs1 = initialCovs;
     // GMM Initializations
     weights = initializeWeights(numComponents);
-    gmm = GMM1D(numComponents, weights, means1, covs1);
+    gmm = GMMND(numComponents, numDimensions, weights, means1, covs1);
     Axes newAxes = addAxes(xRange);
     VGroup dots2 = createDotsFromData(newAxes, data1);
     // VGroup newGMM = createGMM(means1, covs1, newAxes);
@@ -611,10 +659,10 @@ class GaussianScene extends Scene {
     iteration--;
     List<double> weights = initializeWeights(numComponents);
 
-    List<double> means2 = new List<double>.from(initialMeans);
-    List<double> covs2 = new List<double>.from(initialCovs);
+    List<Matrix> means2 = initialMeans;
+    List<Matrix> covs2 = initialCovs;
 
-    gmm = GMM1D(numComponents, weights, means2, covs2);
+    gmm = GMMND(numComponents, numDimensions, weights, means2, covs2);
 
     for (var i = 0; i < iteration; i++) {
       List<List<double>> resp = gmm.eStep(data1);
@@ -622,7 +670,7 @@ class GaussianScene extends Scene {
     }
 
     means1 = gmm.means;
-    covs1 = gmm.variances;
+    covs1 = gmm.covariances;
 
     nextGMM = createGMM(means1, covs1, axes);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
@@ -636,7 +684,7 @@ class GaussianScene extends Scene {
     iteration++;
 
     means1 = gmm.means;
-    covs1 = gmm.variances;
+    covs1 = gmm.covariances;
 
     nextGMM = createGMM(means1, covs1, axes);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
@@ -652,7 +700,7 @@ class GaussianScene extends Scene {
     print(iteration);
 
     means1 = gmm.means;
-    covs1 = gmm.variances;
+    covs1 = gmm.covariances;
 
     bool hasConverged = isConverged(covs1);
     print(means1);
@@ -793,7 +841,7 @@ class GaussianScene extends Scene {
     return reset;
   }
 
-  VGroup createDotsFromData(Axes axesTmp, List<double> data) {
+  VGroup createDotsFromData(Axes axesTmp, List<Matrix> data) {
     List<Dot> dots1 = [];
 
     var length = data.length;
@@ -805,7 +853,7 @@ class GaussianScene extends Scene {
     return dotsVG;
   }
 
-  VGroup createGMM(List<double> means, List<double> covs, Axes axesT) {
+  VGroup createGMM(List<Matrix> means, List<Matrix> covs, Axes axesT) {
     List<FunctionGraph> graphs = [];
 
     var colors = [
@@ -854,7 +902,7 @@ class GaussianScene extends Scene {
     return VGroup(graphs);
   }
 
-  bool isConverged(List<double> covs) {
+  bool isConverged(List<Matrix> covs) {
     for (var i = 0; i < numComponents; i++) {
       if (covs[i] > lowerCovsThreshold && covs[i] < upperCovsThreshold) {
         return false;
@@ -937,7 +985,7 @@ class GaussianScene extends Scene {
     return (a < b) ? a.toInt() : b.toInt();
   }
 
-  VGroup initializeListDisplay(List<double> list, {double heightOffset: 0.0}) {
+  VGroup initializeListDisplay(List<Matrix> list, {double heightOffset: 0.0}) {
     int length = numComponents;
     List<VGroup> vgs = [];
 
@@ -959,9 +1007,9 @@ class GaussianScene extends Scene {
     return VGroup(vgs);
   }
 
-  Animation initializeMCDisplay(List<double> means, List<double> covs) {
-    List<double> meanCopy = [...means];
-    List<double> covsCopy = [...covs];
+  Animation initializeMCDisplay(List<Matrix> means, List<Matrix> covs) {
+    List<Matrix> meanCopy = [...means];
+    List<Matrix> covsCopy = [...covs];
     VGroup mVG = initializeListDisplay(meanCopy);
     VGroup cVG = initializeListDisplay(covsCopy, heightOffset: mcTextOffset);
     mcVG = VGroup([mVG, cVG]);
@@ -969,9 +1017,9 @@ class GaussianScene extends Scene {
     return ShowCreation(mcVG);
   }
 
-  AnimationGroup transformMCDisplay(List<double> means, List<double> covs) {
-    List<double> meanCopy = [...means];
-    List<double> covsCopy = [...covs];
+  AnimationGroup transformMCDisplay(List<Matrix> means, List<Matrix> covs) {
+    List<Matrix> meanCopy = [...means];
+    List<Matrix> covsCopy = [...covs];
     VGroup mVG = initializeListDisplay(meanCopy);
     VGroup cVG = initializeListDisplay(covsCopy, heightOffset: mcTextOffset);
     VGroup mcVG2 = VGroup([mVG, cVG]);
@@ -1043,7 +1091,7 @@ class GaussianScene extends Scene {
     ]);
   }
 
-  AnimationGroup createNumberDisplay(List<double> means, List<double> covs) {
+  AnimationGroup createNumberDisplay(List<Matrix> means, List<Matrix> covs) {
     meanText = MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:');
     varianceText = MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:');
 
@@ -1123,6 +1171,7 @@ class GaussianScene extends Scene {
       iK = Transform(componentNumber, target: newComponentNumber);
     }
 
+    // TODO: Make work for N dimensions
     double randomMean =
         Random().nextDouble() * (xRange[1] - xRange[0]) + xRange[0];
     double randomCov = Random().nextDouble() * 5;
@@ -1134,7 +1183,7 @@ class GaussianScene extends Scene {
 
   Future changeK(Animation xK) async {
     weights = initializeWeights(numComponents);
-    gmm = GMM1D(numComponents, weights, means1, covs1);
+    gmm = GMMND(numComponents, numDimensions, weights, means1, covs1);
 
     nextGMM = createGMM(means1, covs1, axes);
 
@@ -1159,12 +1208,12 @@ class GaussianScene extends Scene {
         Transform(componentNumber, target: initialComponentNumber);
 
     weights = initializeWeights(numComponents);
-    List<double> means2 = new List<double>.from(initialMeans);
-    List<double> covs2 = new List<double>.from(initialCovs);
+    List<Matrix> means2 = initialMeans;
+    List<Matrix> covs2 = initialCovs;
 
-    gmm = GMM1D(numComponents, weights, means2, covs2);
+    gmm = GMMND(numComponents, numDimensions, weights, means2, covs2);
     means1 = gmm.means;
-    covs1 = gmm.variances;
+    covs1 = gmm.covariances;
     iteration = 0;
     nextGMM = createGMM(means1, covs1, axes);
     AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
