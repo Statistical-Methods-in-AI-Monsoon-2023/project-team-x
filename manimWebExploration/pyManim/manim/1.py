@@ -3,28 +3,30 @@ import numpy as np
 
 class GaussianSumEvolution(ThreeDScene):
     def construct(self):
+        # Create 3D axes
         axes = ThreeDAxes()
         self.set_camera_orientation(phi=75 * DEGREES, theta=30 * DEGREES)
         self.add(axes)
 
+        # Initial Gaussians
         initial_gaussians = [
             Gaussian(mean=[-2, -2], variance=0.5),
             Gaussian(mean=[2, 2], variance=0.5),
             Gaussian(mean=[-3, 3], variance=0.8),
         ]
 
+        # Create Gaussian surfaces for the initial state
         gaussian_surfaces = [gaussian.create_surface() for gaussian in initial_gaussians]
         self.play(*[Create(surface) for surface in gaussian_surfaces])
 
+        # Evolution over time
         for _ in range(3):
+            # Update Gaussians for the next time step
             for gaussian in initial_gaussians:
                 gaussian.update()
 
-            updated_surfaces = [gaussian.create_surface() for gaussian in initial_gaussians]
-
-            self.play(*[Transform(surface, updated_surface) for surface, updated_surface in zip(gaussian_surfaces, updated_surfaces)])
-            gaussian_surfaces = updated_surfaces
-
+            # Smoothly transition between surfaces
+            self.play(*[Transform(surface, gaussian.create_surface()) for surface, gaussian in zip(gaussian_surfaces, initial_gaussians)])
             self.wait(1)
 
 class Gaussian:
@@ -33,14 +35,15 @@ class Gaussian:
         self.variance = variance
 
     def update(self):
-        self.mean[0] += 1
-        self.mean[1] += 1
+        # Update the Gaussian for the next time step (for example, change mean or variance)
+        self.mean[0] += 0.5
+        self.mean[1] += 0.5
         self.variance += 0.1
 
     def create_surface(self):
         resolution = (42, 42)
-        u_range = (-10, 10)
-        v_range = (-10, 10)
+        u_range = (-6, 6)
+        v_range = (-6, 6)
 
         return Surface(
             lambda u, v: np.array([u, v, self.function(u, v)]),
@@ -51,4 +54,5 @@ class Gaussian:
         )
 
     def function(self, u, v):
+        # Gaussian function
         return np.exp(-(((u - self.mean[0]) ** 2) + ((v - self.mean[1]) ** 2)) / (2 * self.variance**2))
