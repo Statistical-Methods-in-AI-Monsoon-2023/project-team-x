@@ -3,7 +3,7 @@ import 'package:manim_web/display/abstract_html_display.dart';
 import 'package:gmm/gmm.dart';
 import 'package:manim_web/manim.dart';
 import 'dart:math';
-import 'package:ml_linalg/linalg.dart';
+import 'package:ml_linalg/linalg.dart' as l;
 
 void main() {
   SingleStringMathTex.texToSVGMap[r'''align*'''] = {};
@@ -313,9 +313,11 @@ void main() {
         print(contents);
 
         List<String> contents2 = contents.split(",");
-        List<double> contents3 = [];
+        print(contents2);
+        List<List<double>> contents3 = [];
         for (var i = 0; i < contents2.length; i++) {
-          contents3.add(double.parse(contents2[i]));
+          List<double> contents3Item = [double.parse(contents2[i])];
+          contents3.add(contents3Item);
         }
 
         contentUpload.setInnerHtml("Data: " + contents3.toString());
@@ -346,8 +348,8 @@ class GaussianScene extends Scene {
   late VGroup currentGMM;
   late VGroup gaussians2;
   late VGroup nextGMM;
-  late List<Matrix> means1;
-  late List<Matrix> covs1;
+  late List<l.Matrix> means1;
+  late List<l.Matrix> covs1;
 
   late Button nextGMMUpdateButton;
   late Button resetGMMButton;
@@ -412,39 +414,39 @@ class GaussianScene extends Scene {
   //   [7.9, 9.0]
   // ];
 
-  List<Matrix> originalData = [
-    Matrix.fromList([
+  List<l.Matrix> originalData = [
+    l.Matrix.fromList([
       [1.0, 1.1],
     ]),
-    Matrix.fromList([
+    l.Matrix.fromList([
       [-7.3, -7.2],
     ]),
-    Matrix.fromList([
+    l.Matrix.fromList([
       [-7.1, -7.0],
     ]),
-    Matrix.fromList([
+    l.Matrix.fromList([
       [-7.2, -7.2],
     ]),
-    Matrix.fromList([
+    l.Matrix.fromList([
       [-3.0, -1.0],
     ]),
-    Matrix.fromList([
+    l.Matrix.fromList([
       [2.0, 2.5],
     ]),
-    Matrix.fromList([
+    l.Matrix.fromList([
       [3.1, 3.3],
     ]),
-    Matrix.fromList([
+    l.Matrix.fromList([
       [7.7, 7.9],
     ]),
-    Matrix.fromList([
+    l.Matrix.fromList([
       [7.9, 9.0]
     ]),
   ];
 
-  late List<Matrix> data1;
-  late List<Matrix> initialMeans;
-  late List<Matrix> initialCovs;
+  late List<l.Matrix> data1;
+  late List<l.Matrix> initialMeans;
+  late List<l.Matrix> initialCovs;
 
   late List<double> xRange;
   late List<double> gammas;
@@ -498,24 +500,24 @@ class GaussianScene extends Scene {
       // xRange = [-5, 20];
     }
     initialMeans = [
-      Matrix.fromList([
+      l.Matrix.fromList([
         [1.0, 1.0]
       ]),
-      Matrix.fromList([
+      l.Matrix.fromList([
         [6.0, 2.0]
       ]),
-      Matrix.fromList([
+      l.Matrix.fromList([
         [12.0, 2.0]
       ])
     ];
     initialCovs = [
-      Matrix.fromList([
+      l.Matrix.fromList([
         [1.0, 2.0]
       ]),
-      Matrix.fromList([
+      l.Matrix.fromList([
         [4.0, 2.0]
       ]),
-      Matrix.fromList([
+      l.Matrix.fromList([
         [5.0, 2.0]
       ])
     ];
@@ -574,25 +576,60 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
 
-  void setData(List<Matrix> uploadedData) {
-    double mean = uploadedData.reduce((a, b) => a + b) / uploadedData.length;
-    double min_value = uploadedData.reduce((a, b) => min1(a, b));
-    double max_value = uploadedData.reduce((a, b) => max1(a, b));
+  void setData(List<List<double>> uploadedData) {
+
+    double inf = 999999990.0;
+    List<double> meanValues = [0, 0];
+    List<double> minValue = [inf, inf];
+    List<double> maxValue = [-inf, -inf];
+
+    for (var i = 0; i < uploadedData.length; i++) {
+      double dataPoint1 = uploadedData[i][0];
+      double dataPoint2 = uploadedData[i][1];
+
+      meanValues[0] += dataPoint1 / uploadedData.length;
+      meanValues[1] += dataPoint2 / uploadedData.length;
+
+      if (dataPoint1 < minValue[0]) {
+        minValue[0] = dataPoint1;
+      }
+
+      if (dataPoint2 < minValue[0]) {
+        minValue[1] = dataPoint2;
+      }
+
+      if (dataPoint1 > maxValue[0]) {
+        maxValue[0] = dataPoint1;
+      }
+
+      if (dataPoint2 > maxValue[0]) {
+        maxValue[1] = dataPoint2;
+      }
+
+    }
+
+
 
     double variance = 0;
 
     print("Values");
-    print(min_value);
-    print(max_value);
+    print(minValue);
+    print(maxValue);
 
-    List<Matrix> normalizedData = [];
-    double diff = max_value - min_value;
+    List<l.Matrix> normalizedData = [];
+    List<double> diff = [maxValue[0] - minValue[0], maxValue[1] - minValue[1]];
 
     for (var i = 0; i < uploadedData.length; i++) {
-      double normalizedDataPoint = (uploadedData[i] - mean) /
-          diff *
-          ((xRange[1] - xRange[0]) - xRangeBuffer * 2);
+      double dataPoint1 = uploadedData[i][0];
+      double dataPoint2 = uploadedData[i][1];
+
+
+      l.Matrix normalizedDataPoint = l.Matrix.fromList([[
+        (dataPoint1 - meanValues[0]) / diff[0] * ((xRange[1] - xRange[0]) - xRangeBuffer * 2), 
+        (dataPoint2 - meanValues[1]) / diff[1] * (10)]]);
       normalizedData.add(normalizedDataPoint);
+
+
     }
 
     print("uploaded + normalized data");
@@ -659,8 +696,8 @@ class GaussianScene extends Scene {
     iteration--;
     List<double> weights = initializeWeights(numComponents);
 
-    List<Matrix> means2 = initialMeans;
-    List<Matrix> covs2 = initialCovs;
+    List<l.Matrix> means2 = initialMeans;
+    List<l.Matrix> covs2 = initialCovs;
 
     gmm = GMMND(numComponents, numDimensions, weights, means2, covs2);
 
@@ -841,38 +878,22 @@ class GaussianScene extends Scene {
     return reset;
   }
 
-  VGroup createDotsFromData(Axes axesTmp, List<Matrix> data) {
+  VGroup createDotsFromData(Axes axesTmp, List<l.Matrix> data) {
     List<Dot> dots1 = [];
 
     var length = data.length;
     for (var i = 0; i < length; i++) {
-      Dot dot = Dot(axesTmp.c2p(Vector3(data[i], 0, 0)), color: BLUE);
+      Dot dot = Dot(axesTmp.c2p(Vector3(data[i][0][0], data[i][0][1], 0)), color: BLUE);
       dots1.add(dot);
     }
     VGroup dotsVG = VGroup(dots1);
     return dotsVG;
   }
 
-  VGroup createGMM(List<Matrix> means, List<Matrix> covs, Axes axesT) {
+  VGroup createGMM(List<l.Matrix> means, List<l.Matrix> covs, Axes axesT) {
     List<FunctionGraph> graphs = [];
 
-    var colors = [
-      BLUE_E,
-      YELLOW,
-      ORANGE,
-      GREEN_A,
-      PURPLE,
-      PINK,
-      GRAY,
-      TEAL_C,
-      GREEN_B,
-      BLUE_C,
-      TEAL_B,
-      DARK_GRAY,
-      PURPLE_C,
-      YELLOW_B,
-      BLUE_A,
-    ];
+
     var length = numComponents;
     double threshold = 0.3;
     double stepSize = 0.1;
@@ -902,7 +923,7 @@ class GaussianScene extends Scene {
     return VGroup(graphs);
   }
 
-  bool isConverged(List<Matrix> covs) {
+  bool isConverged(List<l.Matrix> covs) {
     for (var i = 0; i < numComponents; i++) {
       if (covs[i] > lowerCovsThreshold && covs[i] < upperCovsThreshold) {
         return false;
@@ -911,13 +932,148 @@ class GaussianScene extends Scene {
     return true;
   }
 
+  double abs(double x) {
+    return (x > 0) ? x : -x;
+  }
+
+  VGroup makeEllipses(List<l.Matrix> covs, List<l.Matrix> means) {
+    var colors = [
+      BLUE_E,
+      YELLOW,
+      ORANGE,
+      GREEN_A,
+      PURPLE,
+      PINK,
+      GRAY,
+      TEAL_C,
+      GREEN_B,
+      BLUE_C,
+      TEAL_B,
+      DARK_GRAY,
+      PURPLE_C,
+      YELLOW_B,
+      BLUE_A,
+    ];
+
+    List<Ellipse> ellipses = [];
+    for (var covIndex = 0; covIndex < covs.length; covIndex++) {
+      l.Matrix meanMatrix = means[covIndex];
+      l.Matrix covarianceMatrix = covs[covIndex];
+      l.Vector dominantEigenvector = powerIteration(covarianceMatrix, 1000);
+      double angle = atan2(dominantEigenvector[1], dominantEigenvector[0]);
+      Map<String, dynamic> result = eigenDecomposition(covarianceMatrix, 1000);
+      List<double> eigenvalues = result["eigenvalues"];
+
+      if (eigenvalues.length < 2) {
+        print("Eigenvalue list Failure");
+        return VGroup(ellipses);
+      }
+
+      double semimajorLength = sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
+      double semiminorLength = sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
+
+      print(covIndex);
+      print(semiminorLength);
+      print(semimajorLength);
+
+      Ellipse e1 = Ellipse(
+          height: semiminorLength,
+          width: semimajorLength,
+          color: colors[covIndex])
+        // ..center()..shift(Vector3(-1.63, 0.0, 0.0));
+        ..rotate(-angle)
+        ..moveToPoint(axes.getCenter() -
+            Vector3(0.0, 0.05, 0.0) +
+            Vector3(0.5 * meanMatrix[0][0], 0.70 * meanMatrix[0][1], 0.0));
+      // ..center(mask: Vector3(0.1, 0.1, 0.1));
+      e1.fillColors = [TRANSPARENT];
+
+      ellipses.add(e1);
+    }
+
+    return VGroup(ellipses);
+  }
+
+  // Function to normalize a vector
+  l.Vector normalize(l.Vector v) {
+    double magnitude = sqrt(v.dot(v));
+    return v / magnitude;
+  }
+
+  // Function to perform Power Iteration to find the dominant eigenvector
+  l.Vector powerIteration(l.Matrix matrix, int iterations) {
+    int n = matrix.length;
+
+    // Initialize a random vector (initial guess for the eigenvector)
+    l.Vector v =
+        l.Vector.fromList(List.generate(n, (index) => Random().nextDouble()));
+
+    for (int i = 0; i < iterations; i++) {
+      // Multiply the matrix by the vector
+      l.Vector Av =
+          l.Vector.fromList(List.generate(n, (index) => matrix[index].dot(v)));
+
+      // Normalize the result
+      v = normalize(Av);
+    }
+
+    return v;
+  }
+
+  // Function to find eigenvalues and eigenvectors for a 2x2 matrix
+  Map<String, dynamic> eigenDecomposition(l.Matrix matrix, int iterations) {
+    int n = matrix.length;
+
+    // Compute eigenvalues
+    double trace = matrix[0][0] + matrix[1][1];
+    double det = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+
+    double discriminant = trace * trace - 4 * det;
+
+    // Check if eigenvalues are real
+    if (discriminant >= 0) {
+      double lambda1 = (trace + sqrt(discriminant)) / 2;
+      double lambda2 = (trace - sqrt(discriminant)) / 2;
+
+      // Compute eigenvectors
+      l.Vector v1 =
+          l.Vector.fromList([1.0, (lambda1 - matrix[0][0]) / matrix[0][1]]);
+      l.Vector v2 =
+          l.Vector.fromList([1.0, (lambda2 - matrix[0][0]) / matrix[0][1]]);
+
+      // Normalize eigenvectors
+      v1 = normalize(v1);
+      v2 = normalize(v2);
+
+      // Iterate to refine eigenvectors
+      for (int i = 0; i < iterations; i++) {
+        v1 = l.Vector.fromList(
+            List.generate(n, (index) => matrix[index].dot(v1)));
+        v1 = normalize(v1);
+
+        v2 = l.Vector.fromList(
+            List.generate(n, (index) => matrix[index].dot(v2)));
+        v2 = normalize(v2);
+      }
+
+      return {
+        'eigenvalues': [lambda1, lambda2],
+        'eigenvectors': [v1, v2],
+      };
+    } else {
+      // Complex eigenvalues are not handled in this basic example
+      return {};
+    }
+  }
+
+
   Axes addAxes(List<double> xRange) {
     double stepSize = max1(((xRange[1] - xRange[0]) ~/ 20) / 2, 0.5);
     Axes axesTmp = Axes(
       xMin: xRange[0],
       xMax: xRange[1],
-      yMin: -1,
-      yMax: 6,
+      yMin: -5,
+      yMax: 5,
       axisConfig: AxisConfig(
         includeNumbers: true,
         includeTip: true,
@@ -985,7 +1141,7 @@ class GaussianScene extends Scene {
     return (a < b) ? a.toInt() : b.toInt();
   }
 
-  VGroup initializeListDisplay(List<Matrix> list, {double heightOffset: 0.0}) {
+  VGroup initializeListDisplay(List<l.Matrix> list, {double heightOffset: 0.0}) {
     int length = numComponents;
     List<VGroup> vgs = [];
 
@@ -1007,9 +1163,9 @@ class GaussianScene extends Scene {
     return VGroup(vgs);
   }
 
-  Animation initializeMCDisplay(List<Matrix> means, List<Matrix> covs) {
-    List<Matrix> meanCopy = [...means];
-    List<Matrix> covsCopy = [...covs];
+  Animation initializeMCDisplay(List<l.Matrix> means, List<l.Matrix> covs) {
+    List<l.Matrix> meanCopy = [...means];
+    List<l.Matrix> covsCopy = [...covs];
     VGroup mVG = initializeListDisplay(meanCopy);
     VGroup cVG = initializeListDisplay(covsCopy, heightOffset: mcTextOffset);
     mcVG = VGroup([mVG, cVG]);
@@ -1017,9 +1173,9 @@ class GaussianScene extends Scene {
     return ShowCreation(mcVG);
   }
 
-  AnimationGroup transformMCDisplay(List<Matrix> means, List<Matrix> covs) {
-    List<Matrix> meanCopy = [...means];
-    List<Matrix> covsCopy = [...covs];
+  AnimationGroup transformMCDisplay(List<l.Matrix> means, List<l.Matrix> covs) {
+    List<l.Matrix> meanCopy = [...means];
+    List<l.Matrix> covsCopy = [...covs];
     VGroup mVG = initializeListDisplay(meanCopy);
     VGroup cVG = initializeListDisplay(covsCopy, heightOffset: mcTextOffset);
     VGroup mcVG2 = VGroup([mVG, cVG]);
@@ -1091,7 +1247,7 @@ class GaussianScene extends Scene {
     ]);
   }
 
-  AnimationGroup createNumberDisplay(List<Matrix> means, List<Matrix> covs) {
+  AnimationGroup createNumberDisplay(List<l.Matrix> means, List<l.Matrix> covs) {
     meanText = MathTex(r'\textnormal{Means} \hspace{0.1cm} \mu:');
     varianceText = MathTex(r'\textnormal{Variances} \hspace{0.1cm} \sigma^2:');
 
@@ -1208,8 +1364,8 @@ class GaussianScene extends Scene {
         Transform(componentNumber, target: initialComponentNumber);
 
     weights = initializeWeights(numComponents);
-    List<Matrix> means2 = initialMeans;
-    List<Matrix> covs2 = initialCovs;
+    List<l.Matrix> means2 = initialMeans;
+    List<l.Matrix> covs2 = initialCovs;
 
     gmm = GMMND(numComponents, numDimensions, weights, means2, covs2);
     means1 = gmm.means;
@@ -1303,7 +1459,8 @@ class GaussianScene extends Scene {
       {int steps: 17,
       double runTime: 0.03,
       int digits: 3,
-      bool doEnd: true}) async {
+      bool doEnd: true}) async 
+      {
     double step = (b - a) / steps;
     List<VGroup> numbers = [];
     double currentNumber = a - step;
