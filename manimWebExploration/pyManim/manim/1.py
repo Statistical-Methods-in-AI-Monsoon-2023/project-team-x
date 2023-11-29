@@ -1,58 +1,54 @@
 from manim import *
 import numpy as np
 
-class ThreeDAnimation(ThreeDScene):
+class GaussianSumEvolution(ThreeDScene):
     def construct(self):
-        # Create 3D axes
         axes = ThreeDAxes()
         self.set_camera_orientation(phi=75 * DEGREES, theta=30 * DEGREES)
         self.add(axes)
 
-        # Create two 3D Gaussian surfaces
-        gaussian1 = GaussianSurface(color=RED)
-        gaussian2 = GaussianSurface(color=BLUE)
+        initial_gaussians = [
+            Gaussian(mean=[-2, -2], variance=0.5),
+            Gaussian(mean=[2, 2], variance=0.5),
+            Gaussian(mean=[-3, 3], variance=0.8),
+        ]
 
-        self.play(Create(gaussian1.surface), Create(gaussian2.surface))
+        gaussian_surfaces = [gaussian.create_surface() for gaussian in initial_gaussians]
+        self.play(*[Create(surface) for surface in gaussian_surfaces])
 
-        # Animate the movement of Gaussians
-        self.play(
-            MoveAlongPath(gaussian2.surface, self.get_path(gaussian2), rate_func=linear),
-            run_time=3
-        )
+        for _ in range(3):
+            for gaussian in initial_gaussians:
+                gaussian.update()
 
-        self.wait(1)
+            updated_surfaces = [gaussian.create_surface() for gaussian in initial_gaussians]
 
-    def get_path(self, gaussian):
-        # Define the path for the movement (change this based on your requirement)
-        if gaussian.color == RED:
-            return ParametricFunction(lambda t: np.array([0, 0, gaussian.function(0, 0)]), t_range=[-6, 6], color=WHITE)
-        else:
-            return ParametricFunction(lambda t: np.array([t, t, gaussian.function(t, t - 3)]), t_range=[-6, 6], color=WHITE)
+            self.play(*[Transform(surface, updated_surface) for surface, updated_surface in zip(gaussian_surfaces, updated_surfaces)])
+            gaussian_surfaces = updated_surfaces
 
-class GaussianSurface(ThreeDVMobject):
-    def __init__(self, color, **kwargs):
-        super().__init__(**kwargs)
-        self.resolution = (42, 42)
-        self.color = color
-        self.create_gaussian_surface()
+            self.wait(1)
 
-    def create_gaussian_surface(self):
-        self.surface = self.get_surface()
-        self.add(self.surface)
+class Gaussian:
+    def __init__(self, mean, variance):
+        self.mean = mean
+        self.variance = variance
 
-    def get_surface(self):
+    def update(self):
+        self.mean[0] += 1
+        self.mean[1] += 1
+        self.variance += 0.1
+
+    def create_surface(self):
+        resolution = (42, 42)
+        u_range = (-10, 10)
+        v_range = (-10, 10)
+
         return Surface(
             lambda u, v: np.array([u, v, self.function(u, v)]),
-            resolution=self.resolution,
-            u_range=(-2, 2),
-            v_range=(-2, 2),
-            checkerboard_colors=[self.color, self.color],
+            resolution=resolution,
+            u_range=u_range,
+            v_range=v_range,
+            checkerboard_colors=[BLUE_D, BLUE_E],
         )
 
     def function(self, u, v):
-        # Define the function for the Gaussian (customize as needed)
-        if self.color == RED:
-            return np.exp(-(((u - 0) ** 2) + ((v - 0) ** 2)) / 1)
-        else:
-            self.color = RED
-            return np.exp(-(((u - 1) ** 2) + ((v - 1) ** 2)) / 1)
+        return np.exp(-(((u - self.mean[0]) ** 2) + ((v - self.mean[1]) ** 2)) / (2 * self.variance**2))
