@@ -4,6 +4,8 @@ import 'package:gmm/gmm.dart';
 import 'package:manim_web/manim.dart';
 import 'dart:math';
 import 'package:ml_linalg/linalg.dart' as l;
+import 'dart:convert';
+
 
 void main() {
   SingleStringMathTex.texToSVGMap[r'''align*'''] = {};
@@ -309,21 +311,17 @@ void main() {
       final reader = FileReader();
 
       reader.onLoad.listen((e) {
-        final contents = reader.result as String;
+        String contents = reader.result as String;
         print(contents);
 
-        List<String> contents2 = contents.split(",");
-        print(contents2);
-        List<List<double>> contents3 = [];
-        for (var i = 0; i < contents2.length; i++) {
-          List<double> contents3Item = [double.parse(contents2[i])];
-          contents3.add(contents3Item);
-        }
+        contents = contents.replaceAll(RegExp(r'\s+'), '');
+        List<List<dynamic>> dynamicMatrix =
+            json.decode(contents).cast<List<dynamic>>();
 
-        contentUpload.setInnerHtml("Data: " + contents3.toString());
+        List<List<double>> matrix =
+            dynamicMatrix.map((list) => List<double>.from(list)).toList();
 
-        gs.setData(contents3);
-        // var scene = gs..bindDisplay(display);
+        gs.setData(matrix);
       });
 
       reader.onError.listen((e) {
@@ -402,7 +400,7 @@ class GaussianScene extends Scene {
   double xRangeBuffer = 2;
 
   int numDimensions = 2;
-  List<double> yRange = [-5, 5];
+  List<double> yRange = [-6, 6];
 
   // List<List<double>> originalData = [
   //   [-7.3, -7.2],
@@ -513,13 +511,13 @@ class GaussianScene extends Scene {
     ];
     initialCovs = [
       l.Matrix.fromList([
-        [1.0, 2.0]
+        [1.5, 0.7], [0.7, 1.2]
       ]),
       l.Matrix.fromList([
-        [4.0, 2.0]
+        [4.0, -2.0], [1.0, 1.0]
       ]),
       l.Matrix.fromList([
-        [5.0, 2.0]
+        [4.0, -2.0], [1.0, 1.0]
       ])
     ];
     means1 = initialMeans;
@@ -583,6 +581,9 @@ class GaussianScene extends Scene {
     List<double> minValue = [inf, inf];
     List<double> maxValue = [-inf, -inf];
 
+    print("uploaded Data");
+    print(uploadedData);
+
     for (var i = 0; i < uploadedData.length; i++) {
       double dataPoint1 = uploadedData[i][0];
       double dataPoint2 = uploadedData[i][1];
@@ -607,14 +608,14 @@ class GaussianScene extends Scene {
       }
     }
 
-    double variance = 0;
-
-    print("Values");
-    print(minValue);
-    print(maxValue);
+    // print("Values");
+    // print(minValue);
+    // print(maxValue);
 
     List<l.Matrix> normalizedData = [];
     List<double> diff = [maxValue[0] - minValue[0], maxValue[1] - minValue[1]];
+    print("Diff");
+    print(diff);
 
     for (var i = 0; i < uploadedData.length; i++) {
       double dataPoint1 = uploadedData[i][0];
@@ -629,6 +630,8 @@ class GaussianScene extends Scene {
         ]
       ]);
       normalizedData.add(normalizedDataPoint);
+
+      // print((dataPoint2 - meanValues[1]) / diff[1]);
     }
 
     print("uploaded + normalized data");
@@ -679,9 +682,9 @@ class GaussianScene extends Scene {
   }
 
   List<double> setXRange(data1) {
-    double dataMin = data1.reduce(min1) - 1;
-    double dataMax = data1.reduce(max1) + 1;
-    double dataPadding = (dataMax - dataMin) / 4;
+    // double dataMin = data1.reduce(min1) - 1;
+    // double dataMax = data1.reduce(max1) + 1;
+    // double dataPadding = (dataMax - dataMin) / 4;
     // List<double> xRange1 = [dataMin - dataPadding, dataMax + dataPadding];
 
     List<double> xRange1 = [-12, 12]; // Axes stays constant
@@ -1005,13 +1008,10 @@ class GaussianScene extends Scene {
   // Function to perform Power Iteration to find the dominant eigenvector
   l.Vector powerIteration(l.Matrix matrix, int iterations) {
     int n = matrix.length;
-
-    // Initialize a random vector (initial guess for the eigenvector)
     l.Vector v =
         l.Vector.fromList(List.generate(n, (index) => Random().nextDouble()));
 
     for (int i = 0; i < iterations; i++) {
-      // Multiply the matrix by the vector
       l.Vector Av =
           l.Vector.fromList(List.generate(n, (index) => matrix[index].dot(v)));
 
@@ -1073,8 +1073,8 @@ class GaussianScene extends Scene {
     Axes axesTmp = Axes(
       xMin: xRange[0],
       xMax: xRange[1],
-      yMin: -5,
-      yMax: 5,
+      yMin: yRange[0],
+      yMax: yRange[1],
       axisConfig: AxisConfig(
         includeNumbers: true,
         includeTip: true,
@@ -1087,11 +1087,12 @@ class GaussianScene extends Scene {
           // numbersToShow: range(start: 1, end: (xRange[1] - xRange[0]).toInt()),
           labelDirection: DOWN),
       yAxisConfig: AxisConfig(
-        unitSize: 0.7,
+        unitSize: 0.55,
       ),
     )
       ..setColor(color: WHITE)
-      ..toCorner(corner: DL);
+      ..toCorner(corner: DL)
+      ..shift(Vector3(0.0, -1.0, 0.0));
 
     // TODO Add labels
 
@@ -1336,7 +1337,8 @@ class GaussianScene extends Scene {
     ]);
 
     l.Matrix randomCov = l.Matrix.fromList([
-      [Random().nextDouble() * 5, Random().nextDouble() * 5]
+      [Random().nextDouble() * 5, Random().nextDouble() * 5],
+      [Random().nextDouble() * 5, Random().nextDouble() * 5],
     ]);
     means1.add(randomMean);
     covs1.add(randomCov);
