@@ -17,13 +17,9 @@ class GaussianSumEvolution(ThreeDScene):
         self.play(*[Create(surface) for surface in gaussian_surfaces])
 
         for _ in range(3):
-            for gaussian in initial_gaussians:
+            for gaussian, surface in zip(initial_gaussians, gaussian_surfaces):
                 gaussian.update()
-
-            updated_surfaces = [gaussian.create_surface() for gaussian in initial_gaussians]
-
-            self.play(*[Transform(surface, updated_surface) for surface, updated_surface in zip(gaussian_surfaces, updated_surfaces)])
-            gaussian_surfaces = updated_surfaces
+                surface.become(gaussian.create_surface())
 
             self.wait(1)
 
@@ -39,8 +35,8 @@ class Gaussian:
 
     def create_surface(self):
         resolution = (42, 42)
-        u_range = (-10, 10)
-        v_range = (-10, 10)
+        u_range = (-6, 6)
+        v_range = (-6, 6)
 
         return Surface(
             lambda u, v: np.array([u, v, self.function(u, v)]),
