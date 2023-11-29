@@ -495,7 +495,7 @@ class GaussianScene extends Scene {
     if (!isUploaded) {
       data1 = originalData;
       xRange = setXRange(data1);
-      print(xRange);
+      // print(xRange);
       // xRange = [-5, 20];
     }
     initialMeans = [
@@ -520,8 +520,8 @@ class GaussianScene extends Scene {
         [4.0, -2.0], [1.0, 1.0]
       ])
     ];
-    means1 = initialMeans;
-    covs1 = initialCovs;
+    means1 = new List<l.Matrix>.from(initialMeans);
+    covs1 = new List<l.Matrix>.from(initialCovs);
     // GMM Initializations
     List<double> weights = initializeWeights(numComponents);
     gmm = GMMND(numComponents, numDimensions, weights, means1, covs1);
@@ -581,8 +581,8 @@ class GaussianScene extends Scene {
     List<double> minValue = [inf, inf];
     List<double> maxValue = [-inf, -inf];
 
-    print("uploaded Data");
-    print(uploadedData);
+    // print("uploaded Data");
+    // print(uploadedData);
 
     for (var i = 0; i < uploadedData.length; i++) {
       double dataPoint1 = uploadedData[i][0];
@@ -595,7 +595,7 @@ class GaussianScene extends Scene {
         minValue[0] = dataPoint1;
       }
 
-      if (dataPoint2 < minValue[0]) {
+      if (dataPoint2 < minValue[1]) {
         minValue[1] = dataPoint2;
       }
 
@@ -603,7 +603,7 @@ class GaussianScene extends Scene {
         maxValue[0] = dataPoint1;
       }
 
-      if (dataPoint2 > maxValue[0]) {
+      if (dataPoint2 > maxValue[1]) {
         maxValue[1] = dataPoint2;
       }
     }
@@ -614,8 +614,8 @@ class GaussianScene extends Scene {
 
     List<l.Matrix> normalizedData = [];
     List<double> diff = [maxValue[0] - minValue[0], maxValue[1] - minValue[1]];
-    print("Diff");
-    print(diff);
+    // print("Diff");
+    // print(diff);
 
     for (var i = 0; i < uploadedData.length; i++) {
       double dataPoint1 = uploadedData[i][0];
@@ -626,7 +626,7 @@ class GaussianScene extends Scene {
           (dataPoint1 - meanValues[0]) /
               diff[0] *
               ((xRange[1] - xRange[0]) - xRangeBuffer * 2),
-          (dataPoint2 - meanValues[1]) / diff[1] * (yRange[1] - yRange[0])
+          (dataPoint2 - meanValues[1]) / diff[1] * (yRange[1] - yRange[0] - 2)
         ]
       ]);
       normalizedData.add(normalizedDataPoint);
@@ -634,9 +634,9 @@ class GaussianScene extends Scene {
       // print((dataPoint2 - meanValues[1]) / diff[1]);
     }
 
-    print("uploaded + normalized data");
-    print(uploadedData);
-    print(normalizedData);
+    // print("uploaded + normalized data");
+    // print(uploadedData);
+    // print(normalizedData);
 
     data1 = normalizedData;
     isUploaded = true;
@@ -644,17 +644,17 @@ class GaussianScene extends Scene {
   }
 
   Future restartWithUploadedData() async {
-    print("Uploaded Data");
+    // print("Uploaded Data");
 
     xRange = setXRange(data1);
-    print(xRange);
+    // print(xRange);
     numComponents = 3;
     iteration = 0;
     numComponents = initialComponents;
 
     // TODO: Fix this temp initialization. Make it a proper copy
-    means1 = initialMeans;
-    covs1 = initialCovs;
+    means1 = new List<l.Matrix>.from(initialMeans);
+    covs1 = new List<l.Matrix>.from(initialCovs);
     // GMM Initializations
     weights = initializeWeights(numComponents);
     gmm = GMMND(numComponents, numDimensions, weights, means1, covs1);
@@ -670,7 +670,7 @@ class GaussianScene extends Scene {
     //   // Transform(currentGMM, target: newGMM)
     // ]);
 
-    print("Finished animation");
+    // print("Finished animation");
   }
 
   double min1(double a, double b) {
@@ -698,8 +698,8 @@ class GaussianScene extends Scene {
     iteration--;
     List<double> weights = initializeWeights(numComponents);
 
-    List<l.Matrix> means2 = initialMeans;
-    List<l.Matrix> covs2 = initialCovs;
+    List<l.Matrix> means2 = new List<l.Matrix>.from(initialMeans);
+    List<l.Matrix> covs2 = new List<l.Matrix>.from(initialCovs);
 
     gmm = GMMND(numComponents, numDimensions, weights, means2, covs2);
 
@@ -708,8 +708,8 @@ class GaussianScene extends Scene {
       gmm.mStep(data1, resp);
     }
 
-    means1 = gmm.means;
-    covs1 = gmm.covariances;
+    means1 = new List<l.Matrix>.from(gmm.means);
+    covs1 = new List<l.Matrix>.from(gmm.covariances);
 
     nextGMM = makeEllipses(means1, covs1);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
@@ -722,8 +722,12 @@ class GaussianScene extends Scene {
     final temp = gmm.mStep(data1, resp);
     iteration++;
 
-    means1 = gmm.means;
-    covs1 = gmm.covariances;
+    means1 = new List<l.Matrix>.from(gmm.means);
+    covs1 = new List<l.Matrix>.from(gmm.covariances);
+
+    print("Things");
+    print(means1);
+    print(covs1);
 
     nextGMM = makeEllipses(means1, covs1);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
@@ -735,17 +739,17 @@ class GaussianScene extends Scene {
     List<List<double>> resp = gmm.eStep(data1);
     gmm.mStep(data1, resp);
     iteration++;
-    print("iteration");
-    print(iteration);
+    // print("iteration");
+    // print(iteration);
 
-    means1 = gmm.means;
-    covs1 = gmm.covariances;
+    means1 = new List<l.Matrix>.from(gmm.means);
+    covs1 = new List<l.Matrix>.from(gmm.covariances);
 
     bool hasConverged = isConverged(covs1);
-    print(means1);
-    print(covs1);
-    print("hasConverged");
-    print(hasConverged);
+    // print(means1);
+    // print(covs1);
+    // print("hasConverged");
+    // print(hasConverged);
     if (hasConverged && iteration > 3) {
       state = 0;
       playShape.become(tri);
@@ -758,7 +762,7 @@ class GaussianScene extends Scene {
   }
 
   void stopUpdater() {
-    print("Paused");
+    // print("Paused");
 
     state = 5;
   }
@@ -768,8 +772,8 @@ class GaussianScene extends Scene {
   }
 
   void resetGMMUpdater() {
-    print("state");
-    print(state);
+    // print("state");
+    // print(state);
     state = 2;
   }
 
@@ -782,7 +786,7 @@ class GaussianScene extends Scene {
       state = 3;
     }
     isPlay = !isPlay;
-    print("Play");
+    // print("Play");
   }
 
   void prevGMMUpdater() {
@@ -977,9 +981,9 @@ class GaussianScene extends Scene {
       double semimajorLength = sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
       double semiminorLength = sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
 
-      print(covIndex);
-      print(semiminorLength);
-      print(semimajorLength);
+      // print(covIndex);
+      // print(semiminorLength);
+      // print(semimajorLength);
 
       Ellipse e1 = Ellipse(
           height: semiminorLength,
@@ -989,7 +993,7 @@ class GaussianScene extends Scene {
         ..rotate(-angle)
         ..moveToPoint(axes.getCenter() -
             Vector3(0.0, 0.05, 0.0) +
-            Vector3(0.5 * meanMatrix[0][0], 0.70 * meanMatrix[0][1], 0.0));
+            Vector3(0.5 * meanMatrix[0][0], 0.58 * meanMatrix[0][1], 0.0));
       // ..center(mask: Vector3(0.1, 0.1, 0.1));
       e1.fillColors = [TRANSPARENT];
 
@@ -1281,8 +1285,8 @@ class GaussianScene extends Scene {
   }
 
   VGroup getComponentNumberVGroup(nComponents) {
-    print("NumComponents:");
-    print(nComponents);
+    // print("NumComponents:");
+    // print(nComponents);
 
     // // CODE FOR CREATING NUMCOMPONENTS TEXT >= 10
     // VGroup componentNumberObject = (nComponents < 10)
@@ -1559,7 +1563,7 @@ class GaussianScene extends Scene {
           continue;
         }
         Animation iK = incrementK();
-        print(numComponents);
+        // print(numComponents);
         await changeK(iK);
         // await wait(0.5);
         state = 0;
