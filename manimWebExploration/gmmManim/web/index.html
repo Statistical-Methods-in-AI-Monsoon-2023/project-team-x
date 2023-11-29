@@ -4,19 +4,25 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>GMM 1D Visualization</title>
 
-    <style>
-        head, body {
-            padding: 0px;
-            margin: 0px;
-            background-color: black;
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="index.css">
+
   </head>
   <body>
+    <div id="uploadWrapper">
+        <h1>File upload: </h1>
+        <div class="uploadDisplayContainer">
+            <form id="uploadFile">
+            <input type="file" id="fileInput" name="filename">
+            </form>
+            <div *ngIf="contents != null" id="dataDisplay">
+                <!-- <p>Data:</p> -->
+                <p id="uploadedContent"></p>
+            </div>
+        </div>
+    </div>
     <div id="canvas-container"></div>
-    <script src="index.dart.js"></script>
+    <script defer src="index.dart.js"></script>
   </body>
 </html>

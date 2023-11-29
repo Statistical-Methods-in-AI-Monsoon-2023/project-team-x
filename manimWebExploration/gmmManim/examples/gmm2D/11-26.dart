@@ -530,7 +530,7 @@ class GaussianScene extends Scene {
 
     // Creating Premade Manim Objects
     axes = addAxes(xRange);
-    currentGMM = createGMM(means1, covs1, axes);
+    currentGMM = makeEllipses(means1, covs1);
     dots = createDotsFromData(axes, data1);
     Animation ag = createInitialGMMAnimations(currentGMM);
 
@@ -710,7 +710,7 @@ class GaussianScene extends Scene {
     means1 = gmm.means;
     covs1 = gmm.covariances;
 
-    nextGMM = createGMM(means1, covs1, axes);
+    nextGMM = makeEllipses(means1, covs1);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
@@ -724,7 +724,7 @@ class GaussianScene extends Scene {
     means1 = gmm.means;
     covs1 = gmm.covariances;
 
-    nextGMM = createGMM(means1, covs1, axes);
+    nextGMM = makeEllipses(means1, covs1);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
@@ -750,7 +750,7 @@ class GaussianScene extends Scene {
       playShape.become(tri);
     }
 
-    nextGMM = createGMM(means1, covs1, axes);
+    nextGMM = makeEllipses(means1, covs1);
     AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
