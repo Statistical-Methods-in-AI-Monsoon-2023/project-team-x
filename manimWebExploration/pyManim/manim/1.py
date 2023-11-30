@@ -1,13 +1,14 @@
 from manim import *
+
 import numpy as np
 from sklearn.mixture import GaussianMixture
 
 class GMMAnimation(ThreeDScene):
     def construct(self):
         axes = ThreeDAxes(
-            x_range=[-10, 10],
-            y_range=[-10, 10],
-            z_range=[-10, 10],
+            x_range=[-7, 7],
+            y_range=[-7, 7],
+            z_range=[-7, 7],
         )
         self.set_camera_orientation(phi=75 * DEGREES, theta=30 * DEGREES, zoom=0.8)
         self.begin_ambient_camera_rotation(rate=0.1)
@@ -20,10 +21,13 @@ class GMMAnimation(ThreeDScene):
             np.random.normal(loc=[2, 2], scale=0.5, size=(50, 2)),
             np.random.normal(loc=[-3, 3], scale=0.8, size=(50, 2)),
         ])
-        # print(data)
 
         gmm = GaussianMixture(n_components=3, covariance_type='full', random_state=42)
         gmm.fit(data)
+
+        # adding points with spheres from data
+        data_points = self.create_data_points(data)
+        self.play(Create(data_points))
 
         gaussian_surfaces = [
             GaussianSurface(mean, covariance, weight).create_surface()
@@ -32,7 +36,7 @@ class GMMAnimation(ThreeDScene):
 
         self.play(*[Create(surface) for surface in gaussian_surfaces])
 
-        num_iter = 5
+        num_iter = 4
 
         for i in range(num_iter):
             gmm.fit(data)
@@ -52,6 +56,17 @@ class GMMAnimation(ThreeDScene):
             # transforms.append(Transform(axes, rotated_axes))
             self.play(*transforms)
 
+        self.wait(3)
+
+
+    def create_data_points(self, data):
+        points = []
+        for point in data:
+            points.append(np.append(point, 0))
+
+        data_points = VGroup(*[Dot(point, radius=0.05) for point in points])
+        return data_points
+
 
 class GaussianSurface(ThreeDVMobject):
     def __init__(self, mean, covariance, weight, **kwargs):
@@ -65,15 +80,8 @@ class GaussianSurface(ThreeDVMobject):
         u_range = (-6, 6)
         v_range = (-6, 6)
 
-        axes = ThreeDAxes(
-            x_range=[-5, 5],
-            y_range=[-5, 5],
-            z_range=[-5, 5],
-        )
-
         return Surface(
-            # lambda u, v: np.array([u, v, self.function(u, v)]),
-            lambda u, v: axes.c2p(u, v, self.function(u, v)),
+            lambda u, v: np.array([u, v, self.function(u, v)]),
             resolution=self.resolution,
             u_range=u_range,
             v_range=v_range,
@@ -82,21 +90,13 @@ class GaussianSurface(ThreeDVMobject):
         )
 
     def function(self, u, v):
-        # Multivariate Gaussian function
         delta = np.array([u - self.mean[0], v - self.mean[1]])
         exponent = -0.5 * delta.T @ np.linalg.inv(self.covariance) @ delta
-        # print(exponent)
         normalization = 10
         return self.weight * normalization * np.exp(exponent)
 
     def update(self, new_mean, covariance):
-        # Update Gaussian parameters
-        axes = ThreeDAxes(
-            x_range=[-5, 5],
-            y_range=[-5, 5],
-            z_range=[-5, 5],
-        )
-        self.mean = axes.c2p(new_mean[0], new_mean[1], 0)
+        self.mean = new_mean[0]
         self.covariance = covariance
         self.become(self.create_surface())
 

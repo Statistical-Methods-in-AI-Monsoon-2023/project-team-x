@@ -1,0 +1,2 @@
+# This file is used internally by FFMPEG.
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/new/480p15/partial_movie_files/ScatterPoints3DExample/2550307886_3309654957_223132457.mp4'
