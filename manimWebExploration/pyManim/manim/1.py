@@ -29,12 +29,22 @@ class GMMAnimation(ThreeDScene):
         data_points = self.create_data_points(data)
         self.play(Create(data_points))
 
+        # gaussian_surfaces = [
+        #     GaussianSurface(mean, covariance, weight).create_surface()
+        #     for mean, covariance, weight in zip(gmm.means_, gmm.covariances_, gmm.weights_)
+        # ]
+        # initializing randomly in the beginning
+        random_means = np.random.normal(loc=0, scale=5, size=(3, 2))
+        random_covariances = np.array([np.eye(2) for _ in range(3)])
+        random_weights = np.array([1/3 for _ in range(3)])
         gaussian_surfaces = [
             GaussianSurface(mean, covariance, weight).create_surface()
-            for mean, covariance, weight in zip(gmm.means_, gmm.covariances_, gmm.weights_)
+            for mean, covariance, weight in zip(random_means, random_covariances, random_weights)
         ]
 
         self.play(*[Create(surface) for surface in gaussian_surfaces])
+
+        self.wait(3)
 
         num_iter = 4
 
@@ -45,7 +55,7 @@ class GMMAnimation(ThreeDScene):
             for surface, mean, covariance, weight in zip(gaussian_surfaces, gmm.means_, gmm.covariances_, gmm.weights_):
                 # also adding rotation like we did for the axes below
                 new_surface = GaussianSurface(mean + np.random.normal(loc=0, scale=0.6, size=2), covariance, weight).create_surface()#.copy().rotate(PI/4, axis=axes.c2p(0, 1, 0))
-                transforms.append(Transform(surface, new_surface))
+                transforms.append(Transform(surface, new_surface, run_time = 1))
 
             # transforms = [[
             #     Transform(surface, )
@@ -71,7 +81,7 @@ class GMMAnimation(ThreeDScene):
 class GaussianSurface(ThreeDVMobject):
     def __init__(self, mean, covariance, weight, **kwargs):
         super().__init__(**kwargs)
-        self.resolution = (10, 10)
+        self.resolution = (40, 40)
         self.mean = mean
         self.covariance = covariance
         self.weight = weight
