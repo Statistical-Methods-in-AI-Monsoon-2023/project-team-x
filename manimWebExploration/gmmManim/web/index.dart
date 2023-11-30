@@ -6,7 +6,6 @@ import 'dart:math';
 import 'package:ml_linalg/linalg.dart' as l;
 import 'dart:convert';
 
-
 void main() {
   SingleStringMathTex.texToSVGMap[r'''align*'''] = {};
   SingleStringMathTex.texToSVGMap[r'''center'''] = {};
@@ -377,6 +376,7 @@ class GaussianScene extends Scene {
   String initialComponentsString = 3.toString();
   late int numComponents;
   int maxComponents = 10;
+  bool hasConverged = false;
 
   bool isPlay = false;
   bool isUploaded = false;
@@ -400,6 +400,7 @@ class GaussianScene extends Scene {
   double xRangeBuffer = 2;
 
   int numDimensions = 2;
+  List<double> xRange = [-12, 12]; // Axes stays constant
   List<double> yRange = [-6, 6];
 
   List<List<double>> originalData1 = [
@@ -427,7 +428,8 @@ class GaussianScene extends Scene {
     [-5.5, 0.8],
     [-7.2, 0.5],
     [-6.4, -0.5],
-    [-6.7, -1.2]];
+    [-6.7, -1.2]
+  ];
 
   // List<l.Matrix> originalData = [
   //   l.Matrix.fromList([
@@ -493,10 +495,11 @@ class GaussianScene extends Scene {
   late List<l.Matrix> initialMeans;
   late List<l.Matrix> initialCovs;
 
-  late List<double> xRange;
   late List<double> gammas;
   late Map m;
   late VGroup initialComponentNumber;
+
+  List<List<double>> prevEllipses = [];
 
   @override
   FutureOr<void> preload() {
@@ -539,8 +542,9 @@ class GaussianScene extends Scene {
     m = makeMap();
 
     if (!isUploaded) {
+      originalData = normalizeData(originalData1);
       data1 = originalData;
-      xRange = setXRange(data1);
+      // xRange = setXRange(data1);
       // print(xRange);
       // xRange = [-5, 20];
     }
@@ -557,13 +561,16 @@ class GaussianScene extends Scene {
     ];
     initialCovs = [
       l.Matrix.fromList([
-        [1.5, 0.7], [0.7, 1.2]
+        [1.5, 0.7],
+        [0.7, 1.2]
       ]),
       l.Matrix.fromList([
-        [4.0, -2.0], [1.0, 1.0]
+        [4.0, -2.0],
+        [1.0, 1.0]
       ]),
       l.Matrix.fromList([
-        [4.0, -2.0], [1.0, 1.0]
+        [4.0, -2.0],
+        [1.0, 1.0]
       ])
     ];
     means1 = new List<l.Matrix>.from(initialMeans);
@@ -608,8 +615,10 @@ class GaussianScene extends Scene {
     ]);
 
     // CREATE DISPLAYS
-    await playMany(
-        [numberDisplayAnimation, fixedComponentDisplayAnimation, mainButtons]);
+    await playMany([
+        // numberDisplayAnimation, 
+        fixedComponentDisplayAnimation, 
+        mainButtons]);
 
     // HANDLE INTERACTION
     await continueRendering();
@@ -684,7 +693,6 @@ class GaussianScene extends Scene {
   }
 
   void setData(List<List<double>> uploadedData) {
-
     List<l.Matrix> normalizedData = normalizeData(uploadedData);
     // print("uploaded + normalized data");
     // print(uploadedData);
@@ -797,11 +805,6 @@ class GaussianScene extends Scene {
     means1 = new List<l.Matrix>.from(gmm.means);
     covs1 = new List<l.Matrix>.from(gmm.covariances);
 
-    bool hasConverged = isConverged(covs1);
-    // print(means1);
-    // print(covs1);
-    // print("hasConverged");
-    // print(hasConverged);
     if (hasConverged && iteration > 3) {
       state = 0;
       playShape.become(tri);
@@ -1017,11 +1020,24 @@ class GaussianScene extends Scene {
     ];
 
     List<Ellipse> ellipses = [];
+    print("\nAngles");
+    print(iteration);
+    
+    bool isFirstEllipse = false;
+    if (iteration == 0) {
+      isFirstEllipse = true;
+    }
+
+    bool hasConverged1 = true;
+
     for (var covIndex = 0; covIndex < covs.length; covIndex++) {
       l.Matrix meanMatrix = means[covIndex];
       l.Matrix covarianceMatrix = covs[covIndex];
       l.Vector dominantEigenvector = powerIteration(covarianceMatrix, 1000);
       double angle = atan2(dominantEigenvector[1], dominantEigenvector[0]);
+      if (angle < 0) angle += pi;
+      print("angle");
+      print(angle);
       Map<String, dynamic> result = eigenDecomposition(covarianceMatrix, 1000);
       List<double> eigenvalues = result["eigenvalues"];
 
@@ -1030,12 +1046,31 @@ class GaussianScene extends Scene {
         return VGroup(ellipses);
       }
 
-      double semimajorLength = 3 * sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
-      double semiminorLength = 3 * sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
+      double semimajorLength =
+          3 * sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
+      double semiminorLength =
+          3 * sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
 
       // print(covIndex);
       // print(semiminorLength);
       // print(semimajorLength);
+
+      List<double> currentMetrics = [semiminorLength, semimajorLength, meanMatrix[0][0], meanMatrix[0][1]];
+      if (isFirstEllipse) {
+        prevEllipses.add(currentMetrics);
+        hasConverged1 = false;
+      } else {
+        for (var i = 0; i < currentMetrics.length; i++) {
+          if (prevEllipses[covIndex][i] - currentMetrics[i] > 0.2) {
+            hasConverged1 = false;
+            // print("Problem");
+            break;
+          }
+        }
+        prevEllipses[covIndex] = currentMetrics;
+      }
+
+      hasConverged = hasConverged1;
 
       Ellipse e1 = Ellipse(
           height: semiminorLength,
