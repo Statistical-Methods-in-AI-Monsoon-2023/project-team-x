@@ -1,0 +1,4 @@
+# This file is used internally by FFMPEG.
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/scatter/480p15/partial_movie_files/ScatterPlotExample/1185818338_3217748505_223132457.mp4'
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/scatter/480p15/partial_movie_files/ScatterPlotExample/624642324_4031038204_2151452927.mp4'
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/scatter/480p15/partial_movie_files/ScatterPlotExample/624642324_2999291583_2113011525.mp4'

@@ -5,9 +5,9 @@ from sklearn.mixture import GaussianMixture
 class GMMAnimation(ThreeDScene):
     def construct(self):
         axes = ThreeDAxes(
-            x_range=[-7, 7],
-            y_range=[-7, 7],
-            z_range=[-15, 15],
+            x_range=[-10, 10],
+            y_range=[-10, 10],
+            z_range=[-10, 10],
         )
         self.set_camera_orientation(phi=75 * DEGREES, theta=30 * DEGREES, zoom=0.8)
         self.begin_ambient_camera_rotation(rate=0.1)
@@ -20,6 +20,7 @@ class GMMAnimation(ThreeDScene):
             np.random.normal(loc=[2, 2], scale=0.5, size=(50, 2)),
             np.random.normal(loc=[-3, 3], scale=0.8, size=(50, 2)),
         ])
+        # print(data)
 
         gmm = GaussianMixture(n_components=3, covariance_type='full', random_state=42)
         gmm.fit(data)
@@ -64,8 +65,15 @@ class GaussianSurface(ThreeDVMobject):
         u_range = (-6, 6)
         v_range = (-6, 6)
 
+        axes = ThreeDAxes(
+            x_range=[-5, 5],
+            y_range=[-5, 5],
+            z_range=[-5, 5],
+        )
+
         return Surface(
-            lambda u, v: np.array([u, v, self.function(u, v)]),
+            # lambda u, v: np.array([u, v, self.function(u, v)]),
+            lambda u, v: axes.c2p(u, v, self.function(u, v)),
             resolution=self.resolution,
             u_range=u_range,
             v_range=v_range,
@@ -77,12 +85,18 @@ class GaussianSurface(ThreeDVMobject):
         # Multivariate Gaussian function
         delta = np.array([u - self.mean[0], v - self.mean[1]])
         exponent = -0.5 * delta.T @ np.linalg.inv(self.covariance) @ delta
+        # print(exponent)
         normalization = 10
-        return 2 + self.weight * normalization * np.exp(exponent)
+        return self.weight * normalization * np.exp(exponent)
 
     def update(self, new_mean, covariance):
         # Update Gaussian parameters
-        self.mean = new_mean[0]  # Extract the first component
+        axes = ThreeDAxes(
+            x_range=[-5, 5],
+            y_range=[-5, 5],
+            z_range=[-5, 5],
+        )
+        self.mean = axes.c2p(new_mean[0], new_mean[1], 0)
         self.covariance = covariance
         self.become(self.create_surface())
 
