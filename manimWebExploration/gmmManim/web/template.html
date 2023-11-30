@@ -13,7 +13,11 @@
   <script>
     function showInput() {
         const giveData = document.getElementById("giveData");
-        giveData.classList.remove("hidden");
+        if (giveData.classList.contains("hidden")) {
+            giveData.classList.remove("hidden");
+        } else {
+            giveData.classList.add("hidden");
+        }
     }
     
     function closeInput() {
@@ -23,6 +27,7 @@
     }
   </script>
   <body>
+    <div id="title">GMM Interactive Visualization of 1D Data</div>
     <button id="showDataInput" onclick=showInput()>Change Input</button>
     <div id="giveData" class="hidden">
         <h1>Data upload: </h1>

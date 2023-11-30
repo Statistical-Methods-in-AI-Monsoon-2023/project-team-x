@@ -111,7 +111,7 @@ input[type=text] {
 
     background-color: white;
     color: black;
-
+    z-index: 100;
     border-radius: 20px;
     padding: 40px;
     backdrop-filter: blur(100px);
@@ -120,6 +120,7 @@ input[type=text] {
 }
 #giveData.hidden {
     opacity: 0%;
+    z-index: -100;
     transition: all 0.1s ease-in-out;
 }
 #uploadWrapper {
@@ -268,4 +269,12 @@ label,
     position: absolute;
     margin-top: -125px;
     margin-left: 200px;
+}
+#title {
+    font-size: 16px;
+    font-family: var(--font_family);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 20px;
 }

@@ -320,7 +320,6 @@ void main() {
         List<List<double>> matrix =
             dynamicMatrix.map((list) => List<double>.from(list)).toList();
 
-        contentUpload.setInnerHtml(contents);
         gs.setData(matrix);
       });
 
