@@ -6,7 +6,7 @@
 
 ### Requirements
 
-Must install Dart (built and tested with dart version: 2.14.4)
+Must install Dart v2
 
 Install manim_web and other relevant libraries (webdev) using 
 

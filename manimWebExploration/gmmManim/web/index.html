@@ -10,18 +10,26 @@
 
   </head>
   <body>
-    <div id="uploadWrapper">
-        <h1>File upload: </h1>
-        <div class="uploadDisplayContainer">
-            <form id="uploadFile">
-            <input type="file" id="fileInput" name="filename">
-            </form>
-            <div *ngIf="contents != null" id="dataDisplay">
-                <!-- <p>Data:</p> -->
-                <p id="uploadedContent"></p>
+    <div id="giveData">
+        <h1>Data upload: </h1>
+        <div id="uploadWrapper">
+            <div class="uploadDisplayContainer">
+                <form id="uploadFile">
+                <input type="file" id="fileInput" name="filename">
+                </form>
+                <div *ngIf="contents != null" id="dataDisplay">
+                    <!-- <p>Data:</p> -->
+                    <p id="uploadedContent"></p>
+                </div>
             </div>
+            <!-- <input type="text" id="textInput" placeholder=""> -->
+              <div class="form-group">
+                <input type="text" id="full-name" class="form-field" placeholder="Your Name" required>
+                <label for="full-name" class="form-label">Your Name</label>
+              </div>
         </div>
     </div>
+
     <div id="canvas-container"></div>
     <script defer src="index.dart.js"></script>
   </body>
