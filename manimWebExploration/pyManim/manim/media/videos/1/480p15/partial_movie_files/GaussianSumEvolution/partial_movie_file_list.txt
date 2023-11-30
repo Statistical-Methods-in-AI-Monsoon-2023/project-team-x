@@ -1,8 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GaussianSumEvolution/1121228674_2175794583_1770798370.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GaussianSumEvolution/3953065503_601608377_1693545817.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GaussianSumEvolution/3953065503_3420339324_2489205385.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GaussianSumEvolution/3953065503_801989182_1092531839.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GaussianSumEvolution/3953065503_3420339324_2841394406.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GaussianSumEvolution/3953065503_1366955489_3446633795.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GaussianSumEvolution/3953065503_3420339324_3403116487.mp4'
