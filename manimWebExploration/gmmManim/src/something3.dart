@@ -1,14 +1,9 @@
 import 'dart:convert';
 
 void main() {
-  String input = """[[-7.3, -7.2],
-    [-7.1, -7.0],
-    [-7.2, -7.2],
-    [-3.0, -1.0],
-    [2.0, 2.5],
-    [3.1, 3.3],
-    [7.7, 7.9],
-    [7.9, 9.0]]""";
+  String input = """[[-7.3, -7.2, 6.5],
+    [-7.1, -7.0, 6.2],
+    [-7.2, -7.2, 6.5]]""";
 
   // Remove unnecessary whitespaces and line breaks
   input = input.replaceAll(RegExp(r'\s+'), '');

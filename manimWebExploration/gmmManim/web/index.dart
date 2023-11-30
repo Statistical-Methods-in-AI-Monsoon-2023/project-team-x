@@ -978,8 +978,8 @@ class GaussianScene extends Scene {
         return VGroup(ellipses);
       }
 
-      double semimajorLength = sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
-      double semiminorLength = sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
+      double semimajorLength = 3 * sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
+      double semiminorLength = 3 * sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
 
       // print(covIndex);
       // print(semiminorLength);
