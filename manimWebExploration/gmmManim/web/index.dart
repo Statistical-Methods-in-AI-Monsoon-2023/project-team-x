@@ -603,7 +603,7 @@ class GaussianScene extends Scene {
     await play(FadeIn(dots));
     await play(ag);
 
-    AnimationGroup numberDisplayAnimation = createNumberDisplay(means1, covs1);
+    // AnimationGroup numberDisplayAnimation = createNumberDisplay(means1, covs1);
     AnimationGroup fixedComponentDisplayAnimation =
         fixedComponentNumberDisplay();
 
@@ -718,12 +718,13 @@ class GaussianScene extends Scene {
     // GMM Initializations
     weights = initializeWeights(numComponents);
     gmm = GMMND(numComponents, numDimensions, weights, means1, covs1);
-    Axes newAxes = addAxes(xRange);
-    VGroup dots2 = createDotsFromData(newAxes, data1);
+    // Axes newAxes = addAxes(xRange);
+    VGroup dots2 = createDotsFromData(axes, data1);
     // VGroup newGMM = createGMM(means1, covs1, newAxes);
 
-    axes.become(newAxes);
-    dots.become(dots2);
+    // axes.become(newAxes);
+    // dots.become(dots2);
+    await play(Transform(dots, target: dots2));
     // await playMany([
     //   // Transform(axes, target: newAxes),
     //   // Transform(dots, target: dots2),
@@ -772,9 +773,11 @@ class GaussianScene extends Scene {
     covs1 = new List<l.Matrix>.from(gmm.covariances);
 
     nextGMM = makeEllipses(means1, covs1);
-    Animation mcVGAnimation = transformMCDisplay(means1, covs1);
+    // Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
-    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
+    await playMany([Transform(currentGMM, target: nextGMM), 
+    // mcVGAnimation
+    ]);
   }
 
   Future nextGMMIteration() async {
@@ -790,9 +793,11 @@ class GaussianScene extends Scene {
     print(covs1);
 
     nextGMM = makeEllipses(means1, covs1);
-    Animation mcVGAnimation = transformMCDisplay(means1, covs1);
+    // Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
-    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
+    await playMany([Transform(currentGMM, target: nextGMM), 
+    // mcVGAnimation
+    ]);
   }
 
   Future playGMM() async {
@@ -811,9 +816,11 @@ class GaussianScene extends Scene {
     }
 
     nextGMM = makeEllipses(means1, covs1);
-    AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
+    // AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
 
-    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
+    await playMany([Transform(currentGMM, target: nextGMM), 
+    // mcVGAnimation
+    ]);
   }
 
   void stopUpdater() {
@@ -1270,16 +1277,16 @@ class GaussianScene extends Scene {
     VGroup mVG = initializeListDisplay(meanCopy);
     VGroup cVG = initializeListDisplay(covsCopy, heightOffset: mcTextOffset);
     VGroup mcVG2 = VGroup([mVG, cVG]);
-    MathTex meanText1 = moveMCText(meanText);
-    MathTex varianceText1 = moveMCText(varianceText, offset: 0.6);
+    // MathTex meanText1 = moveMCText(meanText);
+    // MathTex varianceText1 = moveMCText(varianceText, offset: 0.6);
 
     Rectangle mcSurroundingRectangle2 = createMCSurroundingRectangle();
     Animation mcVGAnimation = Transform(mcVG, target: mcVG2);
     Animation mcSurroundingRectangleAnimation =
         Transform(mcSurroundingRectangle, target: mcSurroundingRectangle2);
     AnimationGroup mcVGTextAnimation = AnimationGroup([
-      Transform(meanText, target: meanText1),
-      Transform(varianceText, target: varianceText1)
+      // Transform(meanText, target: meanText1),
+      // Transform(varianceText, target: varianceText1)
     ]);
 
     return AnimationGroup(
@@ -1443,16 +1450,20 @@ class GaussianScene extends Scene {
 
     nextGMM = makeEllipses(means1, covs1);
 
-    Animation transformMCDisplayAnimation = transformMCDisplay(means1, covs1);
+    // Animation transformMCDisplayAnimation = transformMCDisplay(means1, covs1);
     AnimationGroup changeKAnimationGroup;
 
     if (reduceMotion) {
       currentGMM.become(nextGMM);
-      changeKAnimationGroup = AnimationGroup([transformMCDisplayAnimation, xK]);
+      changeKAnimationGroup = AnimationGroup([
+        // transformMCDisplayAnimation, 
+        xK]);
     } else {
       Animation transformGMMs = Transform(currentGMM, target: nextGMM);
       changeKAnimationGroup =
-          AnimationGroup([transformGMMs, transformMCDisplayAnimation, xK]);
+          AnimationGroup([transformGMMs, 
+          // transformMCDisplayAnimation, 
+          xK]);
     }
 
     await play(changeKAnimationGroup);
@@ -1472,9 +1483,11 @@ class GaussianScene extends Scene {
     covs1 = gmm.covariances;
     iteration = 0;
     nextGMM = makeEllipses(means1, covs1);
-    AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
+    // AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
     AnimationGroup resetAnimationGroup = AnimationGroup(
-        [xKAnimation, Transform(currentGMM, target: nextGMM), mcVGAnimation]);
+        [xKAnimation, Transform(currentGMM, target: nextGMM), 
+        // mcVGAnimation
+        ]);
     await play(resetAnimationGroup);
   }
 
