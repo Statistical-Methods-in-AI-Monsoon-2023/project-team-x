@@ -6,7 +6,7 @@
 
 ### Requirements
 
-Must install Dart (built and tested with dart version: 2.14.4)
+Must install Dart v2
 
 Install manim_web and other relevant libraries (webdev) using 
 
@@ -22,7 +22,22 @@ cd manimWebExploration/gmmManim
 pub get
 ```
 
-and start build server using:
+and start webdev server using: [NEW PIPELINE]
+
+
+```
+webdev build
+```
+
+or alternatively, start development server using:
+
+```
+webdev serve
+```
+
+
+
+and start build server using: [DEPRECATED PIPELINE]
 
 ```
 manimweb build --file src/example.dart --html src/example.html

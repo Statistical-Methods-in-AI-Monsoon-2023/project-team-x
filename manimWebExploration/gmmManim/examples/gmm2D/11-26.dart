@@ -402,6 +402,7 @@ class GaussianScene extends Scene {
   double xRangeBuffer = 2;
 
   int numDimensions = 2;
+  List<double> yRange = [-5, 5];
 
   // List<List<double>> originalData = [
   //   [-7.3, -7.2],
@@ -529,7 +530,7 @@ class GaussianScene extends Scene {
 
     // Creating Premade Manim Objects
     axes = addAxes(xRange);
-    currentGMM = createGMM(means1, covs1, axes);
+    currentGMM = makeEllipses(means1, covs1);
     dots = createDotsFromData(axes, data1);
     Animation ag = createInitialGMMAnimations(currentGMM);
 
@@ -626,7 +627,7 @@ class GaussianScene extends Scene {
 
       l.Matrix normalizedDataPoint = l.Matrix.fromList([[
         (dataPoint1 - meanValues[0]) / diff[0] * ((xRange[1] - xRange[0]) - xRangeBuffer * 2), 
-        (dataPoint2 - meanValues[1]) / diff[1] * (10)]]);
+        (dataPoint2 - meanValues[1]) / diff[1] * (yRange[1] - yRange[0])]]);
       normalizedData.add(normalizedDataPoint);
 
 
@@ -709,7 +710,7 @@ class GaussianScene extends Scene {
     means1 = gmm.means;
     covs1 = gmm.covariances;
 
-    nextGMM = createGMM(means1, covs1, axes);
+    nextGMM = makeEllipses(means1, covs1);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
@@ -723,7 +724,7 @@ class GaussianScene extends Scene {
     means1 = gmm.means;
     covs1 = gmm.covariances;
 
-    nextGMM = createGMM(means1, covs1, axes);
+    nextGMM = makeEllipses(means1, covs1);
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
@@ -749,7 +750,7 @@ class GaussianScene extends Scene {
       playShape.become(tri);
     }
 
-    nextGMM = createGMM(means1, covs1, axes);
+    nextGMM = makeEllipses(means1, covs1);
     AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
 
     await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
@@ -890,53 +891,57 @@ class GaussianScene extends Scene {
     return dotsVG;
   }
 
-  VGroup createGMM(List<l.Matrix> means, List<l.Matrix> covs, Axes axesT) {
-    List<FunctionGraph> graphs = [];
+  // VGroup createGMM(List<l.Matrix> means, List<l.Matrix> covs, Axes axesT) {
+  //   List<FunctionGraph> graphs = [];
 
 
-    var length = numComponents;
-    double threshold = 0.3;
-    double stepSize = 0.1;
+  //   var length = numComponents;
+  //   double threshold = 0.3;
+  //   double stepSize = 0.1;
 
-    for (var i = 0; i < numComponents; i++) {
-      if (covs[i] < lowerCovsThreshold) {
-        covs[i] = lowerCovsThreshold;
-      }
+  //   for (var i = 0; i < numComponents; i++) {
+  //     if (covs[i] < lowerCovsThreshold) {
+  //       covs[i] = lowerCovsThreshold;
+  //     }
 
-      if (covs[i] > upperCovsThreshold + 2) {
-        covs[i] = upperCovsThreshold;
-      }
+  //     if (covs[i] > upperCovsThreshold + 2) {
+  //       covs[i] = upperCovsThreshold;
+  //     }
 
-      stepSize = covs[i] / 5;
+  //     stepSize = covs[i] / 5;
 
-      FunctionGraph graph = axesT.getGraph(
-          (x) =>
-              (4 / covs[i]) *
-              exp(-(((x - means[i]) * (x - means[i])) /
-                  (2 * covs[i] * covs[i]))),
-          xMin: means[i] - 3 * covs[i],
-          xMax: means[i] + 3 * covs[i],
-          color: colors[i],
-          stepSize: stepSize);
-      graphs.add(graph);
-    }
-    return VGroup(graphs);
-  }
+  //     FunctionGraph graph = axesT.getGraph(
+  //         (x) =>
+  //             (4 / covs[i]) *
+  //             exp(-(((x - means[i]) * (x - means[i])) /
+  //                 (2 * covs[i] * covs[i]))),
+  //         xMin: means[i] - 3 * covs[i],
+  //         xMax: means[i] + 3 * covs[i],
+  //         color: colors[i],
+  //         stepSize: stepSize);
+  //     graphs.add(graph);
+  //   }
+  //   return VGroup(graphs);
+  // }
 
   bool isConverged(List<l.Matrix> covs) {
-    for (var i = 0; i < numComponents; i++) {
-      if (covs[i] > lowerCovsThreshold && covs[i] < upperCovsThreshold) {
-        return false;
-      }
-    }
-    return true;
+    // for (var i = 0; i < numComponents; i++) {
+    //   if (covs[i] > lowerCovsThreshold && covs[i] < upperCovsThreshold) {
+    //     return false;
+    //   }
+    // }
+    // return true;
+    
+    // TODO: Update with New Cov Convergence Function
+    return false;
+
   }
 
   double abs(double x) {
     return (x > 0) ? x : -x;
   }
 
-  VGroup makeEllipses(List<l.Matrix> covs, List<l.Matrix> means) {
+  VGroup makeEllipses(List<l.Matrix> means, List<l.Matrix> covs) {
     var colors = [
       BLUE_E,
       YELLOW,
@@ -1145,12 +1150,11 @@ class GaussianScene extends Scene {
     int length = numComponents;
     List<VGroup> vgs = [];
 
-    // print("ild");
-    list.sort(min2);
 
     for (var i = 0; i < length; i++) {
-      // print(list[i].toStringAsPrecision(2));
-      VGroup number = VGroup(getNumber(list[i].toStringAsPrecision(2)))
+
+      // TODO: Add Second Number as a Pair (a, b)
+      VGroup number = VGroup(getNumber(list[i][0][0].toStringAsPrecision(2)))
         ..scale(Vector3(0.5, 0.5, 1))
         ..shift(Vector3(0.0, -0.1, 0.0));
       number
@@ -1328,9 +1332,11 @@ class GaussianScene extends Scene {
     }
 
     // TODO: Make work for N dimensions
-    double randomMean =
-        Random().nextDouble() * (xRange[1] - xRange[0]) + xRange[0];
-    double randomCov = Random().nextDouble() * 5;
+    l.Matrix randomMean =
+        l.Matrix.fromList([[Random().nextDouble() * (xRange[1] - xRange[0]) + xRange[0],
+        Random().nextDouble() * (yRange[1] - yRange[0]) + yRange[0]]]);
+
+    l.Matrix randomCov = l.Matrix.fromList([[Random().nextDouble() * 5, Random().nextDouble() * 5]]);
     means1.add(randomMean);
     covs1.add(randomCov);
 
@@ -1341,7 +1347,7 @@ class GaussianScene extends Scene {
     weights = initializeWeights(numComponents);
     gmm = GMMND(numComponents, numDimensions, weights, means1, covs1);
 
-    nextGMM = createGMM(means1, covs1, axes);
+    nextGMM = makeEllipses(means1, covs1);
 
     Animation transformMCDisplayAnimation = transformMCDisplay(means1, covs1);
     AnimationGroup changeKAnimationGroup;
@@ -1371,7 +1377,7 @@ class GaussianScene extends Scene {
     means1 = gmm.means;
     covs1 = gmm.covariances;
     iteration = 0;
-    nextGMM = createGMM(means1, covs1, axes);
+    nextGMM = makeEllipses(means1, covs1);
     AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
     AnimationGroup resetAnimationGroup = AnimationGroup(
         [xKAnimation, Transform(currentGMM, target: nextGMM), mcVGAnimation]);

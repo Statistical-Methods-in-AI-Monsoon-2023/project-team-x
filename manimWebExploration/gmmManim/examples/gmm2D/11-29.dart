@@ -6,7 +6,6 @@ import 'dart:math';
 import 'package:ml_linalg/linalg.dart' as l;
 import 'dart:convert';
 
-
 void main() {
   SingleStringMathTex.texToSVGMap[r'''align*'''] = {};
   SingleStringMathTex.texToSVGMap[r'''center'''] = {};
@@ -511,13 +510,16 @@ class GaussianScene extends Scene {
     ];
     initialCovs = [
       l.Matrix.fromList([
-        [1.5, 0.7], [0.7, 1.2]
+        [1.5, 0.7],
+        [0.7, 1.2]
       ]),
       l.Matrix.fromList([
-        [4.0, -2.0], [1.0, 1.0]
+        [4.0, -2.0],
+        [1.0, 1.0]
       ]),
       l.Matrix.fromList([
-        [4.0, -2.0], [1.0, 1.0]
+        [4.0, -2.0],
+        [1.0, 1.0]
       ])
     ];
     means1 = new List<l.Matrix>.from(initialMeans);
@@ -978,8 +980,10 @@ class GaussianScene extends Scene {
         return VGroup(ellipses);
       }
 
-      double semimajorLength = 3 * sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
-      double semiminorLength = 3 * sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
+      double semimajorLength =
+          3 * sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
+      double semiminorLength =
+          3 * sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
 
       // print(covIndex);
       // print(semiminorLength);
