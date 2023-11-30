@@ -7,21 +7,48 @@
     <title>GMM 1D Visualization</title>
 
     <link rel="stylesheet" type="text/css" href="index.css">
+    <script src="https://kit.fontawesome.com/f210a1def5.js" crossorigin="anonymous"></script>
 
   </head>
+  <script>
+    function showInput() {
+        const giveData = document.getElementById("giveData");
+        giveData.classList.remove("hidden");
+    }
+    
+    function closeInput() {
+        
+        const giveData = document.getElementById("giveData");
+        giveData.classList.add("hidden");
+    }
+  </script>
   <body>
-    <div id="uploadWrapper">
-        <h1>File upload: </h1>
-        <div class="uploadDisplayContainer">
-            <form id="uploadFile">
-            <input type="file" id="fileInput" name="filename">
-            </form>
-            <div *ngIf="contents != null" id="dataDisplay">
-                <!-- <p>Data:</p> -->
-                <p id="uploadedContent"></p>
+    <button id="showDataInput" onclick=showInput()>Change Input</button>
+    <div id="giveData" class="hidden">
+        <h1>Data upload: </h1>
+        <div id="uploadWrapper">
+            <div class="uploadDisplayContainer">
+                <form id="uploadFile">
+                <input type="file" id="fileInput" name="filename">
+                </form>
+                <div *ngIf="contents != null" id="dataDisplay">
+                    <!-- <p>Data:</p> -->
+                    <p id="uploadedContent"></p>
+                </div>
             </div>
+            <!-- <input type="text" id="textInput" placeholder=""> -->
+              <div class="form-group">
+                <input type="text" id="full-name" class="form-field" placeholder="Data" required>
+                <label for="full-name" class="form-label">Data</label>
+                <i class="fa-solid fa-x" onclick=closeInput()></i>
+                <div class="question-circle flex">
+                    <span class="tooltiptext">Add Any N-Dimensional Data | Ex: [[2.1, 1.4], [1.1, 4.7]]</span>
+                    <i class="fa-solid fa-question"></i>
+                </div>
+              </div>
         </div>
     </div>
+
     <div id="canvas-container"></div>
     <script defer src="index.dart.js"></script>
   </body>
