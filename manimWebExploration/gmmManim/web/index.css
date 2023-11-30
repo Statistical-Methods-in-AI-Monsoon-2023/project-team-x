@@ -65,11 +65,17 @@ input[type=file]::file-selector-button {
 
 #showDataInput {
     cursor: pointer;
-    position: absolute;
+    pointer-events: auto;
+        /* position: absolute; */
     margin-left: 40px;
     /* bottom: calc(20px / 5vw); */
-    top: calc(130vw * 2/5 - 0vh);
+    /* top: calc(130vw * 2/5 - 0vh); */
     transition: all .2s ease-in-out;
+z-index: 100;
+}
+#showDataInput:hover {
+    cursor: pointer;
+
 }
 input[type=file]::file-selector-button:hover {
     background: #0d45a5;
@@ -110,6 +116,10 @@ input[type=text] {
     backdrop-filter: blur(100px);
         box-shadow: 0 26px 58px 0 rgba(0, 0, 0, .22), 0 5px 14px 0 rgba(0, 0, 0, .18);
         transition: all 0.2s ease-in-out;
+}
+#giveData.hidden {
+    opacity: 0%;
+    transition: all 0.1s ease-in-out;
 }
 #uploadWrapper {
     display: flex;
@@ -253,3 +263,8 @@ label,
     #full-name {
         padding-left: 10px;
     }
+.fa-x {
+    position: absolute;
+    margin-top: -125px;
+    margin-left: 200px;
+}

@@ -10,9 +10,21 @@
     <script src="https://kit.fontawesome.com/f210a1def5.js" crossorigin="anonymous"></script>
 
   </head>
+  <script>
+    function showInput() {
+        const giveData = document.getElementById("giveData");
+        giveData.classList.remove("hidden");
+    }
+    
+    function closeInput() {
+        
+        const giveData = document.getElementById("giveData");
+        giveData.classList.add("hidden");
+    }
+  </script>
   <body>
-    <button id="showDataInput">Change Input</button>
-    <div id="giveData" style="display: none">
+    <button id="showDataInput" onclick=showInput()>Change Input</button>
+    <div id="giveData" class="hidden">
         <h1>Data upload: </h1>
         <div id="uploadWrapper">
             <div class="uploadDisplayContainer">
@@ -28,6 +40,7 @@
               <div class="form-group">
                 <input type="text" id="full-name" class="form-field" placeholder="Data" required>
                 <label for="full-name" class="form-label">Data</label>
+                <i class="fa-solid fa-x" onclick=closeInput()></i>
                 <div class="question-circle flex">
                     <span class="tooltiptext">Add Any N-Dimensional Data | Ex: [[2.1, 1.4], [1.1, 4.7]]</span>
                     <i class="fa-solid fa-question"></i>
