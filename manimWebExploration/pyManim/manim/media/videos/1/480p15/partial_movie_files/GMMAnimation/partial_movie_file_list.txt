@@ -1,0 +1,7 @@
+# This file is used internally by FFMPEG.
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/1121228674_2462099126_3245433291.mp4'
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/3953065503_3089765981_1739693648.mp4'
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/3953065503_451368361_1739693648.mp4'
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/3953065503_3776142745_1739693648.mp4'
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/3953065503_1307633411_1739693648.mp4'
+file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/3953065503_1529287991_1739693648.mp4'
