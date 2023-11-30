@@ -402,32 +402,32 @@ class GaussianScene extends Scene {
   int numDimensions = 2;
   List<double> yRange = [-6, 6];
 
-  // List<List<double>> originalData = [
-  //   [3.3, 3.2],
-  //   [3.1, 3.5],
-  //   [3.7, 3.2],
-  //   [2.1, 2.3],
-  //   [3.1, 2.8],
-  //   [4.5, 5.2],
-  //   [2.1, 3.7],
-  //   [1.3, 1.2],
-  //   [2.2, 2.5],
-  //   [2.3, 2.7],
-  //   [4.5, -4.2],
-  //   [7.1, -4.1],
-  //   [6.2, -3.3],
-  //   [5.5, -2.6],
-  //   [4.3, -2.9],
-  //   [-8.2, -1.1],
-  //   [-5.1, -2.0],
-  //   [-6.2, -1.0],
-  //   [-7.1, 1.0],
-  //   [-6.5, 1.5],
-  //   [-6.2, 1.0],
-  //   [-5.5, 0.8],
-  //   [-7.2, 0.5],
-  //   [-6.4, -0.5],
-  //   [-6.7, -1.2]];
+  List<List<double>> originalData1 = [
+    [3.3, 3.2],
+    [3.1, 3.5],
+    [3.7, 3.2],
+    [2.1, 2.3],
+    [3.1, 2.8],
+    [4.5, 5.2],
+    [2.1, 3.7],
+    [1.3, 1.2],
+    [2.2, 2.5],
+    [2.3, 2.7],
+    [4.5, -4.2],
+    [7.1, -4.1],
+    [6.2, -3.3],
+    [5.5, -2.6],
+    [4.3, -2.9],
+    [-8.2, -1.1],
+    [-5.1, -2.0],
+    [-6.2, -1.0],
+    [-7.1, 1.0],
+    [-6.5, 1.5],
+    [-6.2, 1.0],
+    [-5.5, 0.8],
+    [-7.2, 0.5],
+    [-6.4, -0.5],
+    [-6.7, -1.2]];
 
   // List<l.Matrix> originalData = [
   //   l.Matrix.fromList([
@@ -459,33 +459,35 @@ class GaussianScene extends Scene {
   //   ]),
   // ];
 
-  List<l.Matrix> originalData = [
-    l.Matrix.fromList([[3.3, 3.2]]),
-    l.Matrix.fromList([[3.1, 3.5]]),
-    l.Matrix.fromList([[3.7, 3.2]]),
-    l.Matrix.fromList([[2.1, 2.3]]),
-    l.Matrix.fromList([[3.1, 2.8]]),
-    l.Matrix.fromList([[4.5, 5.2]]),
-    l.Matrix.fromList([[2.1, 3.7]]),
-    l.Matrix.fromList([[1.3, 1.2]]),
-    l.Matrix.fromList([[2.2, 2.5]]),
-    l.Matrix.fromList([[2.3, 2.7]]),
-    l.Matrix.fromList([[4.5, -4.2]]),
-    l.Matrix.fromList([[7.1, -4.1]]),
-    l.Matrix.fromList([[6.2, -3.3]]),
-    l.Matrix.fromList([[5.5, -2.6]]),
-    l.Matrix.fromList([[4.3, -2.9]]),
-    l.Matrix.fromList([[-8.2, -1.1]]),
-    l.Matrix.fromList([[-5.1, -2.0]]),
-    l.Matrix.fromList([[-6.2, -1.0]]),
-    l.Matrix.fromList([[-7.1, 1.0]]),
-    l.Matrix.fromList([[-6.5, 1.5]]),
-    l.Matrix.fromList([[-6.2, 1.0]]),
-    l.Matrix.fromList([[-5.5, 0.8]]),
-    l.Matrix.fromList([[-7.2, 0.5]]),
-    l.Matrix.fromList([[-6.4, -0.5]]),
-    l.Matrix.fromList([[-6.7, -1.2]])
-  ];
+  // late List<l.Matrix> originalData = [
+  //   l.Matrix.fromList([[3.3, 3.2]]),
+  //   l.Matrix.fromList([[3.1, 3.5]]),
+  //   l.Matrix.fromList([[3.7, 3.2]]),
+  //   l.Matrix.fromList([[2.1, 2.3]]),
+  //   l.Matrix.fromList([[3.1, 2.8]]),
+  //   l.Matrix.fromList([[4.5, 5.2]]),
+  //   l.Matrix.fromList([[2.1, 3.7]]),
+  //   l.Matrix.fromList([[1.3, 1.2]]),
+  //   l.Matrix.fromList([[2.2, 2.5]]),
+  //   l.Matrix.fromList([[2.3, 2.7]]),
+  //   l.Matrix.fromList([[4.5, -4.2]]),
+  //   l.Matrix.fromList([[7.1, -4.1]]),
+  //   l.Matrix.fromList([[6.2, -3.3]]),
+  //   l.Matrix.fromList([[5.5, -2.6]]),
+  //   l.Matrix.fromList([[4.3, -2.9]]),
+  //   l.Matrix.fromList([[-8.2, -1.1]]),
+  //   l.Matrix.fromList([[-5.1, -2.0]]),
+  //   l.Matrix.fromList([[-6.2, -1.0]]),
+  //   l.Matrix.fromList([[-7.1, 1.0]]),
+  //   l.Matrix.fromList([[-6.5, 1.5]]),
+  //   l.Matrix.fromList([[-6.2, 1.0]]),
+  //   l.Matrix.fromList([[-5.5, 0.8]]),
+  //   l.Matrix.fromList([[-7.2, 0.5]]),
+  //   l.Matrix.fromList([[-6.4, -0.5]]),
+  //   l.Matrix.fromList([[-6.7, -1.2]])
+  // ];
+
+  late List<l.Matrix> originalData;
 
   late List<l.Matrix> data1;
   late List<l.Matrix> initialMeans;
@@ -619,7 +621,7 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
 
-  void setData(List<List<double>> uploadedData) {
+  List<l.Matrix> normalizeData(List<List<double>> inputData) {
     double inf = 999999990.0;
     List<double> meanValues = [0, 0];
     List<double> minValue = [inf, inf];
@@ -628,12 +630,12 @@ class GaussianScene extends Scene {
     // print("uploaded Data");
     // print(uploadedData);
 
-    for (var i = 0; i < uploadedData.length; i++) {
-      double dataPoint1 = uploadedData[i][0];
-      double dataPoint2 = uploadedData[i][1];
+    for (var i = 0; i < inputData.length; i++) {
+      double dataPoint1 = inputData[i][0];
+      double dataPoint2 = inputData[i][1];
 
-      meanValues[0] += dataPoint1 / uploadedData.length;
-      meanValues[1] += dataPoint2 / uploadedData.length;
+      meanValues[0] += dataPoint1 / inputData.length;
+      meanValues[1] += dataPoint2 / inputData.length;
 
       if (dataPoint1 < minValue[0]) {
         minValue[0] = dataPoint1;
@@ -661,9 +663,9 @@ class GaussianScene extends Scene {
     // print("Diff");
     // print(diff);
 
-    for (var i = 0; i < uploadedData.length; i++) {
-      double dataPoint1 = uploadedData[i][0];
-      double dataPoint2 = uploadedData[i][1];
+    for (var i = 0; i < inputData.length; i++) {
+      double dataPoint1 = inputData[i][0];
+      double dataPoint2 = inputData[i][1];
 
       l.Matrix normalizedDataPoint = l.Matrix.fromList([
         [
@@ -678,6 +680,12 @@ class GaussianScene extends Scene {
       // print((dataPoint2 - meanValues[1]) / diff[1]);
     }
 
+    return normalizedData;
+  }
+
+  void setData(List<List<double>> uploadedData) {
+
+    List<l.Matrix> normalizedData = normalizeData(uploadedData);
     // print("uploaded + normalized data");
     // print(uploadedData);
     // print(normalizedData);
