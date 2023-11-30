@@ -403,44 +403,88 @@ class GaussianScene extends Scene {
   List<double> yRange = [-6, 6];
 
   // List<List<double>> originalData = [
-  //   [-7.3, -7.2],
-  //   [-7.1, -7.0],
-  //   [-7.2, -7.2],
-  //   [-3.0, -1.0],
-  //   [2.0, 2.5],
-  //   [3.1, 3.3],
-  //   [7.7, 7.9],
-  //   [7.9, 9.0]
+  //   [3.3, 3.2],
+  //   [3.1, 3.5],
+  //   [3.7, 3.2],
+  //   [2.1, 2.3],
+  //   [3.1, 2.8],
+  //   [4.5, 5.2],
+  //   [2.1, 3.7],
+  //   [1.3, 1.2],
+  //   [2.2, 2.5],
+  //   [2.3, 2.7],
+  //   [4.5, -4.2],
+  //   [7.1, -4.1],
+  //   [6.2, -3.3],
+  //   [5.5, -2.6],
+  //   [4.3, -2.9],
+  //   [-8.2, -1.1],
+  //   [-5.1, -2.0],
+  //   [-6.2, -1.0],
+  //   [-7.1, 1.0],
+  //   [-6.5, 1.5],
+  //   [-6.2, 1.0],
+  //   [-5.5, 0.8],
+  //   [-7.2, 0.5],
+  //   [-6.4, -0.5],
+  //   [-6.7, -1.2]];
+
+  // List<l.Matrix> originalData = [
+  //   l.Matrix.fromList([
+  //     [1.0, 1.1],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [-7.3, -7.2],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [-7.1, -7.0],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [-7.2, -7.2],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [-3.0, -1.0],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [2.0, 2.5],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [3.1, 3.3],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [7.7, 7.9],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [7.9, 9.0]
+  //   ]),
   // ];
 
   List<l.Matrix> originalData = [
-    l.Matrix.fromList([
-      [1.0, 1.1],
-    ]),
-    l.Matrix.fromList([
-      [-7.3, -7.2],
-    ]),
-    l.Matrix.fromList([
-      [-7.1, -7.0],
-    ]),
-    l.Matrix.fromList([
-      [-7.2, -7.2],
-    ]),
-    l.Matrix.fromList([
-      [-3.0, -1.0],
-    ]),
-    l.Matrix.fromList([
-      [2.0, 2.5],
-    ]),
-    l.Matrix.fromList([
-      [3.1, 3.3],
-    ]),
-    l.Matrix.fromList([
-      [7.7, 7.9],
-    ]),
-    l.Matrix.fromList([
-      [7.9, 9.0]
-    ]),
+    l.Matrix.fromList([[3.3, 3.2]]),
+    l.Matrix.fromList([[3.1, 3.5]]),
+    l.Matrix.fromList([[3.7, 3.2]]),
+    l.Matrix.fromList([[2.1, 2.3]]),
+    l.Matrix.fromList([[3.1, 2.8]]),
+    l.Matrix.fromList([[4.5, 5.2]]),
+    l.Matrix.fromList([[2.1, 3.7]]),
+    l.Matrix.fromList([[1.3, 1.2]]),
+    l.Matrix.fromList([[2.2, 2.5]]),
+    l.Matrix.fromList([[2.3, 2.7]]),
+    l.Matrix.fromList([[4.5, -4.2]]),
+    l.Matrix.fromList([[7.1, -4.1]]),
+    l.Matrix.fromList([[6.2, -3.3]]),
+    l.Matrix.fromList([[5.5, -2.6]]),
+    l.Matrix.fromList([[4.3, -2.9]]),
+    l.Matrix.fromList([[-8.2, -1.1]]),
+    l.Matrix.fromList([[-5.1, -2.0]]),
+    l.Matrix.fromList([[-6.2, -1.0]]),
+    l.Matrix.fromList([[-7.1, 1.0]]),
+    l.Matrix.fromList([[-6.5, 1.5]]),
+    l.Matrix.fromList([[-6.2, 1.0]]),
+    l.Matrix.fromList([[-5.5, 0.8]]),
+    l.Matrix.fromList([[-7.2, 0.5]]),
+    l.Matrix.fromList([[-6.4, -0.5]]),
+    l.Matrix.fromList([[-6.7, -1.2]])
   ];
 
   late List<l.Matrix> data1;

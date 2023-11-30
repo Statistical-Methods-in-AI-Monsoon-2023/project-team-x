@@ -47,9 +47,10 @@ input,
 input[type=file],
 #file-upload-button {
     font-family: var(--font_family);
-    height: 50px;
+    /* height: 50px; */
 }
 
+#showDataInput,
 input[type=file]::file-selector-button {
     margin-right: 10px;
     margin-top: 10px;
@@ -62,16 +63,25 @@ input[type=file]::file-selector-button {
     transition: background .2s ease-in-out;
 }
 
+#showDataInput {
+    cursor: pointer;
+    position: absolute;
+    margin-left: 40px;
+    /* bottom: calc(20px / 5vw); */
+    top: calc(130vw * 2/5 - 0vh);
+    transition: all .2s ease-in-out;
+}
 input[type=file]::file-selector-button:hover {
     background: #0d45a5;
 }
 
 input[type=text] {
-    height: 30px;
+    height: 20px;
     margin-left: 10px;
     margin-top: -5px;
     border: 1px solid black;
-    border-radius: 15px;
+    /* border-radius: 15px; */
+        border-radius: 10px;
     outline: none;
 }
 
@@ -83,19 +93,23 @@ input[type=text] {
 }
 
 #giveData {
-    height: 200px;
+    height: fit-content;
     width: 500px;
+    opacity: 98%;
 
     position: absolute;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 10%;
+        transform: translateX(-50%);
 
     background-color: white;
     color: black;
 
     border-radius: 20px;
     padding: 40px;
+    backdrop-filter: blur(100px);
+        box-shadow: 0 26px 58px 0 rgba(0, 0, 0, .22), 0 5px 14px 0 rgba(0, 0, 0, .18);
+        transition: all 0.2s ease-in-out;
 }
 #uploadWrapper {
     display: flex;
@@ -125,8 +139,8 @@ input[type=text] {
 form {
     width: 80%;
     position: relative;
-    padding: 15px 0 0;
-    margin-top: 10px;
+    padding: 5px 0 0;
+        margin-top: 5px;
 }
 
 .form-group {
@@ -143,7 +157,6 @@ form {
     background: transparent;
     transition: border-color 0.2s;
     box-sizing: border-box;
-    width: 100%;
     margin: 0 0 1em 0;
     border: 1px solid var(--color1);
     background: #eeeeee;
@@ -154,6 +167,7 @@ form {
 input[type="text"],
 input[type="email"] {
     height: calc(3em + 2px);
+    margin-left: 5px;
 }
 
 .form-field::placeholder {
@@ -163,14 +177,15 @@ input[type="email"] {
 .form-field:placeholder-shown~.form-label {
     font-size: 16px;
     cursor: text;
-    top: 20px;
+    top: 25px;
+        left: 30px;
 }
 
 label,
 .form-field:focus~.form-label {
     position: absolute;
     top: 5px;
-    left: 8px;
+    left: 20px;
     display: block;
     transition: 0.2s;
     font-size: 12px;
@@ -191,9 +206,50 @@ label,
 }
 
 .form-field:valid {
-    border-color: green;
+    border-color: #0d45a5;
 }
 
+
 .form-field:valid~.form-label {
-    color: green;
-}
+    color: #0d45a5;
+    }
+    
+    .question-circle {
+        border: 1px solid #9b9b9b;
+        border-radius: 50%;
+    
+        position: absolute;
+        margin-top: -53px;
+        margin-left: 190px;
+    
+        height: 20px;
+        width: 20px;
+    
+        color: #9b9b9b;
+    }
+    
+    /* .fa-question {
+                                                                                                                                                                                                                                                                                                                } */
+    
+    .tooltiptext {
+        visibility: hidden;
+        width: 160px;
+        background-color: #9b9b9b;
+        color: #fff;
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+    
+        margin-bottom: 120px;
+    
+        position: absolute;
+        z-index: 1;
+    }
+    
+    .question-circle:hover .tooltiptext {
+        visibility: visible;
+    }
+    
+    #full-name {
+        padding-left: 10px;
+    }
