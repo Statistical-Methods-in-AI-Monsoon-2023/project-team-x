@@ -1,9 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/2471230883_3869545312_1643185906.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/3839662450_1222152278_1478271599.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/1380816048_243101821_4005609047.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/1302766368_2678102928_2408252708.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/1926985561_3055646127_2408252708.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/1231384393_2230995720_2408252708.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/3526776794_1968758251_2408252708.mp4'
-file 'file:/home/akshat/project-team-x/manimWebExploration/pyManim/manim/media/videos/1/480p15/partial_movie_files/GMMAnimation/2238849694_243101821_1241653826.mp4'
