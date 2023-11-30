@@ -6,7 +6,6 @@ import 'dart:math';
 import 'package:ml_linalg/linalg.dart' as l;
 import 'dart:convert';
 
-
 void main() {
   SingleStringMathTex.texToSVGMap[r'''align*'''] = {};
   SingleStringMathTex.texToSVGMap[r'''center'''] = {};
@@ -377,6 +376,7 @@ class GaussianScene extends Scene {
   String initialComponentsString = 3.toString();
   late int numComponents;
   int maxComponents = 10;
+  bool hasConverged = false;
 
   bool isPlay = false;
   bool isUploaded = false;
@@ -400,57 +400,106 @@ class GaussianScene extends Scene {
   double xRangeBuffer = 2;
 
   int numDimensions = 2;
+  List<double> xRange = [-12, 12]; // Axes stays constant
   List<double> yRange = [-6, 6];
 
-  // List<List<double>> originalData = [
-  //   [-7.3, -7.2],
-  //   [-7.1, -7.0],
-  //   [-7.2, -7.2],
-  //   [-3.0, -1.0],
-  //   [2.0, 2.5],
-  //   [3.1, 3.3],
-  //   [7.7, 7.9],
-  //   [7.9, 9.0]
+  List<List<double>> originalData1 = [
+    [3.3, 3.2],
+    [3.1, 3.5],
+    [3.7, 3.2],
+    [2.1, 2.3],
+    [3.1, 2.8],
+    [4.5, 5.2],
+    [2.1, 3.7],
+    [1.3, 1.2],
+    [2.2, 2.5],
+    [2.3, 2.7],
+    [4.5, -4.2],
+    [7.1, -4.1],
+    [6.2, -3.3],
+    [5.5, -2.6],
+    [4.3, -2.9],
+    [-8.2, -1.1],
+    [-5.1, -2.0],
+    [-6.2, -1.0],
+    [-7.1, 1.0],
+    [-6.5, 1.5],
+    [-6.2, 1.0],
+    [-5.5, 0.8],
+    [-7.2, 0.5],
+    [-6.4, -0.5],
+    [-6.7, -1.2]
+  ];
+
+  // List<l.Matrix> originalData = [
+  //   l.Matrix.fromList([
+  //     [1.0, 1.1],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [-7.3, -7.2],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [-7.1, -7.0],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [-7.2, -7.2],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [-3.0, -1.0],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [2.0, 2.5],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [3.1, 3.3],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [7.7, 7.9],
+  //   ]),
+  //   l.Matrix.fromList([
+  //     [7.9, 9.0]
+  //   ]),
   // ];
 
-  List<l.Matrix> originalData = [
-    l.Matrix.fromList([
-      [1.0, 1.1],
-    ]),
-    l.Matrix.fromList([
-      [-7.3, -7.2],
-    ]),
-    l.Matrix.fromList([
-      [-7.1, -7.0],
-    ]),
-    l.Matrix.fromList([
-      [-7.2, -7.2],
-    ]),
-    l.Matrix.fromList([
-      [-3.0, -1.0],
-    ]),
-    l.Matrix.fromList([
-      [2.0, 2.5],
-    ]),
-    l.Matrix.fromList([
-      [3.1, 3.3],
-    ]),
-    l.Matrix.fromList([
-      [7.7, 7.9],
-    ]),
-    l.Matrix.fromList([
-      [7.9, 9.0]
-    ]),
-  ];
+  // late List<l.Matrix> originalData = [
+  //   l.Matrix.fromList([[3.3, 3.2]]),
+  //   l.Matrix.fromList([[3.1, 3.5]]),
+  //   l.Matrix.fromList([[3.7, 3.2]]),
+  //   l.Matrix.fromList([[2.1, 2.3]]),
+  //   l.Matrix.fromList([[3.1, 2.8]]),
+  //   l.Matrix.fromList([[4.5, 5.2]]),
+  //   l.Matrix.fromList([[2.1, 3.7]]),
+  //   l.Matrix.fromList([[1.3, 1.2]]),
+  //   l.Matrix.fromList([[2.2, 2.5]]),
+  //   l.Matrix.fromList([[2.3, 2.7]]),
+  //   l.Matrix.fromList([[4.5, -4.2]]),
+  //   l.Matrix.fromList([[7.1, -4.1]]),
+  //   l.Matrix.fromList([[6.2, -3.3]]),
+  //   l.Matrix.fromList([[5.5, -2.6]]),
+  //   l.Matrix.fromList([[4.3, -2.9]]),
+  //   l.Matrix.fromList([[-8.2, -1.1]]),
+  //   l.Matrix.fromList([[-5.1, -2.0]]),
+  //   l.Matrix.fromList([[-6.2, -1.0]]),
+  //   l.Matrix.fromList([[-7.1, 1.0]]),
+  //   l.Matrix.fromList([[-6.5, 1.5]]),
+  //   l.Matrix.fromList([[-6.2, 1.0]]),
+  //   l.Matrix.fromList([[-5.5, 0.8]]),
+  //   l.Matrix.fromList([[-7.2, 0.5]]),
+  //   l.Matrix.fromList([[-6.4, -0.5]]),
+  //   l.Matrix.fromList([[-6.7, -1.2]])
+  // ];
+
+  late List<l.Matrix> originalData;
 
   late List<l.Matrix> data1;
   late List<l.Matrix> initialMeans;
   late List<l.Matrix> initialCovs;
 
-  late List<double> xRange;
   late List<double> gammas;
   late Map m;
   late VGroup initialComponentNumber;
+
+  List<List<double>> prevEllipses = [];
 
   @override
   FutureOr<void> preload() {
@@ -493,8 +542,9 @@ class GaussianScene extends Scene {
     m = makeMap();
 
     if (!isUploaded) {
+      originalData = normalizeData(originalData1);
       data1 = originalData;
-      xRange = setXRange(data1);
+      // xRange = setXRange(data1);
       // print(xRange);
       // xRange = [-5, 20];
     }
@@ -511,13 +561,16 @@ class GaussianScene extends Scene {
     ];
     initialCovs = [
       l.Matrix.fromList([
-        [1.5, 0.7], [0.7, 1.2]
+        [1.5, 0.7],
+        [0.7, 1.2]
       ]),
       l.Matrix.fromList([
-        [4.0, -2.0], [1.0, 1.0]
+        [4.0, -2.0],
+        [1.0, 1.0]
       ]),
       l.Matrix.fromList([
-        [4.0, -2.0], [1.0, 1.0]
+        [4.0, -2.0],
+        [1.0, 1.0]
       ])
     ];
     means1 = new List<l.Matrix>.from(initialMeans);
@@ -550,7 +603,7 @@ class GaussianScene extends Scene {
     await play(FadeIn(dots));
     await play(ag);
 
-    AnimationGroup numberDisplayAnimation = createNumberDisplay(means1, covs1);
+    // AnimationGroup numberDisplayAnimation = createNumberDisplay(means1, covs1);
     AnimationGroup fixedComponentDisplayAnimation =
         fixedComponentNumberDisplay();
 
@@ -562,8 +615,10 @@ class GaussianScene extends Scene {
     ]);
 
     // CREATE DISPLAYS
-    await playMany(
-        [numberDisplayAnimation, fixedComponentDisplayAnimation, mainButtons]);
+    await playMany([
+        // numberDisplayAnimation, 
+        fixedComponentDisplayAnimation, 
+        mainButtons]);
 
     // HANDLE INTERACTION
     await continueRendering();
@@ -575,7 +630,7 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
 
-  void setData(List<List<double>> uploadedData) {
+  List<l.Matrix> normalizeData(List<List<double>> inputData) {
     double inf = 999999990.0;
     List<double> meanValues = [0, 0];
     List<double> minValue = [inf, inf];
@@ -584,12 +639,12 @@ class GaussianScene extends Scene {
     // print("uploaded Data");
     // print(uploadedData);
 
-    for (var i = 0; i < uploadedData.length; i++) {
-      double dataPoint1 = uploadedData[i][0];
-      double dataPoint2 = uploadedData[i][1];
+    for (var i = 0; i < inputData.length; i++) {
+      double dataPoint1 = inputData[i][0];
+      double dataPoint2 = inputData[i][1];
 
-      meanValues[0] += dataPoint1 / uploadedData.length;
-      meanValues[1] += dataPoint2 / uploadedData.length;
+      meanValues[0] += dataPoint1 / inputData.length;
+      meanValues[1] += dataPoint2 / inputData.length;
 
       if (dataPoint1 < minValue[0]) {
         minValue[0] = dataPoint1;
@@ -617,9 +672,9 @@ class GaussianScene extends Scene {
     // print("Diff");
     // print(diff);
 
-    for (var i = 0; i < uploadedData.length; i++) {
-      double dataPoint1 = uploadedData[i][0];
-      double dataPoint2 = uploadedData[i][1];
+    for (var i = 0; i < inputData.length; i++) {
+      double dataPoint1 = inputData[i][0];
+      double dataPoint2 = inputData[i][1];
 
       l.Matrix normalizedDataPoint = l.Matrix.fromList([
         [
@@ -634,6 +689,11 @@ class GaussianScene extends Scene {
       // print((dataPoint2 - meanValues[1]) / diff[1]);
     }
 
+    return normalizedData;
+  }
+
+  void setData(List<List<double>> uploadedData) {
+    List<l.Matrix> normalizedData = normalizeData(uploadedData);
     // print("uploaded + normalized data");
     // print(uploadedData);
     // print(normalizedData);
@@ -658,12 +718,13 @@ class GaussianScene extends Scene {
     // GMM Initializations
     weights = initializeWeights(numComponents);
     gmm = GMMND(numComponents, numDimensions, weights, means1, covs1);
-    Axes newAxes = addAxes(xRange);
-    VGroup dots2 = createDotsFromData(newAxes, data1);
+    // Axes newAxes = addAxes(xRange);
+    VGroup dots2 = createDotsFromData(axes, data1);
     // VGroup newGMM = createGMM(means1, covs1, newAxes);
 
-    axes.become(newAxes);
-    dots.become(dots2);
+    // axes.become(newAxes);
+    // dots.become(dots2);
+    await play(Transform(dots, target: dots2));
     // await playMany([
     //   // Transform(axes, target: newAxes),
     //   // Transform(dots, target: dots2),
@@ -712,9 +773,11 @@ class GaussianScene extends Scene {
     covs1 = new List<l.Matrix>.from(gmm.covariances);
 
     nextGMM = makeEllipses(means1, covs1);
-    Animation mcVGAnimation = transformMCDisplay(means1, covs1);
+    // Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
-    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
+    await playMany([Transform(currentGMM, target: nextGMM), 
+    // mcVGAnimation
+    ]);
   }
 
   Future nextGMMIteration() async {
@@ -730,9 +793,11 @@ class GaussianScene extends Scene {
     print(covs1);
 
     nextGMM = makeEllipses(means1, covs1);
-    Animation mcVGAnimation = transformMCDisplay(means1, covs1);
+    // Animation mcVGAnimation = transformMCDisplay(means1, covs1);
 
-    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
+    await playMany([Transform(currentGMM, target: nextGMM), 
+    // mcVGAnimation
+    ]);
   }
 
   Future playGMM() async {
@@ -745,20 +810,17 @@ class GaussianScene extends Scene {
     means1 = new List<l.Matrix>.from(gmm.means);
     covs1 = new List<l.Matrix>.from(gmm.covariances);
 
-    bool hasConverged = isConverged(covs1);
-    // print(means1);
-    // print(covs1);
-    // print("hasConverged");
-    // print(hasConverged);
     if (hasConverged && iteration > 3) {
       state = 0;
       playShape.become(tri);
     }
 
     nextGMM = makeEllipses(means1, covs1);
-    AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
+    // AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
 
-    await playMany([Transform(currentGMM, target: nextGMM), mcVGAnimation]);
+    await playMany([Transform(currentGMM, target: nextGMM), 
+    // mcVGAnimation
+    ]);
   }
 
   void stopUpdater() {
@@ -965,11 +1027,24 @@ class GaussianScene extends Scene {
     ];
 
     List<Ellipse> ellipses = [];
+    print("\nAngles");
+    print(iteration);
+    
+    bool isFirstEllipse = false;
+    if (iteration == 0) {
+      isFirstEllipse = true;
+    }
+
+    bool hasConverged1 = true;
+
     for (var covIndex = 0; covIndex < covs.length; covIndex++) {
       l.Matrix meanMatrix = means[covIndex];
       l.Matrix covarianceMatrix = covs[covIndex];
       l.Vector dominantEigenvector = powerIteration(covarianceMatrix, 1000);
       double angle = atan2(dominantEigenvector[1], dominantEigenvector[0]);
+      if (angle < 0) angle += pi;
+      print("angle");
+      print(angle);
       Map<String, dynamic> result = eigenDecomposition(covarianceMatrix, 1000);
       List<double> eigenvalues = result["eigenvalues"];
 
@@ -978,12 +1053,31 @@ class GaussianScene extends Scene {
         return VGroup(ellipses);
       }
 
-      double semimajorLength = 3 * sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
-      double semiminorLength = 3 * sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
+      double semimajorLength =
+          3 * sqrt(abs(max(eigenvalues[0], eigenvalues[1])));
+      double semiminorLength =
+          3 * sqrt(abs(min(eigenvalues[0], eigenvalues[1])));
 
       // print(covIndex);
       // print(semiminorLength);
       // print(semimajorLength);
+
+      List<double> currentMetrics = [semiminorLength, semimajorLength, meanMatrix[0][0], meanMatrix[0][1]];
+      if (isFirstEllipse) {
+        prevEllipses.add(currentMetrics);
+        hasConverged1 = false;
+      } else {
+        for (var i = 0; i < currentMetrics.length; i++) {
+          if (prevEllipses[covIndex][i] - currentMetrics[i] > 0.2) {
+            hasConverged1 = false;
+            // print("Problem");
+            break;
+          }
+        }
+        prevEllipses[covIndex] = currentMetrics;
+      }
+
+      hasConverged = hasConverged1;
 
       Ellipse e1 = Ellipse(
           height: semiminorLength,
@@ -1183,16 +1277,16 @@ class GaussianScene extends Scene {
     VGroup mVG = initializeListDisplay(meanCopy);
     VGroup cVG = initializeListDisplay(covsCopy, heightOffset: mcTextOffset);
     VGroup mcVG2 = VGroup([mVG, cVG]);
-    MathTex meanText1 = moveMCText(meanText);
-    MathTex varianceText1 = moveMCText(varianceText, offset: 0.6);
+    // MathTex meanText1 = moveMCText(meanText);
+    // MathTex varianceText1 = moveMCText(varianceText, offset: 0.6);
 
     Rectangle mcSurroundingRectangle2 = createMCSurroundingRectangle();
     Animation mcVGAnimation = Transform(mcVG, target: mcVG2);
     Animation mcSurroundingRectangleAnimation =
         Transform(mcSurroundingRectangle, target: mcSurroundingRectangle2);
     AnimationGroup mcVGTextAnimation = AnimationGroup([
-      Transform(meanText, target: meanText1),
-      Transform(varianceText, target: varianceText1)
+      // Transform(meanText, target: meanText1),
+      // Transform(varianceText, target: varianceText1)
     ]);
 
     return AnimationGroup(
@@ -1356,16 +1450,20 @@ class GaussianScene extends Scene {
 
     nextGMM = makeEllipses(means1, covs1);
 
-    Animation transformMCDisplayAnimation = transformMCDisplay(means1, covs1);
+    // Animation transformMCDisplayAnimation = transformMCDisplay(means1, covs1);
     AnimationGroup changeKAnimationGroup;
 
     if (reduceMotion) {
       currentGMM.become(nextGMM);
-      changeKAnimationGroup = AnimationGroup([transformMCDisplayAnimation, xK]);
+      changeKAnimationGroup = AnimationGroup([
+        // transformMCDisplayAnimation, 
+        xK]);
     } else {
       Animation transformGMMs = Transform(currentGMM, target: nextGMM);
       changeKAnimationGroup =
-          AnimationGroup([transformGMMs, transformMCDisplayAnimation, xK]);
+          AnimationGroup([transformGMMs, 
+          // transformMCDisplayAnimation, 
+          xK]);
     }
 
     await play(changeKAnimationGroup);
@@ -1385,9 +1483,11 @@ class GaussianScene extends Scene {
     covs1 = gmm.covariances;
     iteration = 0;
     nextGMM = makeEllipses(means1, covs1);
-    AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
+    // AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
     AnimationGroup resetAnimationGroup = AnimationGroup(
-        [xKAnimation, Transform(currentGMM, target: nextGMM), mcVGAnimation]);
+        [xKAnimation, Transform(currentGMM, target: nextGMM), 
+        // mcVGAnimation
+        ]);
     await play(resetAnimationGroup);
   }
 
