@@ -432,20 +432,10 @@ class GaussianScene extends Scene {
     Tex.preload('9');
   }
 
-  Future showFrame() async {
-    Rectangle frame =
-        Rectangle(height: FRAME_HEIGHT - 0.5, width: FRAME_WIDTH - 0.5)
-          ..toCorner(corner: UL)
-          ..shift(Vector3(-0.2, 0.5, 0.0));
-    frame.fillColors = [TRANSPARENT];
-    await play(ShowCreation(frame));
-  }
-
   @override
   Future construct() async {
     numComponents = initialComponents;
     m = makeMap();
-    await loadingAnimation();
 
     if (!isUploaded) {
       data1 = normalizeData([
@@ -525,6 +515,15 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
+
+  Future showFrame() async {
+    Rectangle frame =
+        Rectangle(height: FRAME_HEIGHT - 0.5, width: FRAME_WIDTH - 0.5)
+          ..toCorner(corner: UL)
+          ..shift(Vector3(-0.2, 0.5, 0.0));
+    frame.fillColors = [TRANSPARENT];
+    await play(ShowCreation(frame));
+  }
 
   List<double> normalizeData(List<double> inputData) {
     double inf = 999999999999.0;
@@ -660,7 +659,7 @@ class GaussianScene extends Scene {
     print(covs1);
     print("hasConverged");
     print(hasConverged);
-    if (hasConverged && iteration > 3) {
+    if (hasConverged && iteration > 3 && iteration < 50) {
       state = 0;
       playShape.become(tri);
     }

@@ -6,6 +6,12 @@ import "dart:math";
 class TestingEllipse extends Scene {
   late Axes axes;
 
+  @override
+  FutureOr<void> preload() {
+    MathTex.preload(r'\Iteration: ');
+
+  }
+
   var colors = [
     BLUE_E,
     YELLOW,
