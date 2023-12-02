@@ -331,6 +331,29 @@ void main() {
   Element contentUpload = document.getElementById("uploadedContent") as Element;
   fileInput.accept = 'text/plain';
 
+  Element submitText = document.getElementById("submit") as Element;
+  TextInputElement textField = document.getElementById("textUpload") as TextInputElement;
+
+  void takeInput(String contents) {
+    print(contents);
+
+    contents = contents.replaceAll(RegExp(r'\s+'), '');
+    List<List<dynamic>> dynamicMatrix =
+        json.decode(contents).cast<List<dynamic>>();
+
+    List<List<double>> matrix =
+        dynamicMatrix.map((list) => List<double>.from(list)).toList();
+
+    contentUpload.setInnerHtml(contents);
+    gs.setData(matrix);
+  }
+
+  submitText.onClick.listen((e) {
+    print(textField.attributes);
+    String contents = textField.innerText;
+    takeInput(contents);
+  });
+
   fileInput.onChange.listen((e) {
     final files = fileInput.files;
     if (files!.length == 1) {
@@ -339,17 +362,7 @@ void main() {
 
       reader.onLoad.listen((e) {
         String contents = reader.result as String;
-        print(contents);
-
-        contents = contents.replaceAll(RegExp(r'\s+'), '');
-        List<List<dynamic>> dynamicMatrix =
-            json.decode(contents).cast<List<dynamic>>();
-
-        List<List<double>> matrix =
-            dynamicMatrix.map((list) => List<double>.from(list)).toList();
-
-        contentUpload.setInnerHtml(contents);
-        gs.setData(matrix);
+        takeInput(contents);
       });
 
       reader.onError.listen((e) {

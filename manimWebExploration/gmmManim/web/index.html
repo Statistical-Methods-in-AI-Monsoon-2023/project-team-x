@@ -41,7 +41,7 @@
         
     }
 
-    window.setTimeout(removeFernImage, 7000);
+    window.setTimeout(removeFernImage, 6500);
   </script>
   <body>
     <img id="fernGif">
@@ -65,12 +65,16 @@
             </div>
             <!-- <input type="text" id="textInput" placeholder=""> -->
               <div class="form-group">
-                <input type="text" id="full-name" class="form-field" placeholder="Data" required>
+                <input type="text" id="textUpload" class="form-field" placeholder="Data" required>
                 <label for="full-name" class="form-label">Data</label>
                 <div class="question-circle flex">
                     <span class="tooltiptext">Add Any N-Dimensional Data | Ex: [[2.1, 1.4], [1.1, 4.7]]</span>
                     <i class="fa-solid fa-question"></i>
 
+                </div>
+
+                <div id="submit" class="flex">
+                    <i class="fa-solid fa-arrow-right" onclick></i>
                 </div>
               </div>
         </div>
