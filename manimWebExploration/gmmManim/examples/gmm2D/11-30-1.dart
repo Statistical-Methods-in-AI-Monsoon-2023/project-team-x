@@ -335,6 +335,11 @@ void main() {
   TextInputElement textField =
       document.getElementById("textUpload") as TextInputElement;
 
+	SelectElement selectingData = document.getElementById("dataOptions") as SelectElement;
+  Element submitOption = document.getElementById("submitOption") as Element;
+
+
+
   void takeInput(String contents) {
     print(contents);
 
@@ -354,6 +359,16 @@ void main() {
     String contents = textField.value.toString();
     takeInput(contents);
   });
+
+  submitOption.onClick.listen((e) {
+	final data = [
+		[]
+	];
+
+	String contents = data[selectingData.selectedIndex!].toString();
+	takeInput(contents);
+  });
+
 
   fileInput.onChange.listen((e) {
     final files = fileInput.files;
