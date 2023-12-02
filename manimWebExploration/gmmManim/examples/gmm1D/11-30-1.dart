@@ -332,6 +332,10 @@ void main() {
   TextInputElement textField =
       document.getElementById("textUpload") as TextInputElement;
 
+  SelectElement selectingData =
+      document.getElementById("dataOptions") as SelectElement;
+  Element submitOption = document.getElementById("submitOption") as Element;
+
   void takeInput(contents) {
     List<String> contents2 = contents.split(",");
     List<double> contents3 = [];
@@ -348,6 +352,54 @@ void main() {
     // print(textField.value);
     String contents = textField.value.toString();
     takeInput(contents);
+  });
+
+  submitOption.onClick.listen((e) {
+    final data = [
+      [
+        3.3,
+        3.1,
+        3.7,
+        2.1,
+        3.1,
+        4.5,
+        2.1,
+        1.3,
+        2.2,
+        2.3,
+        4.5,
+        7.1,
+        6.2,
+        5.5,
+        4.3,
+        -8.2,
+        -5.1,
+        -6.2,
+        -7.1,
+        -6.5,
+        -6.2,
+        -5.5,
+        -7.2,
+        -6.4,
+        -6.7,
+      ],
+      [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 3.3, 2.1, 3.3, 3.2, 3.1, 3.9],
+      [-7.3, -7.1, -7.2, -3.0, 2.0, 3.1, 7.7, 7.9]
+    ];
+
+    List<double> contents = [];
+
+    if (selectingData.options[selectingData.selectedIndex!].value.toString() == "Random") {
+      for (var i = 0; i < 15; i++) {
+        contents.add(Random().nextDouble()*18 - 9);
+      }
+    } else {
+      contents = data[selectingData.selectedIndex!];
+
+    }
+
+    contentUpload.setInnerHtml(contents.toString());
+    gs.setData(contents);
   });
 
   fileInput.onChange.listen((e) {
@@ -528,7 +580,7 @@ class GaussianScene extends Scene {
 
     // TODO: SHOULD MAKE START BUTTON
 
-    // await loadingAnimation();
+    await loadingAnimation();
     // await showFrame();
     await play(FadeIn(axes));
     await play(FadeIn(dots));
@@ -1407,7 +1459,7 @@ class GaussianScene extends Scene {
 
   Future loadingAnimation() async {
     Vector3 loadingAnimationVector = Vector3(0.0, -2.5, 0.0);
-    Circle circle = Circle(radius: 1.0, color: WHITE)
+    Circle circle = Circle(radius: 0.5, color: WHITE)
       ..shift(loadingAnimationVector);
     circle.fillColors = [BLACK];
 

@@ -335,10 +335,9 @@ void main() {
   TextInputElement textField =
       document.getElementById("textUpload") as TextInputElement;
 
-	SelectElement selectingData = document.getElementById("dataOptions") as SelectElement;
+  SelectElement selectingData =
+      document.getElementById("dataOptions") as SelectElement;
   Element submitOption = document.getElementById("submitOption") as Element;
-
-
 
   void takeInput(String contents) {
     print(contents);
@@ -361,14 +360,72 @@ void main() {
   });
 
   submitOption.onClick.listen((e) {
-	final data = [
-		[]
-	];
+    final data = [
+      [
+        [3.3, 3.2],
+        [3.1, 3.5],
+        [3.7, 3.2],
+        [2.1, 2.3],
+        [3.1, 2.8],
+        [4.5, 5.2],
+        [2.1, 3.7],
+        [1.3, 1.2],
+        [2.2, 2.5],
+        [2.3, 2.7],
+        [4.5, -4.2],
+        [7.1, -4.1],
+        [6.2, -3.3],
+        [5.5, -2.6],
+        [4.3, -2.9],
+        [-8.2, -1.1],
+        [-5.1, -2.0],
+        [-6.2, -1.0],
+        [-7.1, 1.0],
+        [-6.5, 1.5],
+        [-6.2, 1.0],
+        [-5.5, 0.8],
+        [-7.2, 0.5],
+        [-6.4, -0.5],
+        [-6.7, -1.2]
+      ],
+      [
+        [3.3, 3.2],
+        [3.1, 3.5],
+        [3.7, 3.2],
+        [2.1, 2.3],
+        [3.1, 2.8],
+        [4.5, 5.2],
+        [2.1, 3.7],
+        [1.3, 1.2],
+        [2.2, 2.5],
+        [2.3, 2.7],
+        [4.5, -4.2],
+        [7.1, -4.1],
+        [6.2, -3.3],
+        [5.5, -2.6],
+        [4.3, -2.9],
+        [-8.2, -1.1],
+        [-5.1, -2.0],
+        [-6.2, -1.0],
+        [-7.1, 1.0],
+        [-6.5, 1.5]
+      ],
+      [
+        [-7.3, -7.2],
+        [-7.1, -7.0],
+        [-7.2, -7.2],
+        [-3.0, -1.0],
+        [2.0, 2.5],
+        [3.1, 3.3],
+        [7.7, 7.9],
+        [7.9, 9.0]
+      ]
+    ];
 
-	String contents = data[selectingData.selectedIndex!].toString();
-	takeInput(contents);
+    List<List<double>> contents = data[selectingData.selectedIndex!];
+    contentUpload.setInnerHtml(contents.toString());
+    gs.setData(contents);
   });
-
 
   fileInput.onChange.listen((e) {
     final files = fileInput.files;
@@ -1687,7 +1744,7 @@ class GaussianScene extends Scene {
 
   Future loadingAnimation() async {
     Vector3 loadingAnimationVector = Vector3(0.0, -2.5, 0.0);
-    Circle circle = Circle(radius: 1.0, color: WHITE)
+    Circle circle = Circle(radius: 0.5, color: WHITE)
       ..shift(loadingAnimationVector);
     circle.fillColors = [BLACK];
 
