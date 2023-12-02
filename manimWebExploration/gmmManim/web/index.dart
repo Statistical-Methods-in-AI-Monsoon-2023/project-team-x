@@ -349,8 +349,8 @@ void main() {
   }
 
   submitText.onClick.listen((e) {
-    print(textField.attributes);
-    String contents = textField.innerText;
+    // print(textField.value);
+    String contents = textField.value.toString();
     takeInput(contents);
   });
 
