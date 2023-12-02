@@ -318,7 +318,6 @@ void main() {
   </g>
   </svg>''';
 
-
   var display = Canvas2DDisplay(document.getElementById('canvas-container')!);
   GaussianScene gs = GaussianScene();
 
@@ -524,7 +523,8 @@ class GaussianScene extends Scene {
     AnimationGroup numberDisplayAnimation = createNumberDisplay(means1, covs1);
     AnimationGroup fixedComponentDisplayAnimation =
         fixedComponentNumberDisplay();
-    AnimationGroup initialIterationAnimations = createInitialIterationAnimation();
+    AnimationGroup initialIterationAnimations =
+        createInitialIterationAnimation();
 
     AnimationGroup mainButtons = AnimationGroup([
       ShowCreation(nextGMMUpdateButton),
@@ -534,13 +534,12 @@ class GaussianScene extends Scene {
     ]);
 
     // CREATE DISPLAYS
-    await playMany(
-        [
-          numberDisplayAnimation, 
-          fixedComponentDisplayAnimation, 
-          mainButtons,
-          initialIterationAnimations,
-          ]);
+    await playMany([
+      numberDisplayAnimation,
+      fixedComponentDisplayAnimation,
+      mainButtons,
+      initialIterationAnimations,
+    ]);
 
     // HANDLE INTERACTION
     await continueRendering();
@@ -560,7 +559,6 @@ class GaussianScene extends Scene {
     frame.fillColors = [TRANSPARENT];
     await play(ShowCreation(frame));
   }
-
 
   List<double> normalizeData(List<double> inputData) {
     double inf = 999999999999.0;
@@ -665,12 +663,11 @@ class GaussianScene extends Scene {
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
     Animation updateIteration = transformIterationAnimation();
 
-
     await playMany([
-      Transform(currentGMM, target: nextGMM), 
+      Transform(currentGMM, target: nextGMM),
       mcVGAnimation,
       updateIteration,
-      ]);
+    ]);
   }
 
   Future nextGMMIteration() async {
@@ -685,11 +682,11 @@ class GaussianScene extends Scene {
     Animation mcVGAnimation = transformMCDisplay(means1, covs1);
     Animation updateIteration = transformIterationAnimation();
 
-    await playMany(
-      [Transform(currentGMM, target: nextGMM), 
+    await playMany([
+      Transform(currentGMM, target: nextGMM),
       mcVGAnimation,
       updateIteration
-      ]);
+    ]);
   }
 
   Future playGMM() async {
@@ -716,12 +713,11 @@ class GaussianScene extends Scene {
     AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
     Animation updateIteration = transformIterationAnimation();
 
-
     await playMany([
-      Transform(currentGMM, target: nextGMM), 
+      Transform(currentGMM, target: nextGMM),
       mcVGAnimation,
       updateIteration,
-      ]);
+    ]);
   }
 
   void stopUpdater() {
@@ -1241,13 +1237,12 @@ class GaussianScene extends Scene {
     AnimationGroup mcVGAnimation = transformMCDisplay(means1, covs1);
     Animation updateIteration = transformIterationAnimation();
 
-    AnimationGroup resetAnimationGroup = AnimationGroup(
-        [
-          xKAnimation, 
-          Transform(currentGMM, target: nextGMM), 
-          mcVGAnimation,
-          updateIteration
-          ]);
+    AnimationGroup resetAnimationGroup = AnimationGroup([
+      xKAnimation,
+      Transform(currentGMM, target: nextGMM),
+      mcVGAnimation,
+      updateIteration
+    ]);
     await play(resetAnimationGroup);
   }
 
@@ -1328,6 +1323,41 @@ class GaussianScene extends Scene {
     return t;
   }
 
+  AnimationGroup createInitialIterationAnimation() {
+    double iterationScale = 0.7;
+    Vector3 iterationScaleVector =
+        Vector3(iterationScale, iterationScale, iterationScale);
+    Vector3 iterationPositionVector =
+        Vector3(1.3, mainButtonsTopOffset - 0.7, 0.0);
+    MathTex initialIteration = MathTex(r"Iteration: ")
+      ..scale(iterationScaleVector)
+      ..toCorner(corner: UL)
+      ..shift(iterationPositionVector - Vector3(1.3, 0.0, 0.0));
+    iterationNumber = VGroup(getNumber(iteration.toString()))
+      ..scale(iterationScaleVector)
+      ..toCorner(corner: UL)
+      ..shift(iterationPositionVector);
+
+    return AnimationGroup(
+        [ShowCreation(initialIteration), ShowCreation(iterationNumber)]);
+  }
+
+  Animation transformIterationAnimation() {
+    double iterationScale = 0.7;
+    Vector3 iterationScaleVector =
+        Vector3(iterationScale, iterationScale, iterationScale);
+    Vector3 iterationPositionVector =
+        Vector3(1.3, mainButtonsTopOffset - 0.7, 0.0);
+
+    VGroup nextIterationNumber = VGroup(getNumber(iteration.toString()))
+      ..scale(iterationScaleVector)
+      ..toCorner(corner: UL)
+      ..shift(iterationPositionVector);
+    Animation iterationAnimation =
+        Transform(iterationNumber, target: nextIterationNumber);
+    return iterationAnimation;
+  }
+
   Future animateNumberChange(double a, double b, Vector3 pos, Map map,
       {int steps: 17,
       double runTime: 0.03,
@@ -1341,8 +1371,8 @@ class GaussianScene extends Scene {
     for (var i = 0; i < steps + 1; i++) {
       currentNumber += step;
       tmp = currentNumber.toStringAsPrecision(digits);
-      List<Tex> t = getNumber(tmp, pos: pos);
-      numbers.add(VGroup(t));
+      VGroup t = VGroup(getNumber(tmp, pos: pos))..center();
+      numbers.add(t);
 
       if (i == 0) {
         initial = numbers[0];
@@ -1359,22 +1389,8 @@ class GaussianScene extends Scene {
     }
   }
 
-  AnimationGroup createInitialIterationAnimation() {
-    MathTex initialIteration = MathTex(r"Iteration: ");
-    iterationNumber = VGroup(getNumber(iteration.toString(), pos: Vector3(1.0, 0.0, 0.0)));
-
-    return AnimationGroup([ShowCreation(initialIteration), ShowCreation(iterationNumber)]);
-  }
-
-  Animation transformIterationAnimation() {
-    VGroup nextIterationNumber = VGroup(getNumber(iteration.toString(), pos: Vector3(1.0, 0.0, 0.0)));
-    Animation iterationAnimation = Transform(iterationNumber, target: nextIterationNumber);
-    return iterationAnimation;
-  }
-
   Future loadingAnimation() async {
-    Circle circle = Circle(radius: 1.0, color: WHITE)
-      ..shift(Vector3(0.1, 0.0, 0.0));
+    Circle circle = Circle(radius: 1.0, color: WHITE);
     circle.fillColors = [BLACK];
     await play(ShowCreation(circle));
     await animateNumberChange(0, 9, ORIGIN, m,
@@ -1382,7 +1398,7 @@ class GaussianScene extends Scene {
     await animateNumberChange(9, 99, ORIGIN, m,
         steps: 90, digits: 2, runTime: 0.025);
 
-    VGroup v100 = VGroup(getNumber("100"));
+    VGroup v100 = VGroup(getNumber("100"))..center();
     this.add([v100]);
     await play(FadeOut(circle));
     await play(FadeOut(v100, lagRatio: 2.0));
