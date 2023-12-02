@@ -1,5 +1,6 @@
+@import url('https://fonts.googleapis.com/css?family=Merriweather');
 :root {
-    --font_family: "Hack Nerd Font";
+    --font_family: Merriweather, "Hack Nerd Font";
     --color1:
 }
 

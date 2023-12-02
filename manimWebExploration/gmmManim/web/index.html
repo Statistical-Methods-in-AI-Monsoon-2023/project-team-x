@@ -4,63 +4,25 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GMM 1D Visualization</title>
+    <title>Document</title>
 
-    <link rel="stylesheet" type="text/css" href="index.css">
-    <script src="https://kit.fontawesome.com/f210a1def5.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather">
 
-  </head>
-  <script>
-    function showInput() {
-        const giveData = document.getElementById("giveData");
-        console.log(giveData);
-        if (giveData.classList.contains("hidden")) {
-            giveData.classList.remove("hidden");
-        } else {
-            giveData.classList.add("hidden");
+
+    <style>
+        head, body {
+            padding: 0px;
+            margin: 0px;
+            background-color: black;
+            color: white;
         }
-    }
-    
-    function closeInput() {
-        
-        const giveData = document.getElementById("giveData");
-        giveData.classList.add("hidden");
-    }
-  </script>
+    </style>
+  </head>
   <body>
-    <div id="title">GMM Interactive Visualization of 1D Data</div>
-    <button class="showDataInput" onclick=showInput()>Change Input</button>
-    <div id="giveData" class="hidden">
-        <button class="showDataInput closeButton flex" onclick=closeInput()>
-            <i class="fa-solid fa-x"></i>
-        </button>
-
-        <h1>Data upload: </h1>
-        <div id="uploadWrapper">
-            <div class="uploadDisplayContainer">
-                <form id="uploadFile">
-                <input type="file" id="fileInput" name="filename">
-                </form>
-                <div *ngIf="contents != null" id="dataDisplay">
-                    <!-- <p>Data:</p> -->
-                    <p id="uploadedContent"></p>
-                </div>
-            </div>
-            <!-- <input type="text" id="textInput" placeholder=""> -->
-              <div class="form-group">
-                <input type="text" id="full-name" class="form-field" placeholder="Data" required>
-                <label for="full-name" class="form-label">Data</label>
-                <div class="question-circle flex">
-                    <span class="tooltiptext">Add Any N-Dimensional Data | Ex: [[2.1, 1.4], [1.1, 4.7]]</span>
-                    <i class="fa-solid fa-question"></i>
-
-                </div>
-              </div>
-        </div>
-    </div>
-
+    hi there
+    HI THERE
+    Hi There
     <div id="canvas-container"></div>
-    <script defer src="index.dart.js"></script>
+    <script src="index.dart.js"></script>
   </body>
 </html>
