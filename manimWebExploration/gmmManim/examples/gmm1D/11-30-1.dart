@@ -389,13 +389,13 @@ void main() {
 
     List<double> contents = [];
 
-    if (selectingData.options[selectingData.selectedIndex!].value.toString() == "Random") {
+    if (selectingData.options[selectingData.selectedIndex!].value.toString() ==
+        "Random") {
       for (var i = 0; i < 15; i++) {
-        contents.add(Random().nextDouble()*18 - 9);
+        contents.add(Random().nextDouble() * 18 - 9);
       }
     } else {
       contents = data[selectingData.selectedIndex!];
-
     }
 
     contentUpload.setInnerHtml(contents.toString());
