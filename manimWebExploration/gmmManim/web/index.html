@@ -28,8 +28,23 @@
         const giveData = document.getElementById("giveData");
         giveData.classList.add("hidden");
     }
+
+    function removeFernImage() {
+        const fernImage = document.getElementById("fernGif");
+        fernImage.remove()
+    }
+
+    
+    window.onload = function() {
+        const fernImage = document.getElementById("fernGif");
+        fernImage.src = "./Fern-4.gif?=" + Math.random();
+        
+    }
+
+    window.setTimeout(removeFernImage, 7000);
   </script>
   <body>
+    <img id="fernGif">
     <div id="title">GMM Interactive Visualization of 1D Data</div>
     <button class="showDataInput" onclick=showInput()>Change Input</button>
     <div id="giveData" class="hidden">

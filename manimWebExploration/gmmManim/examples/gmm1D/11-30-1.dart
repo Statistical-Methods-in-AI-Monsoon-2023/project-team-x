@@ -1371,7 +1371,9 @@ class GaussianScene extends Scene {
     for (var i = 0; i < steps + 1; i++) {
       currentNumber += step;
       tmp = currentNumber.toStringAsPrecision(digits);
-      VGroup t = VGroup(getNumber(tmp, pos: pos))..center();
+      VGroup t = VGroup(getNumber(tmp, pos: pos))
+        ..center()
+        ..shift(pos);
       numbers.add(t);
 
       if (i == 0) {
@@ -1390,18 +1392,23 @@ class GaussianScene extends Scene {
   }
 
   Future loadingAnimation() async {
-    Circle circle = Circle(radius: 1.0, color: WHITE);
+    Vector3 loadingAnimationVector = Vector3(0.0, -2.5, 0.0);
+    Circle circle = Circle(radius: 1.0, color: WHITE)
+      ..shift(loadingAnimationVector);
     circle.fillColors = [BLACK];
-    await play(ShowCreation(circle));
-    await animateNumberChange(0, 9, ORIGIN, m,
-        steps: 9, digits: 1, runTime: 0.025);
-    await animateNumberChange(9, 99, ORIGIN, m,
-        steps: 90, digits: 2, runTime: 0.025);
 
-    VGroup v100 = VGroup(getNumber("100"))..center();
+    await play(ShowCreation(circle));
+    await animateNumberChange(0, 9, loadingAnimationVector, m,
+        steps: 9, digits: 1, runTime: 0.01);
+    await animateNumberChange(9, 99, loadingAnimationVector, m,
+        steps: 90, digits: 2, runTime: 0.015);
+
+    VGroup v100 = VGroup(getNumber("100"))
+      ..center()
+      ..shift(loadingAnimationVector);
     this.add([v100]);
     await play(FadeOut(circle));
-    await play(FadeOut(v100, lagRatio: 2.0));
+    await play(FadeOut(v100, lagRatio: 1.0));
   }
 
   // UTILITY

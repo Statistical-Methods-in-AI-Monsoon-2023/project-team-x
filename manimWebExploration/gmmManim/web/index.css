@@ -301,3 +301,17 @@ label,
     transform: translateX(-50%);
     top: 20px;
 }
+#fernGif {
+    position: absolute;
+    left: 45%;
+    top: 10%;
+    z-index: 5;
+
+    height: auto;
+    width: 150px;
+}
+
+#fernGif.hidden {
+    z-index: -100;
+    opacity: 0%;
+}
