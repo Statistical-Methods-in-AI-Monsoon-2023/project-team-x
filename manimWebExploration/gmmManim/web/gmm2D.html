@@ -8,6 +8,8 @@
 
     <link rel="stylesheet" type="text/css" href="index.css">
     <script src="https://kit.fontawesome.com/f210a1def5.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather">
+
 
   </head>
   <script>
@@ -26,9 +28,24 @@
         const giveData = document.getElementById("giveData");
         giveData.classList.add("hidden");
     }
+
+    function removeFernImage() {
+        const fernImage = document.getElementById("fernGif");
+        fernImage.remove()
+    }
+
+    
+    window.onload = function() {
+        const fernImage = document.getElementById("fernGif");
+        fernImage.src = "./Fern-4.gif?=" + Math.random();
+        
+    }
+
+    window.setTimeout(removeFernImage, 6500);
   </script>
   <body>
-    <div id="title">GMM Interactive Visualization of 1D Data</div>
+    <img id="fernGif">
+    <div id="title">GMM Interactive Visualization of 2D Data</div>
     <button class="showDataInput" onclick=showInput()>Change Input</button>
     <div id="giveData" class="hidden">
         <button class="showDataInput closeButton flex" onclick=closeInput()>
@@ -48,12 +65,16 @@
             </div>
             <!-- <input type="text" id="textInput" placeholder=""> -->
               <div class="form-group">
-                <input type="text" id="full-name" class="form-field" placeholder="Data" required>
+                <input type="text" id="textUpload" class="form-field" placeholder="Data" required>
                 <label for="full-name" class="form-label">Data</label>
                 <div class="question-circle flex">
                     <span class="tooltiptext">Add Any N-Dimensional Data | Ex: [[2.1, 1.4], [1.1, 4.7]]</span>
                     <i class="fa-solid fa-question"></i>
 
+                </div>
+
+                <div id="submit" class="flex">
+                    <i class="fa-solid fa-arrow-right" onclick></i>
                 </div>
               </div>
         </div>

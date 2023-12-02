@@ -328,6 +328,28 @@ void main() {
   Element contentUpload = document.getElementById("uploadedContent") as Element;
   fileInput.accept = 'text/plain';
 
+  Element submitText = document.getElementById("submit") as Element;
+  TextInputElement textField =
+      document.getElementById("textUpload") as TextInputElement;
+
+  void takeInput(contents) {
+    List<String> contents2 = contents.split(",");
+    List<double> contents3 = [];
+    for (var i = 0; i < contents2.length; i++) {
+      contents3.add(double.parse(contents2[i]));
+    }
+
+    contentUpload.setInnerHtml(contents3.toString());
+
+    gs.setData(contents3);
+  }
+
+  submitText.onClick.listen((e) {
+    // print(textField.value);
+    String contents = textField.value.toString();
+    takeInput(contents);
+  });
+
   fileInput.onChange.listen((e) {
     final files = fileInput.files;
     if (files!.length == 1) {
@@ -337,16 +359,8 @@ void main() {
       reader.onLoad.listen((e) {
         final contents = reader.result as String;
         print(contents);
+        takeInput(contents);
 
-        List<String> contents2 = contents.split(",");
-        List<double> contents3 = [];
-        for (var i = 0; i < contents2.length; i++) {
-          contents3.add(double.parse(contents2[i]));
-        }
-
-        contentUpload.setInnerHtml(contents3.toString());
-
-        gs.setData(contents3);
         // var scene = gs..bindDisplay(display);
       });
 

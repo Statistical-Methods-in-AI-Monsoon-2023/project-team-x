@@ -314,10 +314,8 @@ label,
 #fernGif {
     position: absolute;
     left: 43%;
-        top: 30%;
+        top: min(25vh, 25vw);
     z-index: 5;
-
-    transform: translate(0%, -30%);
     height: auto;
     width: 150px;
 }
