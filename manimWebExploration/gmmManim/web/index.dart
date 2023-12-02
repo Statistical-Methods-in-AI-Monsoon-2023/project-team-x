@@ -445,6 +445,7 @@ class GaussianScene extends Scene {
   Future construct() async {
     numComponents = initialComponents;
     m = makeMap();
+    await loadingAnimation();
 
     if (!isUploaded) {
       data1 = normalizeData([

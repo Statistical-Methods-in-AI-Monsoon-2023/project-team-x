@@ -528,15 +528,6 @@ class GaussianScene extends Scene {
     Tex.preload('9');
   }
 
-  Future showFrame() async {
-    Rectangle frame =
-        Rectangle(height: FRAME_HEIGHT - 0.5, width: FRAME_WIDTH - 0.5)
-          ..toCorner(corner: UL)
-          ..shift(Vector3(-0.2, 0.5, 0.0));
-    frame.fillColors = [TRANSPARENT];
-    await play(ShowCreation(frame));
-  }
-
   @override
   Future construct() async {
     numComponents = initialComponents;
@@ -598,7 +589,7 @@ class GaussianScene extends Scene {
 
     // TODO: SHOULD MAKE START BUTTON
 
-    // await loadingAnimation();
+    await loadingAnimation();
     // await showFrame();
     await play(FadeIn(axes));
     await play(FadeIn(dots));
@@ -631,6 +622,16 @@ class GaussianScene extends Scene {
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
   // CONSTRUCTION FUNCTION ENDS HERE
+
+  Future showFrame() async {
+    Rectangle frame =
+        Rectangle(height: FRAME_HEIGHT - 0.5, width: FRAME_WIDTH - 0.5)
+          ..toCorner(corner: UL)
+          ..shift(Vector3(-0.2, 0.5, 0.0));
+    frame.fillColors = [TRANSPARENT];
+    await play(ShowCreation(frame));
+  }
+
 
   List<l.Matrix> normalizeData(List<List<double>> inputData) {
     double inf = 999999990.0;
@@ -1444,9 +1445,12 @@ class GaussianScene extends Scene {
       ]
     ]);
 
+    // l.Matrix randomCov = l.Matrix.fromList([
+    //   [Random().nextDouble() * 5, Random().nextDouble() * 5],
+    //   [Random().nextDouble() * 5, Random().nextDouble() * 5],
     l.Matrix randomCov = l.Matrix.fromList([
-      [Random().nextDouble() * 5, Random().nextDouble() * 5],
-      [Random().nextDouble() * 5, Random().nextDouble() * 5],
+      [1, 0],
+      [0, 1],
     ]);
     means1.add(randomMean);
     covs1.add(randomCov);

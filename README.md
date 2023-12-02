@@ -24,7 +24,6 @@ pub get
 
 and start webdev server using: [NEW PIPELINE]
 
-
 ```
 webdev build
 ```
